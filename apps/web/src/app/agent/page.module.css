@@ -1,0 +1,684 @@
+.shell {
+  min-height: 100vh;
+  background: #f7f8fb;
+  color: #18202f;
+}
+
+.inner {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.backLink {
+  color: #315f89;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.previewPill {
+  border: 1px solid #d59d32;
+  border-radius: 999px;
+  background: #fff6df;
+  color: #67420c;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #456479;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 760px;
+  margin: 0;
+  color: #111827;
+  font-size: 44px;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.description {
+  max-width: 780px;
+  margin: 18px 0 0;
+  color: #485569;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.safetyPanel {
+  border: 1px solid #efb7aa;
+  border-radius: 8px;
+  background: #fff7f5;
+  padding: 18px;
+}
+
+.safetyTitle {
+  margin: 0;
+  color: #8d2f20;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.safetyText {
+  margin: 10px 0 0;
+  color: #643a34;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.section {
+  margin-top: 36px;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #18202f;
+  font-size: 24px;
+  letter-spacing: 0;
+}
+
+.sectionNote {
+  max-width: 620px;
+  margin: 6px 0 0;
+  color: #5a687a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.moduleCard,
+.levelItem,
+.inputPreview,
+.providerPanel,
+.planPreviewCard,
+.planDetailPanel {
+  border: 1px solid #dde3eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.moduleCard {
+  padding: 18px;
+}
+
+.moduleTopLine {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.moduleTitle {
+  margin: 0;
+  color: #1d2735;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.statusBadge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
+
+.boundaryReady {
+  background: #e7f6ef;
+  color: #14623d;
+}
+
+.previewOnly {
+  background: #eef4ff;
+  color: #275287;
+}
+
+.disabled {
+  background: #fbe8e8;
+  color: #8a2c2c;
+}
+
+.notStarted {
+  background: #eceff3;
+  color: #4a5565;
+}
+
+.moduleDescription {
+  margin: 14px 0 0;
+  color: #4e5b6c;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.fact {
+  border-radius: 6px;
+  background: #f2f5f8;
+  padding: 9px;
+}
+
+.factLabel {
+  display: block;
+  color: #69778b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.factValue {
+  display: block;
+  margin-top: 4px;
+  color: #1d2735;
+  font-size: 13px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.notes {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #5c6877;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.notes li + li {
+  margin-top: 6px;
+}
+
+.levelsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.levelItem {
+  padding: 16px;
+}
+
+.levelName {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.levelCode {
+  display: inline-block;
+  margin-top: 8px;
+  border-radius: 6px;
+  background: #f1f3f7;
+  color: #39475a;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 7px;
+}
+
+.levelDescription {
+  margin: 12px 0 0;
+  color: #586678;
+  font-size: 13px;
+  line-height: 1.52;
+}
+
+.taskLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 16px;
+}
+
+.inputPreview {
+  padding: 18px;
+}
+
+.taskForm {
+  display: grid;
+  gap: 12px;
+}
+
+.taskLabel {
+  color: #253246;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.taskTextarea {
+  display: block;
+  width: 100%;
+  min-height: 150px;
+  box-sizing: border-box;
+  border: 1px solid #b9c5d3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18202f;
+  font: inherit;
+  line-height: 1.5;
+  padding: 14px;
+  resize: vertical;
+}
+
+.taskTextarea:focus {
+  border-color: #315f89;
+  box-shadow: 0 0 0 3px #dbeafe;
+  outline: 0;
+}
+
+.disabledTextarea {
+  display: block;
+  width: 100%;
+  min-height: 132px;
+  box-sizing: border-box;
+  border: 1px solid #cdd5df;
+  border-radius: 8px;
+  background: #f4f6f8;
+  color: #667386;
+  font: inherit;
+  line-height: 1.5;
+  padding: 14px;
+  resize: vertical;
+}
+
+.taskActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.previewButton {
+  border: 0;
+  border-radius: 8px;
+  background: #315f89;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  padding: 11px 14px;
+}
+
+.previewButton:hover,
+.previewButton:focus-visible {
+  background: #254a6b;
+}
+
+.disabledButton {
+  border: 0;
+  border-radius: 8px;
+  background: #c9d1dc;
+  color: #596779;
+  cursor: not-allowed;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 11px 14px;
+}
+
+.disabledCopy {
+  margin: 0;
+  color: #656f7f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.providerPanel {
+  padding: 18px;
+}
+
+.providerRows {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.providerRow {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  border-bottom: 1px solid #edf0f4;
+  padding-bottom: 10px;
+}
+
+.providerRow:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.providerLabel {
+  color: #687588;
+  font-size: 13px;
+}
+
+.providerValue {
+  color: #172033;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.planPreviewCard {
+  margin-top: 16px;
+  padding: 20px;
+}
+
+.planHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.planTitle {
+  margin: 0;
+  color: #172033;
+  font-size: 19px;
+  letter-spacing: 0;
+}
+
+.planSummary {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: #4d5b6d;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.riskBadge,
+.stepRisk {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0;
+  padding: 7px 10px;
+  text-transform: uppercase;
+}
+
+.stepRisk {
+  font-size: 11px;
+  padding: 5px 8px;
+}
+
+.riskLow {
+  background: #e7f6ef;
+  color: #14623d;
+}
+
+.riskMedium {
+  background: #fff3cf;
+  color: #6f4a09;
+}
+
+.riskHigh {
+  background: #ffe5d6;
+  color: #8b340f;
+}
+
+.riskCritical {
+  background: #fbe1e6;
+  color: #982035;
+}
+
+.riskUnknown {
+  background: #eceff3;
+  color: #4a5565;
+}
+
+.invalidNotice {
+  margin: 16px 0 0;
+  border: 1px solid #efb7aa;
+  border-radius: 8px;
+  background: #fff7f5;
+  color: #7f2f23;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.5;
+  padding: 12px;
+}
+
+.previewFactsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.previewFact {
+  border-radius: 6px;
+  background: #f2f5f8;
+  padding: 10px;
+}
+
+.planDetailsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.planDetailPanel {
+  padding: 16px;
+}
+
+.detailTitle {
+  margin: 0;
+  color: #1d2735;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.detailSubheading {
+  margin: 14px 0 0;
+  color: #687588;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.inlineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inlineList li {
+  border-radius: 6px;
+  background: #edf3f9;
+  color: #28435e;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 8px;
+}
+
+.emptyList,
+.disabledReason,
+.toolDisabledNote {
+  margin: 12px 0 0;
+  color: #5f6d7f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.toolDisabledNote {
+  color: #7f2f23;
+}
+
+.disabledReason {
+  color: #643a34;
+}
+
+.planBlock {
+  margin-top: 18px;
+}
+
+.stepList {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepItem {
+  border: 1px solid #e2e7ef;
+  border-radius: 8px;
+  background: #fbfcfe;
+  padding: 14px;
+}
+
+.stepTopLine {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.stepTitle {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.stepKind {
+  margin: 5px 0 0;
+  color: #667386;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.stepDescription {
+  margin: 10px 0 0;
+  color: #536174;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.stepFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.stepFacts span {
+  border-radius: 6px;
+  background: #f0f3f7;
+  color: #405066;
+  font-size: 12px;
+  font-weight: 750;
+  padding: 5px 7px;
+}
+
+.safetyNotes {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #5c6877;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.safetyNotes li + li {
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .header,
+  .taskLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .moduleGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .levelsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .previewFactsGrid,
+  .planDetailsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .inner {
+    width: min(100% - 24px, 1120px);
+    padding: 28px 0;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .moduleGrid,
+  .levelsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .facts {
+    grid-template-columns: 1fr;
+  }
+
+  .previewFactsGrid,
+  .planDetailsGrid {
+    grid-template-columns: 1fr;
+  }
+}

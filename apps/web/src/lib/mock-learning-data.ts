@@ -1,0 +1,156 @@
+import type {
+  LearningEvent,
+  RecentProblemAttempt,
+  RecommendationProblem,
+} from "@learning-agent-platform/learning-engine";
+
+export const mockTargetDate = new Date("2026-05-01T00:00:00.000Z");
+
+export const mockLearningEvents: readonly LearningEvent[] = [
+  {
+    id: "event-problem-two-sum",
+    type: "problem_attempt",
+    problemId: "problem-two-sum-map",
+    difficulty: "easy",
+    isCorrect: true,
+    timeSpentSeconds: 720,
+    tags: ["algorithm", "fundamentals"],
+    occurredAt: "2026-04-26T09:10:00.000Z",
+  },
+  {
+    id: "event-reading-state",
+    type: "reading_progress",
+    bookId: "book-web-fundamentals",
+    chapterId: "chapter-state-and-events",
+    progressRatio: 0.72,
+    timeSpentSeconds: 1620,
+    occurredAt: "2026-04-27T14:20:00.000Z",
+  },
+  {
+    id: "event-question-state",
+    type: "chapter_question",
+    bookId: "book-web-fundamentals",
+    chapterId: "chapter-state-and-events",
+    questionLength: 148,
+    answerHelpfulnessRating: 4,
+    occurredAt: "2026-04-27T14:36:00.000Z",
+  },
+  {
+    id: "event-problem-debug-form",
+    type: "problem_attempt",
+    problemId: "problem-debug-form-state",
+    difficulty: "medium",
+    isCorrect: false,
+    timeSpentSeconds: 1320,
+    tags: ["debugging", "bug", "react"],
+    occurredAt: "2026-04-28T19:08:00.000Z",
+  },
+  {
+    id: "event-problem-cache",
+    type: "problem_attempt",
+    problemId: "problem-cache-invalidation",
+    difficulty: "hard",
+    isCorrect: false,
+    timeSpentSeconds: 2100,
+    tags: ["system-design", "architecture"],
+    occurredAt: "2026-04-29T20:15:00.000Z",
+  },
+  {
+    id: "event-reading-async",
+    type: "reading_progress",
+    bookId: "book-web-fundamentals",
+    chapterId: "chapter-async-data",
+    progressRatio: 0.38,
+    timeSpentSeconds: 960,
+    occurredAt: "2026-04-30T11:45:00.000Z",
+  },
+  {
+    id: "event-question-async",
+    type: "chapter_question",
+    bookId: "book-web-fundamentals",
+    chapterId: "chapter-async-data",
+    questionLength: 96,
+    answerHelpfulnessRating: 3,
+    occurredAt: "2026-04-30T12:02:00.000Z",
+  },
+];
+
+export const mockCandidateProblems: readonly RecommendationProblem[] = [
+  {
+    id: "problem-array-window",
+    title: "用滑动窗口统计连续阅读",
+    difficulty: "easy",
+    tags: ["algorithm", "data-structures", "fundamentals"],
+    source: "mock",
+    estimatedMinutes: 18,
+  },
+  {
+    id: "problem-debug-form-state",
+    title: "修复提交后的过期表单状态",
+    difficulty: "medium",
+    tags: ["debugging", "bug", "react"],
+    source: "mock",
+    estimatedMinutes: 24,
+  },
+  {
+    id: "problem-two-sum-map",
+    title: "用查找表解决两数之和",
+    difficulty: "easy",
+    tags: ["algorithm", "hash-map", "fundamentals"],
+    source: "mock",
+    estimatedMinutes: 15,
+  },
+  {
+    id: "problem-cache-invalidation",
+    title: "为章节进度设计缓存失效策略",
+    difficulty: "hard",
+    tags: ["system-design", "architecture", "api-design"],
+    source: "mock",
+    estimatedMinutes: 45,
+  },
+  {
+    id: "problem-async-error-boundary",
+    title: "追踪异步加载问题",
+    difficulty: "medium",
+    tags: ["debugging", "async", "testing"],
+    source: "mock",
+    estimatedMinutes: 30,
+  },
+  {
+    id: "problem-reading-checkpoints",
+    title: "建模阅读检查点",
+    difficulty: "medium",
+    tags: ["fundamentals", "reading", "data-modeling"],
+    source: "mock",
+    estimatedMinutes: 26,
+  },
+  {
+    id: "problem-recursive-outline",
+    title: "构建递归章节大纲",
+    difficulty: "medium",
+    tags: ["algorithm", "recursion", "tree"],
+    source: "mock",
+    estimatedMinutes: 28,
+  },
+  {
+    id: "problem-rate-limit-design",
+    title: "为 AI 提问草拟限流方案",
+    difficulty: "hard",
+    tags: ["system-design", "architecture", "security"],
+    source: "mock",
+    estimatedMinutes: 40,
+  },
+];
+
+export const mockRecentAttempts: readonly RecentProblemAttempt[] = [
+  {
+    problemId: "problem-two-sum-map",
+    attemptedAt: new Date("2026-04-26T09:10:00.000Z"),
+    isCorrect: true,
+  },
+  {
+    problemId: "problem-debug-form-state",
+    attemptedAt: new Date("2026-04-28T19:08:00.000Z"),
+    isCorrect: false,
+  },
+];
