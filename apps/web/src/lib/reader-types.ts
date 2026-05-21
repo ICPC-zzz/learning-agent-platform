@@ -3,7 +3,8 @@ export type ReaderDataSource = "database" | "mock_fallback";
 export type ReaderFallbackReason =
   | "missing_database_url"
   | "no_database_book_found"
-  | "database_read_failed";
+  | "database_read_failed"
+  | "demo_fallback_requested";
 
 export interface ReaderBookView {
   id: string;
@@ -50,6 +51,25 @@ export interface ReaderPageData {
   currentChapter: ReaderChapterView;
   currentChapterChunks: ReaderChunkView[];
 }
+
+export type ReaderPageDataLoadStatus =
+  | "loaded"
+  | "missing_params"
+  | "book_not_found"
+  | "database_unavailable"
+  | "read_failed";
+
+export type ReaderPageDataLoadResult =
+  | {
+      status: "loaded";
+      data: ReaderPageData;
+      message: string;
+    }
+  | {
+      status: Exclude<ReaderPageDataLoadStatus, "loaded">;
+      data: null;
+      message: string;
+    };
 
 export interface MockQaMessage {
   id: string;

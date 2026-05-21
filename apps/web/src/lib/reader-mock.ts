@@ -2,7 +2,7 @@ import { sampleBook } from "./sample-book";
 import type { ReaderFallbackReason, ReaderPageData } from "./reader-types";
 
 export function getReaderDataFromMock(
-  reason: ReaderFallbackReason = "missing_database_url"
+  reason: ReaderFallbackReason = "demo_fallback_requested"
 ): ReaderPageData {
   const currentChapter = sampleBook.chapters[0];
 

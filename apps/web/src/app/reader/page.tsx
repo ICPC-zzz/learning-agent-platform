@@ -1,18 +1,17 @@
-import { AskAiPanel } from "../../components/reader/AskAiPanel";
+import Link from "next/link";
+
+import { AskAiPlaceholder } from "../../components/reader/AskAiPlaceholder";
 import { ChunkList } from "../../components/reader/ChunkList";
 import { ReaderDataSourceNotice } from "../../components/reader/ReaderDataSourceNotice";
 import { ReaderContent } from "../../components/reader/ReaderContent";
-import {
-  getMockReadingProgress,
-  mockAbilityProfile
-} from "../../lib/mock-learning-context";
 import { getReaderPageData } from "../../lib/reader-data";
+import {
+  loadLatestReaderProgressChapterId,
+  loadReaderProgressView,
+} from "../../lib/reader-progress";
 import { ReaderChapterNavigation } from "./components/ReaderChapterNavigation";
 import { ReaderChapterSelectionNotice } from "./components/ReaderChapterSelectionNotice";
-import { ReaderQaHistoryPanel } from "./components/ReaderQaHistoryPanel";
 import { ReadingProgressSaveForm } from "./components/ReadingProgressSaveForm";
-import { getReaderAiRuntimeConfig } from "./reader-ai-runtime-config";
-import { loadReaderQaHistoryForCurrentChapter } from "./reader-qa-history-loader";
 import {
   readReaderSearchQuery,
   resolveReaderChapterSelection,
@@ -25,24 +24,45 @@ interface ReaderPageProps {
 
 export default async function ReaderPage({ searchParams }: ReaderPageProps) {
   const readerQuery = await readReaderSearchQuery(searchParams);
-  const readerData = await getReaderPageData({
-    bookId: readerQuery.bookId
+  const readerDataResult = await getReaderPageData({
+    bookId: readerQuery.bookId,
+    chapterId: readerQuery.chapterId,
   });
+
+  if (readerDataResult.status !== "loaded") {
+    return <ReaderEmptyState message={readerDataResult.message} />;
+  }
+
+  const readerData = readerDataResult.data;
+  const latestSavedChapterId =
+    readerQuery.chapterId === undefined
+      ? await loadLatestReaderProgressChapterId({
+          source: readerData.source,
+          bookId: readerData.book.id,
+          chapterIds: readerData.chapters.map((chapter) => chapter.id),
+        })
+      : null;
   const chapterSelection = resolveReaderChapterSelection({
     chapters: readerData.chapters,
-    fallbackChapterId: readerData.currentChapter.id,
+    fallbackChapterId: latestSavedChapterId ?? readerData.currentChapter.id,
     requestedChapterId: readerQuery.chapterId,
   });
 
-  if (chapterSelection === null) {
+  if (
+    chapterSelection === null ||
+    chapterSelection.status === "invalid_chapter_fallback"
+  ) {
     return (
       <main className="readerPage">
         <header className="readerHeader">
           <div>
-            <p className="eyebrow">阅读器数据库只读边界 MVP</p>
+            <p className="eyebrow">A132 阅读器空状态</p>
             <h1>{readerData.book.title}</h1>
-            <p className="status">未找到可读章节。</p>
+            <p className="status">未找到请求的可读章节。</p>
           </div>
+          <Link className="secondaryLink" href="/books">
+            返回书库
+          </Link>
         </header>
         <ReaderDataSourceNotice
           fallbackReason={readerData.fallbackReason}
@@ -52,8 +72,12 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
           aria-label="阅读器章节选择"
           className="readerDataSourceNotice readerDataSourceNoticeFallback"
         >
-          <span className="readerDataSourceBadge">无章节</span>
-          <p>阅读器数据已加载，但其中没有可读章节。</p>
+          <span className="readerDataSourceBadge">章节不可用</span>
+          <p>
+            请求的 chapterId{" "}
+            <code>{readerQuery.chapterId ?? "未提供"}</code>{" "}
+            未匹配到当前书籍章节。请返回书籍详情页重新选择章节。
+          </p>
         </section>
       </main>
     );
@@ -63,17 +87,11 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
   const currentChapterChunks = readerData.chunks.filter(
     (chunk) => chunk.chapterId === currentChapter.id,
   );
-  const aiRuntimeConfig = getReaderAiRuntimeConfig();
-  const qaHistoryResult = await loadReaderQaHistoryForCurrentChapter({
+  const currentChapterIndex = chapterSelection.currentChapterIndex;
+  const savedProgress = await loadReaderProgressView({
+    source: readerData.source,
     bookId: readerData.book.id,
     chapterId: currentChapter.id,
-    readerDataSource: readerData.source,
-  });
-  const currentChapterIndex = chapterSelection.currentChapterIndex;
-  const readingProgress = getMockReadingProgress({
-    currentChapterIndex,
-    currentChapterChunkCount: currentChapterChunks.length,
-    totalChunkCount: readerData.chunks.length
   });
   const bookSourceLabel = readerData.book.sourceType ?? "未知";
   const lastCurrentChunk =
@@ -83,16 +101,18 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
     <main className="readerPage">
       <header className="readerHeader">
         <div>
-          <p className="eyebrow">阅读器数据库只读边界 MVP</p>
+          <p className="eyebrow">A132 阅读进度恢复</p>
           <h1>{readerData.book.title}</h1>
           <p className="status">
             {readerData.book.author ?? bookSourceLabel} · 来源：{bookSourceLabel}
           </p>
         </div>
-        <p className="readerHeaderNote">
-          此页面在可用时读取本地数据库阅读器数据，并在不可用时回退到静态示例书。
-          数据库模式可以为演示用户保存最小 ReadingProgress 记录；模拟回退保持只读。
-        </p>
+        <Link
+          className="secondaryLink"
+          href={`/books/${encodeURIComponent(readerData.book.id)}`}
+        >
+          返回章节列表
+        </Link>
       </header>
 
       <ReaderDataSourceNotice
@@ -122,26 +142,43 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
             fallbackReason={readerData.fallbackReason}
             lastChunkId={lastCurrentChunk?.id ?? null}
             progressRatio={1}
+            savedProgress={savedProgress}
             source={readerData.source}
             totalChapters={readerData.chapters.length}
           />
-          <AskAiPanel
-            abilityProfile={mockAbilityProfile}
-            initialProviderStatus={aiRuntimeConfig}
-            bookId={readerData.book.id}
+          <AskAiPlaceholder
             bookTitle={readerData.book.title}
-            chapterId={currentChapter.id}
-            chapterText={currentChapter.plainText}
             chapterTitle={currentChapter.title}
-            chunks={currentChapterChunks}
-            readingProgress={readingProgress}
-            readerDataSource={readerData.source}
+            chunkCount={currentChapterChunks.length}
           />
-          <ReaderQaHistoryPanel result={qaHistoryResult} />
         </aside>
       </div>
 
       <ChunkList chunks={currentChapterChunks} />
+    </main>
+  );
+}
+
+function ReaderEmptyState({ message }: { message: string }) {
+  return (
+    <main className="readerPage">
+      <header className="readerHeader">
+        <div>
+          <p className="eyebrow">A132 阅读器空状态</p>
+          <h1>阅读器需要书籍参数</h1>
+          <p className="status">请从书库选择一本书，再从章节列表进入阅读器。</p>
+        </div>
+        <Link className="secondaryLink" href="/books">
+          返回书库
+        </Link>
+      </header>
+      <section
+        aria-label="阅读器参数不可用"
+        className="readerDataSourceNotice readerDataSourceNoticeFallback"
+      >
+        <span className="readerDataSourceBadge">不可阅读</span>
+        <p>{message}</p>
+      </section>
     </main>
   );
 }

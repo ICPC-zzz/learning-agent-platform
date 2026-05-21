@@ -6,6 +6,7 @@ import type {
   ReaderDataSource,
   ReaderFallbackReason,
 } from "../../../lib/reader-types";
+import type { ReaderProgressView } from "../../../lib/reader-progress";
 import {
   saveReaderProgressAction,
   type SaveReaderProgressActionState,
@@ -20,10 +21,13 @@ interface ReadingProgressSaveFormProps {
   currentChapterIndex: number;
   totalChapters: number;
   progressRatio: number;
+  savedProgress: ReaderProgressView;
 }
 
 const disabledMessageByFallbackReason: Record<ReaderFallbackReason, string> = {
   database_read_failed: "进度保存不可用：数据库读取失败。",
+  demo_fallback_requested:
+    "进度保存不可用：当前是演示 fallback 数据。",
   missing_database_url:
     "进度保存不可用：DATABASE_URL 未配置。",
   no_database_book_found:
@@ -39,32 +43,76 @@ export function ReadingProgressSaveForm({
   currentChapterIndex,
   totalChapters,
   progressRatio,
+  savedProgress,
 }: ReadingProgressSaveFormProps) {
   const canSave = source === "database";
-  const progressPercent = Math.round(
+  const chapterPositionPercent = Math.round(
     ((currentChapterIndex + 1) / Math.max(totalChapters, 1)) * 100,
   );
   const initialState: SaveReaderProgressActionState = {
     status: "idle",
-    message: canSave
-      ? "保存只会写入演示用户的 ReadingProgress 记录。"
-      : getDisabledMessage(fallbackReason),
+    message: canSave ? savedProgress.message : getDisabledMessage(fallbackReason),
   };
   const [state, formAction, isPending] = useActionState(
     saveReaderProgressAction,
     initialState,
   );
+  const displayProgressPercent =
+    state.status === "success"
+      ? Math.round(state.progressRatio * 100)
+      : savedProgress.progressPercent;
+  const displayStatusLabel =
+    state.status === "success" ? "已完成" : savedProgress.statusLabel;
+  const displaySavedAt =
+    state.status === "success" ? state.savedAt : savedProgress.lastReadAt;
 
   return (
     <section className="progressPanel" aria-labelledby="progress-title">
       <p className="eyebrow">阅读进度</p>
       <h2 id="progress-title">阅读进度</h2>
       <div className="progressTrack" aria-hidden="true">
-        <div className="progressFill" style={{ width: `${progressPercent}%` }} />
+        <div
+          className="progressFill"
+          style={{ width: `${displayProgressPercent}%` }}
+        />
       </div>
-      <p>
-        当前章节估算进度：{progressPercent}%，按章节位置计算。
-      </p>
+      <dl className="scoreMeta" style={{ marginTop: "12px" }}>
+        <div>
+          <dt>章节状态</dt>
+          <dd>{displayStatusLabel}</dd>
+        </div>
+        <div>
+          <dt>已保存进度</dt>
+          <dd>{displayProgressPercent}%</dd>
+        </div>
+        <div>
+          <dt>章节位置</dt>
+          <dd>
+            第 {currentChapterIndex + 1} 章 / 共 {totalChapters} 章（约{" "}
+            {chapterPositionPercent}%）
+          </dd>
+        </div>
+        <div>
+          <dt>用户边界</dt>
+          <dd>{savedProgress.userLabel}</dd>
+        </div>
+        <div>
+          <dt>数据边界</dt>
+          <dd>
+            {savedProgress.isFallback
+              ? "演示 fallback，只读"
+              : savedProgress.isDemoUser
+                ? "演示用户，不是正式登录系统"
+                : "未启用正式用户系统"}
+          </dd>
+        </div>
+        {displaySavedAt === undefined ? null : (
+          <div>
+            <dt>最近保存</dt>
+            <dd>{displaySavedAt}</dd>
+          </div>
+        )}
+      </dl>
 
       {canSave ? (
         <form action={formAction}>
@@ -78,21 +126,18 @@ export function ReadingProgressSaveForm({
             value={String(progressRatio)}
           />
           <button disabled={isPending} type="submit">
-            {isPending ? "正在保存进度..." : "保存当前章节进度"}
+            {isPending ? "正在保存进度..." : "标记本章已读"}
           </button>
         </form>
       ) : (
         <button disabled type="button">
-          保存当前章节进度
+          标记本章已读
         </button>
       )}
 
       <p aria-live="polite" className="askAiLimit">
         {state.message}
       </p>
-      {state.status === "success" ? (
-        <p className="askAiLimit">最近保存时间：{state.savedAt}。</p>
-      ) : null}
     </section>
   );
 }

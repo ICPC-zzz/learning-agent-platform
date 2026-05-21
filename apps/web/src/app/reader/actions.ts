@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import {
   createReadingProgressUpdateFromReaderState,
   getDatabaseEnvStatus,
@@ -130,6 +132,9 @@ export async function saveReaderProgressAction(
         progressRatio: input.progressRatio,
       }),
     );
+
+    revalidatePath("/reader");
+    revalidatePath(`/books/${input.bookId}`);
 
     return {
       status: "success",
