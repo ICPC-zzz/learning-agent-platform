@@ -217,9 +217,9 @@ function formatProblemAttemptPreviewStatus(
   status: LearningRecommendationProblemAttemptStatusPreview["status"],
 ): string {
   switch (status) {
-    case "loaded":
+    case "attempts_loaded":
       return "已加载";
-    case "empty":
+    case "attempts_empty":
       return "暂无数据";
     case "database_unavailable":
       return "数据库不可用";
