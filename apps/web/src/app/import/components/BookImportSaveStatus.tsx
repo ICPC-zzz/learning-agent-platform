@@ -77,7 +77,7 @@ function formatSaveStatus(
   status: BookImportSaveActionState["status"] | "saving",
 ): string {
   const labels: Record<BookImportSaveActionState["status"] | "saving", string> = {
-    database_saved: "数据库已保存",
+    database_saved: "已保存到开发数据源",
     database_unavailable: "数据库不可用",
     local_preview: "本地预览",
     save_failed: "保存失败",

@@ -5,6 +5,7 @@ import {
 } from "@learning-agent-platform/db";
 import type { BookListItem } from "@learning-agent-platform/db";
 
+import { sampleBook } from "../../lib/sample-book";
 import type {
   BookLibraryItemView,
   BookLibraryLoadResult,
@@ -17,12 +18,9 @@ export async function loadBookLibrary(
   input: { limit?: number } = {},
 ): Promise<BookLibraryLoadResult> {
   if (!hasDatabaseUrl()) {
-    return {
-      status: "database_unavailable",
-      books: [],
-      message:
-        "数据库不可用，因为 DATABASE_URL 未配置。当前环境无法列出已保存书籍。",
-    };
+    return createMockFallbackLibraryResult(
+      "数据库不可用，因为 DATABASE_URL 未配置。当前展示 1 本演示 fallback 书籍，用于验收 books -> reader 最短阅读路径。",
+    );
   }
 
   try {
@@ -32,12 +30,9 @@ export async function loadBookLibrary(
     });
 
     if (books.length === 0) {
-      return {
-        status: "empty",
-        books: [],
-        message:
-          "数据库可用，但暂未找到已保存书籍。",
-      };
+      return createMockFallbackLibraryResult(
+        "数据库可用，但暂未找到已保存书籍。当前展示 1 本演示 fallback 书籍，用于验收章节列表和阅读器路径。",
+      );
     }
 
     return {
@@ -46,12 +41,9 @@ export async function loadBookLibrary(
       message: `已从数据库加载 ${books.length} 本已保存书籍。`,
     };
   } catch {
-    return {
-      status: "read_failed",
-      books: [],
-      message:
-        "无法从数据库读取已保存书籍。书库页面仍可打开，但不会显示数据库数据。",
-    };
+    return createMockFallbackLibraryResult(
+      "无法从数据库读取已保存书籍。当前展示 1 本演示 fallback 书籍；这不是生产数据。",
+    );
   }
 }
 
@@ -64,8 +56,33 @@ function mapBookListItem(book: BookListItem): BookLibraryItemView {
     sourceType: book.sourceType,
     createdAtLabel: formatDateLabel(book.createdAt),
     updatedAtLabel: formatDateLabel(book.updatedAt),
+    summary: "数据库书籍入口：进入详情页后可查看章节列表并选择章节阅读。",
     detailHref: `/books/${encodeURIComponent(book.id)}`,
-    readerHref: `/reader?bookId=${encodeURIComponent(book.id)}`,
+  };
+}
+
+function createMockFallbackLibraryResult(
+  message: string,
+): BookLibraryLoadResult {
+  return {
+    status: "mock_fallback",
+    books: [mapSampleBookListItem()],
+    message,
+  };
+}
+
+function mapSampleBookListItem(): BookLibraryItemView {
+  return {
+    id: sampleBook.document.id,
+    title: sampleBook.document.title,
+    author: sampleBook.document.author ?? undefined,
+    sourceType: "演示数据 / fallback",
+    summary:
+      "演示 fallback 书籍：用于在真实数据库暂无可读数据时验收最小阅读路径。",
+    chapterCount: sampleBook.chapters.length,
+    chunkCount: sampleBook.chunks.length,
+    createdAtLabel: formatDateLabel(sampleBook.document.createdAt),
+    detailHref: `/books/${encodeURIComponent(sampleBook.document.id)}`,
   };
 }
 

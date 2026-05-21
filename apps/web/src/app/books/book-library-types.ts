@@ -11,12 +11,12 @@ export interface BookLibraryItemView {
   author?: string;
   language?: string;
   sourceType?: string;
+  summary?: string;
   chapterCount?: number;
   chunkCount?: number;
   createdAtLabel?: string;
   updatedAtLabel?: string;
   detailHref: string;
-  readerHref: string;
 }
 
 export interface BookLibraryLoadResult {

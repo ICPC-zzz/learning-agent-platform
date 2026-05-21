@@ -104,7 +104,7 @@ export async function saveImportedPlainTextBookAction(
       detailHref: resultLinks.detailHref,
       readerHref: resultLinks.readerHref,
       libraryHref: resultLinks.libraryHref,
-      message: `已将《${importedBook.document.title}》保存到数据库。`,
+      message: `已将《${importedBook.document.title}》保存到当前开发环境数据源。`,
     };
   } catch {
     return {
@@ -199,10 +199,14 @@ function validateSaveFormData(
 
   const sourceMetadata: JsonObject = {
     language: parsedLanguage,
-    saveBoundary: "A24",
+    saveBoundary: "A133",
     source: "plain_text_form",
     previewSource: "server_reimport",
     totalChars: normalizedText.length,
+    chaptering: {
+      fallbackChapterTitle: "正文",
+      strategy: "rule_based_preview_or_single_chapter_fallback",
+    },
     chunking: {
       maxChunkChars: effectiveMaxChunkChars,
       overlapChars: effectiveOverlapChars,
@@ -220,6 +224,9 @@ function validateSaveFormData(
       author: author ?? undefined,
       sourceType: "imported_text",
       sourceMetadata,
+      chapteringOptions: {
+        fallbackChapterTitle: "正文",
+      },
       chunkingOptions,
     },
     language: parsedLanguage,

@@ -12,6 +12,7 @@ import type {
   UserRepository,
 } from "@learning-agent-platform/db";
 
+import { sampleBook } from "../../lib/sample-book";
 import type {
   BookDetailChapterView,
   BookDetailLoadResult,
@@ -44,6 +45,12 @@ export async function loadBookDetail({
   }
 
   if (!hasDatabaseUrl()) {
+    if (isSampleBookId(normalizedBookId)) {
+      return createSampleBookDetailResult(
+        "数据库不可用，因为 DATABASE_URL 未配置。当前展示演示 fallback 书籍详情；这不是生产数据。",
+      );
+    }
+
     return {
       status: "database_unavailable",
       book: null,
@@ -58,6 +65,12 @@ export async function loadBookDetail({
     const readerData = await bookRepository.getBookReaderData(normalizedBookId);
 
     if (readerData === null) {
+      if (isSampleBookId(normalizedBookId)) {
+        return createSampleBookDetailResult(
+          "未找到数据库书籍记录。当前展示演示 fallback 书籍详情；这不是生产数据。",
+        );
+      }
+
       return {
         status: "book_not_found",
         book: null,
@@ -79,6 +92,12 @@ export async function loadBookDetail({
       message: `已从数据库加载元数据、${book.chapterCount} 个章节和 ${book.chunkCount} 个 chunk。`,
     };
   } catch {
+    if (isSampleBookId(normalizedBookId)) {
+      return createSampleBookDetailResult(
+        "无法从数据库读取书籍详情。当前展示演示 fallback 书籍详情；这不是生产数据。",
+      );
+    }
+
     return {
       status: "read_failed",
       book: null,
@@ -132,10 +151,78 @@ function mapBookDetail(
     chapterCount: chapters.length,
     chunkCount: readerData.chunks.length,
     characterCount,
-    readerHref: createReaderHref(bookId),
+    readerHref: createDefaultContinueReaderHref(readerData),
     readingProgress,
     chapters,
   };
+}
+
+function createSampleBookDetailResult(message: string): BookDetailLoadResult {
+  return {
+    status: "mock_fallback",
+    book: mapSampleBookDetail(),
+    message,
+  };
+}
+
+function mapSampleBookDetail(): BookDetailView {
+  const chapters: BookDetailChapterView[] = sampleBook.chapters.map(
+    (chapter) => {
+      const chapterChunks = sampleBook.chunks.filter(
+        (chunk) => chunk.chapterId === chapter.id,
+      );
+
+      return {
+        id: chapter.id,
+        title: chapter.title,
+        orderIndex: chapter.orderIndex,
+        level: chapter.level ?? 1,
+        chunkCount: chapterChunks.length,
+        characterCount: chapterChunks.reduce(
+          (total, chunk) => total + getChunkCharacterCount(chunk.plainText),
+          0,
+        ),
+        readerHref: createReaderHref(sampleBook.document.id, chapter.id),
+      };
+    },
+  );
+  const firstChapter = sampleBook.chapters[0];
+  const readerHref =
+    firstChapter === undefined
+      ? createReaderHref(sampleBook.document.id)
+      : createReaderHref(sampleBook.document.id, firstChapter.id);
+
+  return {
+    id: sampleBook.document.id,
+    title: sampleBook.document.title,
+    author: sampleBook.document.author ?? undefined,
+    description:
+      "这是 Web MVP 的演示 fallback 书籍，仅用于数据库暂无可读内容时验收 books -> reader 最短路径。",
+    sourceType: "演示数据 / fallback",
+    tags: ["演示数据", "fallback", "preview-only"],
+    createdAtLabel: formatDateLabel(sampleBook.document.createdAt),
+    chapterCount: chapters.length,
+    chunkCount: sampleBook.chunks.length,
+    characterCount: sampleBook.chunks.reduce(
+      (total, chunk) => total + getChunkCharacterCount(chunk.plainText),
+      0,
+    ),
+    readerHref,
+    readingProgress: {
+      status: "progress_empty",
+      message:
+        "演示 fallback 书籍不读取也不保存阅读进度；进度保存与恢复留给 A132。",
+      hasSavedProgress: false,
+      completedChapterCount: 0,
+      totalChapterCount: chapters.length,
+      continueReaderHref: readerHref,
+    },
+    chapters,
+  };
+}
+
+function isSampleBookId(bookId: string): boolean {
+  return bookId === sampleBook.document.id;
 }
 
 async function loadBookReadingProgress({

@@ -12,25 +12,22 @@ export default async function BooksPage() {
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">A40 书库数据库只读边界 MVP</p>
-          <h1>书库 / 已保存书籍</h1>
+          <p className="eyebrow">A131 书籍阅读最短路径</p>
+          <h1>书库 / 可阅读入口</h1>
           <p className="status">
-            只读展示已保存书籍列表，并提供直接进入阅读器的链接。
+            展示可进入章节列表的书籍入口；演示 fallback 数据会明确标注。
           </p>
         </div>
         <div className="homeActions">
           <Link className="secondaryLink" href="/">
             返回首页
           </Link>
-          <Link className="primaryLink" href="/import">
-            导入新书
-          </Link>
         </div>
       </header>
 
       <BookLibraryStatus result={result} />
 
-      {result.status === "loaded" ? (
+      {result.books.length > 0 ? (
         <BookLibraryList books={result.books} />
       ) : (
         <BookLibraryEmptyState message={result.message} />

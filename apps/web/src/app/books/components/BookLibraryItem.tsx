@@ -20,14 +20,15 @@ export function BookLibraryItem({ book }: BookLibraryItemProps) {
           </p>
         </div>
         <div className="homeActions">
-          <Link className="secondaryLink" href={book.detailHref}>
-            查看详情
-          </Link>
-          <Link className="primaryLink" href={book.readerHref}>
-            打开阅读器
+          <Link className="primaryLink" href={book.detailHref}>
+            查看章节
           </Link>
         </div>
       </div>
+
+      <p className="panelNote" style={{ marginTop: "12px" }}>
+        {book.summary ?? "进入书籍详情页查看章节列表，并从章节进入阅读器。"}
+      </p>
 
       <dl className="scoreMeta" style={{ marginTop: "14px" }}>
         <SummaryRow label="书籍 ID" value={<code>{book.id}</code>} />

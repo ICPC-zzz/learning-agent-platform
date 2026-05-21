@@ -10,7 +10,7 @@ export function BookLibraryEmptyState({ message }: BookLibraryEmptyStateProps) {
       <strong>暂无可显示的已保存书籍。</strong>
       <p>{message}</p>
       <Link className="secondaryLink" href="/import">
-        导入新书
+        导入第一本书
       </Link>
     </section>
   );

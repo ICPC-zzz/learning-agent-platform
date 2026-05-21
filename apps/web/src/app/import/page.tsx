@@ -7,10 +7,10 @@ export default function ImportPage() {
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">A24 书籍导入数据库保存边界 MVP</p>
-          <h1>书籍导入预览</h1>
+          <p className="eyebrow">A133 文本导入最小闭环</p>
+          <h1>文本导入</h1>
           <p className="status">
-            先生成本地纯文本预览，再按需通过服务端数据库边界保存同一份输入。
+            输入标题和正文，先生成最小预览，再显式保存为可阅读的书籍和章节。
           </p>
         </div>
         <Link className="secondaryLink" href="/">
@@ -24,8 +24,8 @@ export default function ImportPage() {
       >
         <span className="readerDataSourceBadge">本地预览</span>
         <p>
-          预览生成仅在本地页面状态中完成。保存必须显式触发，并通过服务端 action
-          在数据库已配置时只写入 Book、Chapter 和 Chunk 数据。
+          当前仅支持粘贴文本导入。URL 导入和文件导入暂未启用；复杂章节识别仍是
+          preview 边界，不会调用真实 LLM，也不会修改数据库 schema。
         </p>
       </section>
 

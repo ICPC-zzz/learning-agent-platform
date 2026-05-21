@@ -20,6 +20,7 @@ const statusLabels: Record<BookDetailLoadResult["status"], string> = {
   book_not_found: "未找到书籍",
   read_failed: "读取失败",
   unavailable: "不可用",
+  mock_fallback: "演示 fallback",
 };
 
 const progressStatusLabels: Record<
@@ -42,7 +43,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">A42 书籍详情数据库只读边界 MVP</p>
+          <p className="eyebrow">A131 章节列表</p>
           <h1>{result.book?.title ?? "书籍详情"}</h1>
           <p className="status">
             {result.book === null
@@ -58,7 +59,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           </Link>
           {result.book === null ? null : (
             <Link className="primaryLink" href={result.book.readerHref}>
-              打开阅读器
+              阅读第一章
             </Link>
           )}
         </div>
@@ -138,7 +139,7 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
             )}
           </div>
           <Link className="primaryLink" href={book.readerHref}>
-            打开阅读器
+            阅读第一章
           </Link>
         </div>
 
@@ -189,7 +190,7 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
           <p className="eyebrow">章节</p>
           <h2 id="book-chapters-title">章节列表</h2>
           <p className="panelNote">
-            章节行只展示元数据和 chunk 数量。
+            选择任一章节进入阅读器；链接会携带 bookId 和 chapterId。
           </p>
         </div>
         <div className="chunkList" style={{ marginTop: "18px" }}>

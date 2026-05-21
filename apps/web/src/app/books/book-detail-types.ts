@@ -3,7 +3,8 @@ export type BookDetailStatus =
   | "database_unavailable"
   | "book_not_found"
   | "read_failed"
-  | "unavailable";
+  | "unavailable"
+  | "mock_fallback";
 
 export type BookDetailReadingProgressStatus =
   | "progress_saved"
@@ -57,12 +58,12 @@ export interface BookDetailReadingProgressView {
 
 export type BookDetailLoadResult =
   | {
-      status: "loaded";
+      status: "loaded" | "mock_fallback";
       book: BookDetailView;
       message: string;
     }
   | {
-      status: Exclude<BookDetailStatus, "loaded">;
+      status: Exclude<BookDetailStatus, "loaded" | "mock_fallback">;
       book: null;
       message: string;
     };

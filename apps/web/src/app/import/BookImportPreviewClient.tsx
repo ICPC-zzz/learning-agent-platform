@@ -157,9 +157,9 @@ export function BookImportPreviewClient() {
     <div className="dashboardGrid">
       <section className="learningPanel askAiPanel" aria-labelledby="import-form-title">
         <p className="eyebrow">纯文本导入</p>
-        <h2 id="import-form-title">生成本地预览</h2>
+        <h2 id="import-form-title">输入标题和正文</h2>
         <p className="panelNote">
-          在这里粘贴纯文本，并在页面状态中运行 book-engine 导入预览。只有生成预览后才能保存。
+          在这里粘贴正文文本，并在页面状态中生成导入预览。只有确认预览后才能保存。
         </p>
 
         <form onSubmit={handleSubmit} style={{ ...formStackStyle, marginTop: "18px" }}>
@@ -212,11 +212,11 @@ export function BookImportPreviewClient() {
             <textarea
               id={`${formId}-content`}
               onChange={(event) => setContent(event.currentTarget.value)}
-              placeholder="粘贴至少 20 个字符的纯文本。book-engine 可以识别类似“第 1 章”或“Chapter 1”的章节标题。"
+              placeholder="粘贴至少 20 个字符的正文文本。没有检测到标题时会生成一个“正文”章节。"
               value={content}
             />
             <span style={fieldHintStyle}>
-              A24 只支持粘贴的纯文本。这里不会上传文件、抓取 URL、解析 PDF / EPUB / HTML，也不会调用 AI。
+              A133 当前仅支持文本导入。URL 导入和文件导入暂未启用；复杂章节识别仍是 preview，不会调用 AI。
             </span>
           </label>
 
@@ -258,13 +258,14 @@ export function BookImportPreviewClient() {
       </section>
 
       <section className="learningPanel" aria-labelledby="import-boundary-title">
-        <p className="eyebrow">A24 边界</p>
-        <h2 id="import-boundary-title">先预览，再保存</h2>
+        <p className="eyebrow">A133 边界</p>
+        <h2 id="import-boundary-title">文本闭环范围</h2>
         <dl className="scoreMeta">
           <SummaryRow label="数据来源" value="本地预览" />
           <SummaryRow label="初始持久化状态" value="未保存" />
           <SummaryRow label="保存边界" value="服务端 action" />
           <SummaryRow label="数据库写入范围" value="Book / Chapter / Chunk" />
+          <SummaryRow label="章节策略" value="规则式预览；无标题时使用单章节 fallback" />
         </dl>
         <div className="warningBlock">
           <h3>此页面不会执行的操作</h3>
@@ -272,7 +273,7 @@ export function BookImportPreviewClient() {
             <li>不会保存 ReadingProgress、User、Learning、Recommendation 或 AI 数据。</li>
             <li>不会创建 API routes、migration、seed 数据、认证、session 或 cookie。</li>
             <li>不会导入 PDF、EPUB、URL、HTML、上传文件或本地文件。</li>
-            <li>不会调用 AI 或任何真实 LLM。</li>
+            <li>不会做复杂章节解析，也不会调用 AI 或任何真实 LLM。</li>
           </ul>
         </div>
       </section>
@@ -354,6 +355,10 @@ function ImportPreviewResult({
         <SummaryRow
           label="重叠字符数（overlapChars）"
           value={preview.chunkSettings.overlapChars}
+        />
+        <SummaryRow
+          label="解析说明"
+          value="规则式文本预览；未检测到章节标题时会保存为单章节 fallback。"
         />
       </dl>
 
@@ -531,6 +536,9 @@ function validateImportForm(input: {
       author: author.length > 0 ? author : undefined,
       sourceType: "imported_text",
       sourceMetadata,
+      chapteringOptions: {
+        fallbackChapterTitle: "正文",
+      },
       chunkingOptions:
         parsedMaxChunkChars.value !== undefined ||
         parsedOverlapChars.value !== undefined

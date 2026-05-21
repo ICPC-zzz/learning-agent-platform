@@ -37,10 +37,10 @@ export function BookImportSaveButton({ input }: BookImportSaveButtonProps) {
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">A24 保存边界</p>
+          <p className="eyebrow">A133 保存边界</p>
           <h2 id="import-save-title">保存导入结果</h2>
           <p className="panelNote">
-            仅保存最近一次生成预览对应的 Book、Chapter 和 Chunk 数据。
+            仅保存最近一次生成预览对应的 Book、Chapter 和 Chunk 数据；不会保存 URL、文件或 AI 结果。
           </p>
         </div>
         <form action={formAction}>
@@ -59,7 +59,7 @@ export function BookImportSaveButton({ input }: BookImportSaveButtonProps) {
             value={input.overlapChars}
           />
           <button disabled={isPending} type="submit">
-            {isPending ? "保存中..." : "保存到数据库"}
+            {isPending ? "保存中..." : "保存到当前开发环境数据源"}
           </button>
         </form>
       </div>

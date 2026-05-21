@@ -6,8 +6,8 @@
 
 整体模块：
 
-- `apps/web`：编程学习网站，负责书籍阅读、AI 问答、学习进度、题单和 Skill 社区 Web 页面。
-- `apps/desktop`：AI 软件端，负责本地对话、工具调用、任务日志、自主性设置和 Skill 运行。
+- `apps/web`：编程学习网站，负责书籍阅读、AI 问答、学习进度、题单，以及 Skill 相关占位页面或提示。
+- `apps/desktop`：软件端 / Desktop client，负责后续本地对话、工具调用预览、任务日志、自主性设置和安全权限边界。
 - `packages/ai-core`：AI Agent 核心，负责 LLM 调用、记忆、检索、工具、Skill、自主性和 Agent 运行机制。
 - `packages/book-engine`：书籍导入、解析、切分、章节生成和 embedding 准备。
 - `packages/learning-engine`：能力评分、题单推荐、题目生成或选择、学习进度模型。
@@ -21,6 +21,17 @@
 - 学习评分和推荐逻辑集中在 `learning-engine`。
 - 数据结构优先放在 `shared` 或 `db` 约定中，避免多端重复定义。
 - 复杂能力必须先有日志、状态和权限边界，再扩大自动化范围。
+
+## 1.1 当前阶段架构口径（A143）
+
+长期架构仍保留 Skill 生态扩展点，但当前主线只按 **Web 网页端 + 软件端/Desktop** 推进。
+
+- Web 网页端：优先形成书库、导入、阅读器、阅读进度、学习推荐和基础用户/数据流闭环。
+- Desktop：作为后续软件端主线，当前可以是未实现或占位；未来再单独推进本地 Agent、任务面板、安全权限和工具调用预览/执行边界。
+- Agent：当前以 preview-only / mock-only / disabled-by-default 方式存在，不代表真实 provider、真实工具执行或真实 Agent loop。
+- Skill 社区：当前仅为 placeholder / scaffold only，不要求近期实现完整社区链路，不作为当前阶段核心路线。
+
+不要删除 Skill scaffold，也不要在当前阶段扩展完整社区上传、下载、安装、评分、版本发布或真实执行链路。
 
 ## 2. 推荐技术栈
 
@@ -44,7 +55,7 @@
 - 书籍库、阅读器、章节页面和导入入口。
 - 当前章节 AI 问答界面。
 - 学习进度、能力分数和每日题单展示。
-- Skill 社区浏览、详情和安装确认界面。
+- Skill 相关占位或未来入口；当前不实现完整 Skill 社区浏览、详情和安装确认链路。
 
 不应承担：
 
@@ -61,8 +72,8 @@
 - `src/features/reader`：阅读器、章节导航、选中文本提问。
 - `src/features/tutor`：学习问答、上下文展示、回答状态。
 - `src/features/problems`：每日题单、答题结果、错题回顾。
-- `src/features/skills`：Skill 浏览、安装、运行入口。
-- `src/features/community`：社区 Skill 列表和详情。
+- `src/features/skills`：Skill 占位、manifest 预览或未来扩展入口。
+- `src/features/community`：社区 Skill 未来扩展入口；当前不作为近期主线。
 - `src/features/agent`：Web 侧 Agent 状态入口。
 - `src/lib`：Web 端 API client、状态管理和轻量工具。
 
@@ -73,7 +84,7 @@
 - AI 软件端主入口。
 - 对话 UI、任务执行面板、工具调用日志。
 - 自主性设置页面。
-- 本地 Skill 管理、运行和审查。
+- 本地 Skill 管理、运行和审查的未来扩展点；当前仍应保持 disabled-by-default。
 - 与本地后端或系统能力交互。
 
 不应承担：
@@ -87,7 +98,7 @@
 - 对话会话管理。
 - 后台任务状态展示。
 - 工具调用确认弹窗。
-- Skill 安装审查。
+- Skill 安装审查的占位或未来扩展。
 - 记忆摘要和检索结果的可解释展示。
 
 ## 5. packages/ai-core
@@ -130,8 +141,8 @@
 职责：
 
 - 定义 Skill manifest。
-- 加载、校验、安装和运行 Skill。
-- 记录 Skill 运行日志。
+- 加载、校验、安装审查和运行相关 scaffold。
+- 当前不代表真实 Skill 社区、真实安装、真实执行或社区分发。
 
 ### 5.6 autonomy
 
@@ -339,6 +350,8 @@ Skill 草案必须包含：
 
 ## 16. Skill 执行流程
 
+当前阶段本流程仅作为长期架构设计与安全边界参考。A143 后 Skill 社区仅保留 placeholder / scaffold only，不要求近期实现完整执行链路。
+
 1. 用户手动触发 Skill，或系统提出运行建议。
 2. 读取 Skill manifest 和用户授权记录。
 3. 检查所需工具是否可用。
@@ -411,3 +424,5 @@ Skill 草案必须包含：
 10. 做社区 Skill 安装审查。
 
 每一步都必须有明确验收标准，不能跨太多模块同时开发。
+
+A143 起，近期落地顺序优先停留在 Web MVP 与 Desktop 最小骨架；第 8-10 步仅保留为未来方向，不驱动当前主线任务。
