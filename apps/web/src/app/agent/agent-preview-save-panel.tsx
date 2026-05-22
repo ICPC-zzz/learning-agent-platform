@@ -90,15 +90,15 @@ export function AgentPreviewSavePanel({
       <div className={styles.previewFactsGrid}>
         <SaveFact label="保存状态" value={formatStatus(status)} />
         <SaveFact
-          label="previewOnly"
+          label="预览标记 (previewOnly)"
           value={String(result?.previewOnly ?? true)}
         />
         <SaveFact
-          label="executable"
+          label="可执行标记 (executable)"
           value={String(result?.executable ?? false)}
         />
         <SaveFact
-          label="realExecutionEnabled"
+          label="真实执行启用标记 (realExecutionEnabled)"
           value={String(result?.realExecutionEnabled ?? false)}
         />
       </div>
@@ -141,10 +141,13 @@ function SaveResultDetails({
       <div className={styles.previewFactsGrid}>
         <SaveFact label="已保存任务 ID" value={result.savedTaskId ?? "无"} />
         <SaveFact
-          label="snapshotSaved"
+          label="快照预览记录保存标记 (snapshotSaved)"
           value={String(result.snapshotSaved)}
         />
-        <SaveFact label="eventSaved" value={String(result.eventSaved)} />
+        <SaveFact
+          label="事件预览记录保存标记 (eventSaved)"
+          value={String(result.eventSaved)}
+        />
         <SaveFact
           label="错误分类"
           value={result.errorCategory ?? "无"}
@@ -158,28 +161,34 @@ function SaveResultDetails({
       )}
       <div className={styles.previewFactsGrid}>
         <SaveFact
-          label="toolsExecuted"
+          label="工具已执行标记 (toolsExecuted)"
           value={String(result.toolsExecuted)}
         />
-        <SaveFact label="llmCalled" value={String(result.llmCalled)} />
-        <SaveFact label="networkUsed" value={String(result.networkUsed)} />
         <SaveFact
-          label="memoryRetrievalExecuted"
+          label="模型已调用标记 (llmCalled)"
+          value={String(result.llmCalled)}
+        />
+        <SaveFact
+          label="网络已使用标记 (networkUsed)"
+          value={String(result.networkUsed)}
+        />
+        <SaveFact
+          label="记忆检索已执行标记 (memoryRetrievalExecuted)"
           value={String(result.memoryRetrievalExecuted)}
         />
       </div>
       <div className={styles.previewFactsGrid}>
         <SaveFact
-          label="embeddingsUsed"
+          label="embedding 已使用标记 (embeddingsUsed)"
           value={String(result.embeddingsUsed)}
         />
         <SaveFact
-          label="vectorSearchUsed"
+          label="向量搜索已使用标记 (vectorSearchUsed)"
           value={String(result.vectorSearchUsed)}
         />
-        <SaveFact label="ragUsed" value={String(result.ragUsed)} />
+        <SaveFact label="RAG 已使用标记 (ragUsed)" value={String(result.ragUsed)} />
         <SaveFact
-          label="skillExecuted"
+          label="Skill 已执行标记 (skillExecuted)"
           value={String(result.skillExecuted)}
         />
       </div>

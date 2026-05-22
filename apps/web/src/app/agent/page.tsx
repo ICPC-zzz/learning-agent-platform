@@ -95,81 +95,81 @@ const previewAvailableTools = [
     name: "file_read",
     description:
       "读取文件的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.FileRead,
+    category: AgentToolRequirementCategory.FileRead,
     riskLevel: AutonomyRiskLevel.Low,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "file_write",
     description:
       "创建或修改文件的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.FileWrite,
+    category: AgentToolRequirementCategory.FileWrite,
     riskLevel: AutonomyRiskLevel.Medium,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "shell_command",
     description:
       "shell 或终端命令的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.ShellCommand,
+    category: AgentToolRequirementCategory.ShellCommand,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "web_request",
     description:
       "浏览器、HTTP、API 或网络访问的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.WebRequest,
+    category: AgentToolRequirementCategory.WebRequest,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "database_read",
     description:
       "数据库读取访问的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.DatabaseRead,
+    category: AgentToolRequirementCategory.DatabaseRead,
     riskLevel: AutonomyRiskLevel.Medium,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "database_write",
     description:
       "数据库写入或迁移的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.DatabaseWrite,
+    category: AgentToolRequirementCategory.DatabaseWrite,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "email_send",
     description:
       "发送邮件的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.EmailSend,
+    category: AgentToolRequirementCategory.EmailSend,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "calendar_write",
     description:
       "创建或修改日历事件的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.CalendarWrite,
+    category: AgentToolRequirementCategory.CalendarWrite,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
   {
     name: "skill_install",
     description:
       "Skill 安装审查的预览元数据。当前已禁用且不可执行。",
-    类别： AgentToolRequirementCategory.SkillInstall,
+    category: AgentToolRequirementCategory.SkillInstall,
     riskLevel: AutonomyRiskLevel.High,
-    需要确认: true,
+    requiresConfirmation: true,
     enabled: false,
   },
 ] satisfies readonly AgentAvailableToolMetadata[];
@@ -184,7 +184,7 @@ const previewSkillManifests = [
     status: SkillStatus.Disabled,
     riskLevel: SkillRiskLevel.Low,
     requiredAutonomyLevel: AutonomyLevel.Manual,
-    需要Tools: [
+    requiredTools: [
       {
         toolName: "file_read",
         isRequired: true,
@@ -212,7 +212,7 @@ const previewSkillManifests = [
     status: SkillStatus.Disabled,
     riskLevel: SkillRiskLevel.Medium,
     requiredAutonomyLevel: AutonomyLevel.ConfirmTools,
-    需要Tools: [
+    requiredTools: [
       {
         toolName: "file_read",
         isRequired: true,
@@ -246,7 +246,7 @@ const previewSkillManifests = [
     status: SkillStatus.Disabled,
     riskLevel: SkillRiskLevel.High,
     requiredAutonomyLevel: AutonomyLevel.Supervised,
-    需要Tools: [
+    requiredTools: [
       {
         toolName: "shell_command",
         isRequired: true,
@@ -273,7 +273,7 @@ const previewSkillManifests = [
     status: SkillStatus.Disabled,
     riskLevel: SkillRiskLevel.Low,
     requiredAutonomyLevel: AutonomyLevel.Manual,
-    需要Tools: [],
+    requiredTools: [],
     safetyNotes: [
       "仅预览 Skill manifest。",
       "该页面不会生成或执行学习总结 Skill。",
@@ -599,7 +599,7 @@ export default async function AgentWorkspacePage({
                   defaultValue={taskText}
                   id="agent-task"
                   name="task"
-                  placeholder="示例：总结这个任务、检查文件，或运行 shell 命令"
+                  placeholder="示例：总结任务、模拟检查文件需求，或预览 shell 命令风险"
                   rows={6}
                 />
                 <div className={styles.taskActions}>
@@ -628,7 +628,10 @@ export default async function AgentWorkspacePage({
                   label="运行时"
                   value={llmProviderPreviewStatus.runtimeStatus}
                 />
-                <ProviderRow label="真实 AI" value={llmProviderPreviewStatus.realAi} />
+                <ProviderRow
+                  label="真实模型调用"
+                  value={llmProviderPreviewStatus.realAi}
+                />
                 <ProviderRow label="网络" value={llmProviderPreviewStatus.network} />
                 <ProviderRow
                   label="禁用原因"
@@ -670,7 +673,7 @@ function ExecutionReadinessPreviewCard({
   preview: AgentExecutionReadinessPreview;
 }) {
   const riskBadgeClassName = `${styles.riskBadge} ${getReadinessRiskClassName(
-    preview.整体风险等级,
+    preview.overallRiskLevel,
   )}`;
 
   return (
@@ -684,14 +687,14 @@ function ExecutionReadinessPreviewCard({
           <p className={styles.planSummary}>{preview.taskSummary}</p>
         </div>
         <span className={riskBadgeClassName}>
-          整体风险： {preview.整体风险等级}
+          整体风险： {preview.overallRiskLevel}
         </span>
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact label="就绪状态" value={preview.readinessStatus} />
-        <PreviewFact label="执行状态" value={preview.执行状态} />
-        <PreviewFact label="可执行" value={String(preview.可执行)} />
+        <PreviewFact label="执行状态" value={preview.executionStatus} />
+        <PreviewFact label="可执行" value={String(preview.executable)} />
         <PreviewFact
           label="真实执行启用"
           value={String(preview.realExecutionEnabled)}
@@ -714,17 +717,17 @@ function ExecutionReadinessPreviewCard({
       <div className={styles.previewFactsGrid}>
         <PreviewFact
           label="工具已执行"
-          value={String(preview.工具已执行)}
+          value={String(preview.toolsExecuted)}
         />
-        <PreviewFact label="模型已调用" value={String(preview.模型已调用)} />
-        <PreviewFact label="网络已使用" value={String(preview.network已使用)} />
-        <PreviewFact label="数据已保存" value={String(preview.数据已保存)} />
+        <PreviewFact label="模型已调用" value={String(preview.llmCalled)} />
+        <PreviewFact label="网络已使用" value={String(preview.networkUsed)} />
+        <PreviewFact label="数据已保存" value={String(preview.dataSaved)} />
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact
           label="记忆检索已执行"
-          value={String(preview.记忆检索已执行)}
+          value={String(preview.memoryRetrievalExecuted)}
         />
         <PreviewFact
           label="阻断项"
@@ -758,11 +761,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="有效"
-              value={String(preview.planReadiness.有效)}
+              value={String(preview.planReadiness.isValid)}
             />
             <ProviderRow
               label="步骤数量"
-              value={String(preview.planReadiness.步骤数量)}
+              value={String(preview.planReadiness.stepCount)}
             />
             <ProviderRow
               label="估计风险等级"
@@ -774,11 +777,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="可执行"
-              value={String(preview.planReadiness.可执行)}
+              value={String(preview.planReadiness.executable)}
             />
             <ProviderRow
               label="执行状态"
-              value={preview.planReadiness.执行状态}
+              value={preview.planReadiness.executionStatus}
             />
           </div>
           <p className={styles.disabledReason}>
@@ -803,11 +806,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="需求数量"
-              value={String(preview.toolReadiness.需求数量)}
+              value={String(preview.toolReadiness.requirementCount)}
             />
             <ProviderRow
               label="已阻断需求数"
-              value={String(preview.toolReadiness.已阻断需求数)}
+              value={String(preview.toolReadiness.blockedRequirementCount)}
             />
             <ProviderRow
               label="需要确认数量"
@@ -815,25 +818,25 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="未解决需求数"
-              value={String(preview.toolReadiness.未解决需求数)}
+              value={String(preview.toolReadiness.unresolvedRequirementCount)}
             />
             <ProviderRow
               label="缺失工具需求数"
-              value={String(preview.toolReadiness.缺失工具需求数)}
+              value={String(preview.toolReadiness.missingToolRequirementCount)}
             />
             <ProviderRow
               label="可执行"
-              value={String(preview.toolReadiness.可执行)}
+              value={String(preview.toolReadiness.executable)}
             />
             <ProviderRow
               label="执行状态"
-              value={preview.toolReadiness.执行状态}
+              value={preview.toolReadiness.executionStatus}
             />
           </div>
           <p className={styles.detailSubheading}>所需工具名称</p>
           <PreviewList
             emptyLabel="就绪预览中没有所需工具名称。"
-            items={preview.toolReadiness.需要ToolNames}
+            items={preview.toolReadiness.requiredToolNames}
           />
           <p className={styles.disabledReason}>
             禁用原因： {preview.toolReadiness.disabledReason ?? "无"}
@@ -859,11 +862,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="匹配 Skill 数量"
-              value={String(preview.skillReadiness.匹配 Skill 数量)}
+              value={String(preview.skillReadiness.matchedSkillCount)}
             />
             <ProviderRow
               label="已阻断建议数"
-              value={String(preview.skillReadiness.已阻断建议数)}
+              value={String(preview.skillReadiness.blockedSuggestionCount)}
             />
             <ProviderRow
               label="需要确认数量"
@@ -875,11 +878,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="可执行"
-              value={String(preview.skillReadiness.可执行)}
+              value={String(preview.skillReadiness.executable)}
             />
             <ProviderRow
               label="执行状态"
-              value={preview.skillReadiness.执行状态}
+              value={preview.skillReadiness.executionStatus}
             />
           </div>
           <p className={styles.detailSubheading}>候选 Skill 名称</p>
@@ -909,39 +912,39 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="候选记忆数量"
-              value={String(preview.memoryReadiness.候选记忆数量)}
+              value={String(preview.memoryReadiness.candidateMemoryCount)}
             />
             <ProviderRow
               label="已选择记忆数量"
-              value={String(preview.memoryReadiness.已选择记忆数量)}
+              value={String(preview.memoryReadiness.selectedMemoryCount)}
             />
             <ProviderRow
               label="上下文块数量"
-              value={String(preview.memoryReadiness.上下文块数量)}
+              value={String(preview.memoryReadiness.contextBlockCount)}
             />
             <ProviderRow
               label="需要记忆上下文"
-              value={String(preview.memoryReadiness.需要记忆上下文)}
+              value={String(preview.memoryReadiness.requireMemoryContext)}
             />
             <ProviderRow
               label="检索已执行"
-              value={String(preview.memoryReadiness.检索已执行)}
+              value={String(preview.memoryReadiness.retrievalExecuted)}
             />
             <ProviderRow
               label="已使用 embedding"
-              value={String(preview.memoryReadiness.已使用 embedding)}
+              value={String(preview.memoryReadiness.embeddingUsed)}
             />
             <ProviderRow
               label="已使用模型"
-              value={String(preview.memoryReadiness.已使用模型)}
+              value={String(preview.memoryReadiness.llmUsed)}
             />
             <ProviderRow
               label="可执行"
-              value={String(preview.memoryReadiness.可执行)}
+              value={String(preview.memoryReadiness.executable)}
             />
             <ProviderRow
               label="执行状态"
-              value={preview.memoryReadiness.执行状态}
+              value={preview.memoryReadiness.executionStatus}
             />
           </div>
           <p className={styles.disabledReason}>
@@ -964,7 +967,7 @@ function ExecutionReadinessPreviewCard({
           <div className={styles.providerRows}>
             <ProviderRow
               label="整体风险等级"
-              value={preview.riskSummary.整体风险等级}
+              value={preview.riskSummary.overallRiskLevel}
             />
             <ProviderRow
               label="计划风险等级"
@@ -984,11 +987,11 @@ function ExecutionReadinessPreviewCard({
             />
             <ProviderRow
               label="检测到严重风险"
-              value={String(preview.riskSummary.检测到严重风险)}
+              value={String(preview.riskSummary.criticalRiskDetected)}
             />
             <ProviderRow
               label="检测到高风险"
-              value={String(preview.riskSummary.检测到高风险)}
+              value={String(preview.riskSummary.highRiskDetected)}
             />
             <ProviderRow
               label="检测到未知风险"
@@ -1111,7 +1114,7 @@ function ExecutionReadinessPreviewCard({
         aria-labelledby="execution-next-actions"
       >
         <h4 className={styles.detailTitle} id="execution-next-actions">
-          recommendedNextActions
+          推荐下一步
         </h4>
         <PreviewList
           emptyLabel="未报告推荐下一步。"
@@ -1311,7 +1314,7 @@ function ReadinessMissingRequirementList({
               <p className={styles.stepKind}>来源： {requirement.source}</p>
             </div>
             <span className={`${styles.stepRisk} ${styles.disabled}`}>
-              需要：{String(requirement.需要)}
+              需要：{String(requirement.required)}
             </span>
           </div>
           <p className={styles.stepDescription}>{requirement.message}</p>
@@ -1408,18 +1411,18 @@ function MemoryContextPreviewCard({
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact label="上下文状态" value={preview.contextStatus} />
-        <PreviewFact label="执行状态" value={preview.执行状态} />
-        <PreviewFact label="可执行" value={String(preview.可执行)} />
+        <PreviewFact label="执行状态" value={preview.executionStatus} />
+        <PreviewFact label="可执行" value={String(preview.executable)} />
         <PreviewFact
           label="候选记忆数量"
-          value={String(preview.候选记忆数量)}
+          value={String(preview.candidateMemoryCount)}
         />
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact
           label="已选记忆数量"
-          value={String(preview.已选择记忆数量)}
+          value={String(preview.selectedMemoryCount)}
         />
         <PreviewFact
           label="上下文字数"
@@ -1428,16 +1431,16 @@ function MemoryContextPreviewCard({
         <PreviewFact label="已截断" value={String(preview.truncated)} />
         <PreviewFact
           label="检索已执行"
-          value={String(preview.检索已执行)}
+          value={String(preview.retrievalExecuted)}
         />
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact
           label="已使用 embedding"
-          value={String(preview.已使用 embedding)}
+          value={String(preview.embeddingUsed)}
         />
-        <PreviewFact label="已使用模型" value={String(preview.已使用模型)} />
+        <PreviewFact label="已使用模型" value={String(preview.llmUsed)} />
         <PreviewFact
           label="静态片段"
           value={String(previewCandidateMemorySnippets.length)}
@@ -1475,7 +1478,7 @@ function MemoryContextPreviewCard({
             <ProviderRow label="真实记忆检索" value="已禁用" />
             <ProviderRow label="embeddings" value="未使用" />
             <ProviderRow label="向量搜索" value="未使用" />
-            <ProviderRow label="rag" value="未使用" />
+            <ProviderRow label="RAG" value="未使用" />
             <ProviderRow label="真实模型" value="已禁用" />
             <ProviderRow label="网络" value="未使用" />
             <ProviderRow label="持久化" value="已禁用" />
@@ -1685,7 +1688,7 @@ function SkillSuggestionPreviewCard({
   preview: AgentSkillSuggestionPreview;
 }) {
   const riskBadgeClassName = `${styles.riskBadge} ${getSkillRiskClassName(
-    preview.整体风险等级,
+    preview.overallRiskLevel,
   )}`;
 
   return (
@@ -1699,21 +1702,21 @@ function SkillSuggestionPreviewCard({
           <p className={styles.planSummary}>{preview.taskSummary}</p>
         </div>
         <span className={riskBadgeClassName}>
-          整体风险： {preview.整体风险等级}
+          整体风险： {preview.overallRiskLevel}
         </span>
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact label="建议状态" value={preview.suggestionStatus} />
-        <PreviewFact label="执行状态" value={preview.执行状态} />
-        <PreviewFact label="可执行" value={String(preview.可执行)} />
+        <PreviewFact label="执行状态" value={preview.executionStatus} />
+        <PreviewFact label="可执行" value={String(preview.executable)} />
         <PreviewFact label="当前自主性" value={preview.autonomyLevel} />
       </div>
 
       <div className={styles.previewFactsGrid}>
         <PreviewFact
           label="匹配 Skill 数量"
-          value={String(preview.匹配 Skill 数量)}
+          value={String(preview.matchedSkillCount)}
         />
         <PreviewFact
           label="需要确认数量"
@@ -1721,7 +1724,7 @@ function SkillSuggestionPreviewCard({
         />
         <PreviewFact
           label="已阻断建议数"
-          value={String(preview.已阻断建议数)}
+          value={String(preview.blockedSuggestionCount)}
         />
         <PreviewFact
           label="预览 manifest 数量"
@@ -1877,7 +1880,7 @@ function SkillSuggestionItem({
           自主性允许：{" "}
           {suggestion.allowedByCurrentAutonomy ? "是" : "否"}
         </span>
-        <span>可执行：{String(suggestion.可执行)}</span>
+        <span>可执行：{String(suggestion.executable)}</span>
       </div>
 
       <div className={styles.planDetailsGrid}>
@@ -1911,12 +1914,12 @@ function SkillSuggestionItem({
           <h5 className={styles.detailTitle}>所需工具元数据</h5>
           <PreviewList
             emptyLabel="未报告所需工具名称。"
-            items={suggestion.需要ToolNames}
+            items={suggestion.requiredToolNames}
           />
           <p className={styles.detailSubheading}>所需工具类别</p>
           <PreviewList
             emptyLabel="未报告所需工具类别。"
-            items={suggestion.需要ToolCategories}
+            items={suggestion.requiredToolCategories}
           />
           <p className={styles.disabledReason}>
             阻断原因：{suggestion.blockedReason}
@@ -1941,7 +1944,7 @@ function ToolRequirementReviewPreviewCard({
 }: {
   preview: AgentToolRequirementReviewPreview;
 }) {
-  const riskBadgeClassName = `${styles.riskBadge} ${riskClasses[preview.整体风险等级]}`;
+  const riskBadgeClassName = `${styles.riskBadge} ${riskClasses[preview.overallRiskLevel]}`;
   const highOrCriticalRiskCount = preview.requirements.filter(
     (requirement) =>
       requirement.riskLevel === AutonomyRiskLevel.High ||
@@ -1961,7 +1964,7 @@ function ToolRequirementReviewPreviewCard({
           <p className={styles.planSummary}>{preview.taskSummary}</p>
         </div>
         <span className={riskBadgeClassName}>
-          整体风险： {preview.整体风险等级}
+          整体风险： {preview.overallRiskLevel}
         </span>
       </div>
 
@@ -1970,9 +1973,9 @@ function ToolRequirementReviewPreviewCard({
         <PreviewFact label="审查状态" value={preview.reviewStatus} />
         <PreviewFact
           label="审查执行状态"
-          value={preview.执行状态}
+          value={preview.executionStatus}
         />
-        <PreviewFact label="可执行" value={String(preview.可执行)} />
+        <PreviewFact label="可执行" value={String(preview.executable)} />
       </div>
 
       <div className={styles.previewFactsGrid}>
@@ -1982,7 +1985,7 @@ function ToolRequirementReviewPreviewCard({
         />
         <PreviewFact
           label="已阻断需求"
-          value={String(preview.已阻断需求数)}
+          value={String(preview.blockedRequirementCount)}
         />
         <PreviewFact
           label="需要确认数量"
@@ -2131,7 +2134,7 @@ function ToolRequirementItem({
           自主性允许：{" "}
           {requirement.allowedByCurrentAutonomy ? "是" : "否"}
         </span>
-        <span>可执行：{String(requirement.可执行)}</span>
+        <span>可执行：{String(requirement.executable)}</span>
       </div>
 
       <div className={styles.planDetailsGrid}>
@@ -2142,7 +2145,7 @@ function ToolRequirementItem({
           <h5 className={styles.detailTitle}>所需工具类别</h5>
           <PreviewList
             emptyLabel="未检测到所需工具类别。"
-            items={requirement.需要ToolCategories}
+            items={requirement.requiredToolCategories}
           />
           <p className={styles.detailSubheading}>候选工具名称</p>
           <PreviewList
@@ -2189,7 +2192,7 @@ function TaskPlanPreviewCard({ preview }: { preview: AgentTaskPlanPreview }) {
         </span>
       </div>
 
-      {!preview.有效 ? (
+      {!preview.isValid ? (
         <p className={styles.invalidNotice}>
           输入任务文本以生成有效预览。空输入会保持禁用且不可执行。
         </p>
@@ -2204,8 +2207,8 @@ function TaskPlanPreviewCard({ preview }: { preview: AgentTaskPlanPreview }) {
           label="需要确认"
           value={preview.requiresConfirmation ? "是" : "否"}
         />
-        <PreviewFact label="可执行" value={String(preview.可执行)} />
-        <PreviewFact label="执行状态" value={preview.执行状态} />
+        <PreviewFact label="可执行" value={String(preview.executable)} />
+        <PreviewFact label="执行状态" value={preview.executionStatus} />
       </div>
 
       <div className={styles.planDetailsGrid}>
@@ -2215,12 +2218,12 @@ function TaskPlanPreviewCard({ preview }: { preview: AgentTaskPlanPreview }) {
           </h4>
           <PreviewList
             emptyLabel="该预览没有匹配或注册的工具名称。"
-            items={preview.需要ToolNames}
+            items={preview.requiredToolNames}
           />
           <p className={styles.detailSubheading}>工具类别</p>
           <PreviewList
             emptyLabel="未检测到工具类别。"
-            items={preview.需要ToolCategories}
+            items={preview.requiredToolCategories}
           />
           <p className={styles.toolDisabledNote}>
             工具名称和类别仅作参考。本页没有注册、调用或执行任何工具。
@@ -2278,7 +2281,7 @@ function PlanStepItem({ step }: { step: AgentTaskPlanStep }) {
         <span>
           确认： {step.requiresConfirmation ? "需要" : "不需要"}
         </span>
-        <span>可执行: {String(step.可执行)}</span>
+        <span>可执行：{String(step.executable)}</span>
         {step.toolCategory === undefined ? null : (
           <span>类别： {step.toolCategory}</span>
         )}
