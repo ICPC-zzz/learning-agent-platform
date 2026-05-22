@@ -394,8 +394,10 @@ export function createSparkTestProvider(
 }
 
 export function getSparkProviderAdapterStatus(
-  _config: SparkProviderConfig = createDisabledSparkProviderConfig(),
+  config: SparkProviderConfig = createDisabledSparkProviderConfig(),
 ): SparkProviderAdapterStatus {
+  void config;
+
   return {
     providerKey: LlmProviderKey.SparkTest,
     scaffoldAvailable: true,

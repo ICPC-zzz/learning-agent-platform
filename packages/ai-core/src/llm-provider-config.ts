@@ -252,10 +252,6 @@ const SENSITIVE_ENV_LIKE_KEYS = [
   LlmProviderEnvKey.LegacyTestApi,
 ] as const;
 
-const SENSITIVE_ENV_LIKE_KEY_SET = new Set(
-  SENSITIVE_ENV_LIKE_KEYS.map(normalizeEnvKey),
-);
-
 const SUPPORTED_DEFAULT_PROVIDER_KEYS = [
   LlmProviderKey.Mock,
   LlmProviderKey.SparkTest,

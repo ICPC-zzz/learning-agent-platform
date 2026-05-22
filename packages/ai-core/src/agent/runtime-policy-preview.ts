@@ -1,6 +1,5 @@
 import {
   AgentExecutionStatus,
-  AgentRuntimeLifecycleStatus,
   AgentRuntimeRiskLevel,
   type AgentExecutionStatus as AgentExecutionStatusValue,
   type AgentRuntimeLifecycleStatus as AgentRuntimeLifecycleStatusValue,

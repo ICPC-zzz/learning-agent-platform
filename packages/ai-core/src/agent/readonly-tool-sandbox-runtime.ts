@@ -12,7 +12,6 @@ import {
   type AgentToolSandboxPolicyPreview,
   type AgentToolSandboxRequestPreview,
   type AgentToolSandboxRiskLevelPreview as AgentToolSandboxRiskLevelPreviewValue,
-  type AgentToolSandboxSideEffectLevelPreview as AgentToolSandboxSideEffectLevelPreviewValue,
 } from "./tool-sandbox-preview";
 import type { AgentMetadata } from "./types";
 
