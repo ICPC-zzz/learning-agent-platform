@@ -138,7 +138,7 @@ export async function saveReaderProgressAction(
 
     return {
       status: "success",
-      message: `阅读进度已保存：${formatPercent(progress.progressRatio)}。`,
+      message: `演示用户阅读进度已保存：${formatPercent(progress.progressRatio)}。该状态不代表正式账户进度闭环。`,
       progressRatio: progress.progressRatio,
       savedAt: progress.updatedAt.toISOString(),
     };

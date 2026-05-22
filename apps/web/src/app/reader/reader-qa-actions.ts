@@ -114,7 +114,7 @@ export async function askChapterQuestionAction(
       ok: false,
       status: "provider_error",
       message:
-        "Reader Ask AI selected provider failed before it could return an answer.",
+        "模拟问答提供方未能返回回答；未调用真实模型。",
       providerStatus: providerSelection.status,
       fallbackUsed: false,
       fallbackReason: null,
@@ -198,7 +198,7 @@ async function answerWithOpenAiProvider({
       providerStatus,
       errorCategory: providerError.category,
       message:
-        "OpenAI-compatible Chapter Q&A provider failed to return an answer.",
+        "真实模型提供方未能返回回答；reader 预览不应依赖真实模型。",
     });
   }
 }
@@ -380,7 +380,7 @@ function createFallbackMockContent(
   fallbackReason: ChapterQaFallbackReason,
 ): string {
   return [
-    `Fallback notice: the requested real provider failed with error_category=${fallbackReason}. Current answer_source=fallback_mock. This response is an explicit deterministic mock fallback and is not being presented as a real AI answer.`,
+    `模拟回退说明：请求的真实模型提供方失败，错误分类为 ${fallbackReason}。当前回答来源为 fallback_mock，不会呈现为真实模型回答。`,
     mockContent,
   ].join("\n\n");
 }
@@ -460,16 +460,16 @@ function createProviderUnavailableMessage(
   status: ChapterQaProviderRuntimeStatus,
 ): string {
   if (status.disabledReason === "network_disabled") {
-    return "OpenAI-compatible Chapter Q&A provider is disabled because network access is not enabled.";
+    return "章节问答真实模型提供方未启用：网络访问未启用。";
   }
 
   if (status.disabledReason === "missing_api_key") {
-    return "OpenAI-compatible Chapter Q&A provider is missing its API key.";
+    return "章节问答真实模型提供方未启用：缺少 API key。";
   }
 
   if (status.disabledReason === "missing_model") {
-    return "OpenAI-compatible Chapter Q&A provider is missing its model configuration.";
+    return "章节问答真实模型提供方未启用：缺少模型配置。";
   }
 
-  return "Reader Ask AI provider selection returned a disabled or unavailable provider.";
+  return "章节问答提供方处于禁用或不可用状态。";
 }

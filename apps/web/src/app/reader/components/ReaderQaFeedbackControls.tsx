@@ -53,7 +53,7 @@ export function ReaderQaFeedbackControls({
       setResult({
         status: "save_failed",
         message:
-          "问答反馈未保存，因为 server action 在返回结构化结果前失败。",
+          "问答反馈未保存：预览保存接口未返回结构化结果。",
         historyRecordId,
         rating,
       });

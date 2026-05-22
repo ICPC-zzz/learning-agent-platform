@@ -11,7 +11,7 @@ export function ReaderAiFallbackNotice({
     return (
       <p className="askAiLimit">
         当前回答来自模拟回退。请求的真实模型提供方失败，错误分类为{" "}
-        {metadata.errorCategory ?? "unknown"}；该响应不会被呈现为真实 AI 回答。
+        {metadata.errorCategory ?? "unknown"}；该响应不会被呈现为真实模型回答。
       </p>
     );
   }
@@ -19,7 +19,7 @@ export function ReaderAiFallbackNotice({
   if (metadata.answerSource === "real_openai") {
     return (
       <p className="askAiLimit">
-        当前回答来自 OpenAI 兼容模型提供方。
+        当前回答标记为真实模型来源；reader 预览默认不应出现此状态，请按安全边界复核。
       </p>
     );
   }

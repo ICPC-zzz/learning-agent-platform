@@ -5,9 +5,11 @@ interface ReadingProgressPlaceholderProps {
 
 export function ReadingProgressPlaceholder({
   currentChapterIndex,
-  totalChapters
+  totalChapters,
 }: ReadingProgressPlaceholderProps) {
-  const progressPercent = Math.round(((currentChapterIndex + 1) / totalChapters) * 100);
+  const progressPercent = Math.round(
+    ((currentChapterIndex + 1) / Math.max(totalChapters, 1)) * 100,
+  );
 
   return (
     <section className="progressPanel" aria-labelledby="progress-title">
@@ -17,7 +19,7 @@ export function ReadingProgressPlaceholder({
         <div className="progressFill" style={{ width: `${progressPercent}%` }} />
       </div>
       <p>
-        静态 MVP 进度：根据章节位置计算为 {progressPercent}%。当前不会持久化保存。
+        静态预览进度：根据章节位置计算为 {progressPercent}%。当前不会持久化保存。
       </p>
     </section>
   );

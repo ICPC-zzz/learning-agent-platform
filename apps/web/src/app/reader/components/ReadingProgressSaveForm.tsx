@@ -27,7 +27,7 @@ interface ReadingProgressSaveFormProps {
 const disabledMessageByFallbackReason: Record<ReaderFallbackReason, string> = {
   database_read_failed: "进度保存不可用：数据库读取失败。",
   demo_fallback_requested:
-    "进度保存不可用：当前是演示 fallback 数据。",
+    "进度保存不可用：当前是只读演示 fallback 数据。",
   missing_database_url:
     "进度保存不可用：DATABASE_URL 未配置。",
   no_database_book_found:
@@ -68,8 +68,8 @@ export function ReadingProgressSaveForm({
 
   return (
     <section className="progressPanel" aria-labelledby="progress-title">
-      <p className="eyebrow">阅读进度</p>
-      <h2 id="progress-title">阅读进度</h2>
+      <p className="eyebrow">演示进度</p>
+      <h2 id="progress-title">阅读进度预览</h2>
       <div className="progressTrack" aria-hidden="true">
         <div
           className="progressFill"
@@ -102,7 +102,7 @@ export function ReadingProgressSaveForm({
             {savedProgress.isFallback
               ? "演示 fallback，只读"
               : savedProgress.isDemoUser
-                ? "演示用户，不是正式登录系统"
+                ? "演示用户进度，不是正式登录系统"
                 : "未启用正式用户系统"}
           </dd>
         </div>
@@ -126,12 +126,12 @@ export function ReadingProgressSaveForm({
             value={String(progressRatio)}
           />
           <button disabled={isPending} type="submit">
-            {isPending ? "正在保存进度..." : "标记本章已读"}
+            {isPending ? "正在保存演示进度..." : "标记本章已读（演示）"}
           </button>
         </form>
       ) : (
         <button disabled type="button">
-          标记本章已读
+          演示进度保存未启用
         </button>
       )}
 
@@ -144,7 +144,7 @@ export function ReadingProgressSaveForm({
 
 function getDisabledMessage(fallbackReason?: ReaderFallbackReason): string {
   if (fallbackReason === undefined) {
-    return "模拟回退模式下进度保存不可用。";
+    return "只读演示模式下进度保存不可用。";
   }
 
   return disabledMessageByFallbackReason[fallbackReason];

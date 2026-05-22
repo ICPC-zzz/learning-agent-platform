@@ -5,27 +5,16 @@ import type { ChapterQaProviderRuntimeConfig } from "@learning-agent-platform/ai
 
 export function getReaderAiRuntimeConfig(): ChapterQaProviderRuntimeConfig {
   return resolveChapterQaProviderRuntimeConfig({
-    requestedProviderMode: process.env.AI_PROVIDER_MODE,
-    networkEnabled: isEnabled(process.env.AI_PROVIDER_NETWORK_ENABLED),
-    hasOpenAiApiKey: hasConfiguredSecret(process.env.OPENAI_API_KEY),
-    hasOpenAiModel: hasConfiguredValue(process.env.OPENAI_MODEL),
-    hasAnthropicApiKey: hasConfiguredSecret(process.env.ANTHROPIC_API_KEY),
+    // A151 keeps reader Ask AI preview-only even if provider env vars exist.
+    requestedProviderMode: "mock",
+    networkEnabled: false,
+    hasOpenAiApiKey: false,
+    hasOpenAiModel: false,
+    hasAnthropicApiKey: false,
     fallbackToMockEnabled: isFallbackToMockEnabled(
       process.env.AI_PROVIDER_FALLBACK_TO_MOCK,
     ),
   });
-}
-
-function hasConfiguredSecret(value: string | undefined): boolean {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function hasConfiguredValue(value: string | undefined): boolean {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function isEnabled(value: string | undefined): boolean {
-  return typeof value === "string" && value.trim().toLowerCase() === "true";
 }
 
 function isFallbackToMockEnabled(value: string | undefined): boolean {

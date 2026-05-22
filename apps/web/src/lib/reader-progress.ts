@@ -117,7 +117,7 @@ export async function loadReaderProgressView({
     const prisma = getPrismaClient();
     const userRepository = new PrismaUserRepository(prisma);
     const progressRepository = new PrismaReadingProgressRepository(prisma);
-    // A132 仍没有真实登录态；reader progress 明确绑定演示用户，不能当成正式用户系统。
+    // Reader progress is still bound to a demo user and must not be presented as a formal account system.
     const demoUser = await userRepository.getUserByEmail(demoUserEmail);
 
     if (demoUser === null) {
@@ -191,7 +191,8 @@ function mapReadingProgressRecord({
     progressStatus,
     progressPercent,
     statusLabel: getProgressStatusLabel(progressStatus),
-    message: "已恢复演示用户在当前章节的已保存阅读进度。",
+    message:
+      "已读取演示用户在当前章节的已保存阅读进度；这不是正式账户进度恢复闭环。",
     loadStatus: "loaded",
     isDemoUser: true,
     isFallback: false,

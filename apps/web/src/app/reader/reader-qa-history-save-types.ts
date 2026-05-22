@@ -24,6 +24,6 @@ export interface ReaderQaHistorySaveResult {
 export function createSkippedNoAnswerHistorySaveResult(): ReaderQaHistorySaveResult {
   return {
     status: "skipped_no_answer",
-    message: "Q&A history was not saved because no answer text was available.",
+    message: "问答历史未保存：没有可保存的模拟回答文本。",
   };
 }

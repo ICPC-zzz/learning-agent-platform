@@ -50,11 +50,11 @@ export function ReaderAiProviderNotice({
         <dd>{status.modelStatus}</dd>
       </div>
       <div>
-        <dt>真实 AI (real_ai)</dt>
+        <dt>真实模型状态 (real_ai)</dt>
         <dd>{status.realAi}</dd>
       </div>
       <div>
-        <dt>真实 AI 是否启用 (real_ai_enabled)</dt>
+        <dt>真实模型是否启用 (real_ai_enabled)</dt>
         <dd>{status.realAiEnabled ? "是" : "否"}</dd>
       </div>
       <div>

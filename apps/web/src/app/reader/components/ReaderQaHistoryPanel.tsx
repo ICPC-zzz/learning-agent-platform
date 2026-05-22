@@ -12,9 +12,9 @@ export function ReaderQaHistoryPanel({ result }: ReaderQaHistoryPanelProps) {
   return (
     <section className="progressPanel" aria-labelledby="qa-history-title">
       <p className="eyebrow">章节问答历史</p>
-      <h2 id="qa-history-title">本章问答历史</h2>
+      <h2 id="qa-history-title">问答历史预览</h2>
       <p>
-        展示当前数据库章节最近保存的问答记录。新的成功回答会在刷新页面后出现在这里。
+        当前仅用于展示演示用户的问答历史占位状态，不代表真实模型问答或正式账户历史已上线。
       </p>
 
       <ReaderQaHistoryStatus result={result} />
@@ -104,7 +104,7 @@ function formatHistoryReadStatus(
     demo_user_missing: "缺少演示用户",
     empty: "暂无记录",
     invalid_reader_context: "阅读器上下文无效",
-    loaded: "已加载",
+        loaded: "已加载演示记录",
     read_failed: "读取失败",
     unavailable_for_mock_reader: "模拟阅读器不可用",
   };

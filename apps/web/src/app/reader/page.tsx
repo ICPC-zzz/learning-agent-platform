@@ -56,7 +56,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
       <main className="readerPage">
         <header className="readerHeader">
           <div>
-            <p className="eyebrow">A132 阅读器空状态</p>
+            <p className="eyebrow">阅读器预览</p>
             <h1>{readerData.book.title}</h1>
             <p className="status">未找到请求的可读章节。</p>
           </div>
@@ -76,7 +76,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
           <p>
             请求的 chapterId{" "}
             <code>{readerQuery.chapterId ?? "未提供"}</code>{" "}
-            未匹配到当前书籍章节。请返回书籍详情页重新选择章节。
+            未匹配到当前书籍章节。当前页面不会自动生成章节或调用 AI，请返回书籍详情页重新选择章节。
           </p>
         </section>
       </main>
@@ -101,7 +101,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
     <main className="readerPage">
       <header className="readerHeader">
         <div>
-          <p className="eyebrow">A132 阅读进度恢复</p>
+          <p className="eyebrow">阅读器预览</p>
           <h1>{readerData.book.title}</h1>
           <p className="status">
             {readerData.book.author ?? bookSourceLabel} · 来源：{bookSourceLabel}
@@ -164,7 +164,7 @@ function ReaderEmptyState({ message }: { message: string }) {
     <main className="readerPage">
       <header className="readerHeader">
         <div>
-          <p className="eyebrow">A132 阅读器空状态</p>
+          <p className="eyebrow">阅读器预览</p>
           <h1>阅读器需要书籍参数</h1>
           <p className="status">请从书库选择一本书，再从章节列表进入阅读器。</p>
         </div>

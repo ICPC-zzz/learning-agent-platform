@@ -36,14 +36,14 @@ export async function loadReaderQaHistoryForCurrentChapter({
   if (!getDatabaseEnvStatus().hasDatabaseUrl) {
     return createResult(
       "database_unavailable",
-      "Q&A history is unavailable because DATABASE_URL is not configured.",
+      "问答历史预览不可用：DATABASE_URL 未配置。",
     );
   }
 
   if (readerDataSource !== "database") {
     return createResult(
       "unavailable_for_mock_reader",
-      "Q&A history is unavailable for mock reader fallback data.",
+      "问答历史预览不可用：当前是只读演示 fallback 阅读器。",
     );
   }
 
@@ -53,7 +53,7 @@ export async function loadReaderQaHistoryForCurrentChapter({
   if (normalizedBookId === null || normalizedChapterId === null) {
     return createResult(
       "invalid_reader_context",
-      "Q&A history is unavailable because the current reader context is incomplete.",
+      "问答历史预览不可用：当前阅读器上下文不完整。",
     );
   }
 
@@ -66,7 +66,7 @@ export async function loadReaderQaHistoryForCurrentChapter({
     if (demoUser === null) {
       return createResult(
         "demo_user_missing",
-        "Q&A history is unavailable because the demo user was not found.",
+        "问答历史预览不可用：未找到演示用户。",
       );
     }
 
@@ -80,21 +80,19 @@ export async function loadReaderQaHistoryForCurrentChapter({
     if (records.length === 0) {
       return createResult(
         "empty",
-        "No Q&A history has been saved for this chapter yet.",
+        "当前章节暂无演示问答历史记录。",
       );
     }
 
     return {
       status: "loaded",
       records: records.map(mapHistoryRecordToView),
-      message: `Loaded ${records.length} recent Q&A history record${
-        records.length === 1 ? "" : "s"
-      } for this chapter.`,
+      message: `已加载 ${records.length} 条当前章节的演示问答历史记录。`,
     };
   } catch {
     return createResult(
       "read_failed",
-      "Q&A history could not be loaded because the database read failed.",
+      "问答历史预览读取失败：数据库读取失败。",
     );
   }
 }

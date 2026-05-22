@@ -58,7 +58,7 @@ function formatChunkIndexes(indexes: readonly number[]): string {
 
 function formatAnswerLabel(answer: ChapterQaAnswer): string {
   if (answer.metadata.answerSource === "real_openai") {
-    return "OpenAI 兼容模型回答";
+    return "真实模型回答（当前 reader 预览不应出现）";
   }
 
   if (answer.metadata.answerSource === "fallback_mock") {
@@ -159,7 +159,7 @@ export function AskAiPanel({
       setQuestion("");
     } catch {
       setErrorMessage(
-        "AI 提问在 server action 返回结构化结果前失败。",
+        "模拟问答预览未能返回结构化结果，未调用真实模型。",
       );
     } finally {
       setIsAsking(false);
@@ -169,32 +169,32 @@ export function AskAiPanel({
   return (
     <section className="askAiPanel" aria-labelledby="ask-ai-title">
       <p className="eyebrow">{currentProviderStatus.providerKind} 模式</p>
-      <h2 id="ask-ai-title">向 AI 提问本章内容</h2>
+      <h2 id="ask-ai-title">章节问答预览</h2>
       <p>
-        当前运行配置在服务端解析。默认仍使用模拟回答；OpenAI 兼容真实调用需要服务端显式开启。
+        当前 reader 问答保持 mock-only 预览，不会调用真实模型、RAG 或工具。
       </p>
       <ReaderAiProviderNotice status={currentProviderStatus} />
 
       <form className="askAiForm" onSubmit={handleSubmit}>
         <label className="visuallyHidden" htmlFor="mock-ai-question">
-          向 AI 提问本章内容
+          输入章节问答预览问题
         </label>
         <textarea
           id="mock-ai-question"
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder="可以询问变量、示例或不理解的部分..."
+          placeholder="仅用于模拟问答预览，不会发送到真实模型"
           rows={4}
           value={question}
         />
         <button disabled={isAskDisabled} type="submit">
-          {isAsking ? "通过 server action 提问中..." : "向 AI 提问"}
+          {isAsking ? "正在生成模拟回答..." : "生成模拟回答"}
         </button>
       </form>
 
       <p aria-live="polite" className="askAiLimit">
         {isAsking
-          ? "正在用当前阅读上下文提交到 server_action..."
-          : "问题会先在服务端校验，之后才可能运行任何模型提供方。"}
+          ? "正在使用当前阅读上下文生成模拟回答。"
+          : "当前只允许模拟提供方；真实模型、RAG 和工具调用未启用。"}
       </p>
       {errorMessage === null ? null : (
         <p className="askAiLimit" role="alert">
@@ -232,7 +232,7 @@ export function AskAiPanel({
 
       <div className="mockQaHistory" aria-live="polite">
         {history.length === 0 ? (
-          <p className="mockQaEmpty">提出一个问题以查看当前模型提供方管线。</p>
+          <p className="mockQaEmpty">提出一个问题以查看模拟问答预览。</p>
         ) : (
           history.map((exchange) => (
             <article className="mockQaCard" key={exchange.id}>
@@ -306,7 +306,7 @@ export function AskAiPanel({
                   <dd>{exchange.providerStatus.status}</dd>
                 </div>
                 <div>
-                  <dt>真实 AI</dt>
+                  <dt>真实模型状态</dt>
                   <dd>
                     {exchange.providerStatus.realAi} (
                     {exchange.providerStatus.realAiEnabled ? "已启用" : "已禁用"})

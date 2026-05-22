@@ -1,6 +1,6 @@
 import type {
   ReaderDataSource,
-  ReaderFallbackReason
+  ReaderFallbackReason,
 } from "../../lib/reader-types";
 
 interface ReaderDataSourceNoticeProps {
@@ -9,8 +9,8 @@ interface ReaderDataSourceNoticeProps {
 }
 
 const sourceLabels: Record<ReaderDataSource, string> = {
-  database: "数据库",
-  mock_fallback: "演示 fallback"
+  database: "数据库预览",
+  mock_fallback: "只读演示 fallback",
 };
 
 const fallbackReasonLabels: Record<ReaderFallbackReason, string> = {
@@ -22,7 +22,7 @@ const fallbackReasonLabels: Record<ReaderFallbackReason, string> = {
 
 export function ReaderDataSourceNotice({
   source,
-  fallbackReason
+  fallbackReason,
 }: ReaderDataSourceNoticeProps) {
   const isDatabaseSource = source === "database";
 
@@ -37,11 +37,13 @@ export function ReaderDataSourceNotice({
     >
       <span className="readerDataSourceBadge">{sourceLabels[source]}</span>
       {isDatabaseSource ? (
-        <p>已从本地数据库加载。</p>
+        <p>
+          已从本地数据库加载阅读预览数据。进度和问答相关能力仍限定为演示用户或占位状态。
+        </p>
       ) : (
         <p>
           回退原因：{fallbackReasonLabels[fallbackReason ?? "database_read_failed"]}。
-          当前展示的是演示 fallback 内容，不是生产数据库内容。
+          当前展示的是只读演示 fallback 内容，不是生产数据库内容，也不会保存阅读进度或问答历史。
         </p>
       )}
     </section>

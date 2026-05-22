@@ -45,7 +45,7 @@ export async function saveReaderQaHistoryBestEffort({
     return {
       status: "skipped_mock_reader",
       message:
-        "Q&A history was not saved because the reader is using mock fallback data.",
+        "问答历史未保存：当前是只读演示 fallback 阅读器。",
     };
   }
 
@@ -56,7 +56,7 @@ export async function saveReaderQaHistoryBestEffort({
     return {
       status: "invalid_reader_context",
       message:
-        "Q&A history was not saved because the reader context is incomplete.",
+        "问答历史未保存：阅读器上下文不完整。",
     };
   }
 
@@ -64,7 +64,7 @@ export async function saveReaderQaHistoryBestEffort({
     return {
       status: "database_unavailable",
       message:
-        "Q&A history was not saved because DATABASE_URL is not configured.",
+        "问答历史未保存：DATABASE_URL 未配置。",
     };
   }
 
@@ -78,7 +78,7 @@ export async function saveReaderQaHistoryBestEffort({
       return {
         status: "demo_user_missing",
         message:
-          "Q&A history was not saved because the demo user was not found.",
+          "问答历史未保存：未找到演示用户。",
       };
     }
 
@@ -93,7 +93,7 @@ export async function saveReaderQaHistoryBestEffort({
 
     return {
       status: "saved",
-      message: "问答历史已保存。",
+      message: "演示用户问答历史已保存；这不是正式 AI 问答历史能力。",
       historyRecordId: record.id,
     };
   } catch {

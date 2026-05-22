@@ -7,14 +7,14 @@ interface AskAiPlaceholderProps {
 export function AskAiPlaceholder({
   bookTitle,
   chapterTitle,
-  chunkCount
+  chunkCount,
 }: AskAiPlaceholderProps) {
   return (
     <section className="askAiPanel" aria-labelledby="ask-ai-title">
-      <p className="eyebrow">即将提供</p>
-      <h2 id="ask-ai-title">向 AI 提问本章内容</h2>
+      <p className="eyebrow">AI 问答未启用</p>
+      <h2 id="ask-ai-title">章节问答占位入口</h2>
       <p>
-        后续回答会结合当前书籍、章节、附近分块和学习者能力分数。当前 MVP 只展示入口。
+        当前只展示 preview-only 占位，不会调用真实模型、RAG、工具或保存问答历史。
       </p>
       <dl className="aiContextList">
         <div>
@@ -30,9 +30,9 @@ export function AskAiPlaceholder({
           <dd>{chunkCount}</dd>
         </div>
       </dl>
-      <textarea disabled placeholder="AI 提问输入即将提供" rows={4} />
+      <textarea disabled placeholder="AI 问答未启用，此处仅为占位" rows={4} />
       <button disabled type="button">
-        向 AI 提问
+        AI 问答未启用
       </button>
     </section>
   );

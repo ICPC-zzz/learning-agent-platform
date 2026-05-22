@@ -31,7 +31,7 @@ export function ReaderQaHistorySaveStatus({
 
 function getDisplayMessage(result: ReaderQaHistorySaveResult): string {
   if (result.status === "saved") {
-    return "问答历史已保存。刷新页面后可在本章问答历史中看到最新记录。";
+    return "演示用户问答历史已保存。该记录不代表正式 AI 问答历史能力已上线。";
   }
 
   if (result.status === "save_failed") {
@@ -49,7 +49,7 @@ function formatHistorySaveStatus(
     demo_user_missing: "缺少演示用户",
     invalid_reader_context: "阅读器上下文无效",
     save_failed: "保存失败",
-    saved: "已保存",
+    saved: "已保存演示记录",
     skipped_mock_reader: "模拟阅读器已跳过",
     skipped_no_answer: "无回答已跳过",
   };
