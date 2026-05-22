@@ -13,6 +13,6 @@ const componentSource = readFileSync(
 test("books empty state import entry points to /import", () => {
   assert.match(
     componentSource,
-    /<Link\b[\s\S]*\bhref="\/import"[\s\S]*>\s*导入第一本书\s*<\/Link>/u,
+    /<Link\b[\s\S]*\bhref="\/import"[\s\S]*>\s*打开文本导入预览\s*<\/Link>/u,
   );
 });

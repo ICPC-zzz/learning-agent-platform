@@ -14,7 +14,7 @@ export function BookImportSaveStatus({
 }: BookImportSaveStatusProps) {
   const status = isSaving ? "saving" : state.status;
   const message = isSaving
-    ? "正在将导入结果保存到数据库..."
+    ? "正在将规则式预览结果保存到当前开发数据源..."
     : state.message;
 
   return (
@@ -29,10 +29,10 @@ export function BookImportSaveStatus({
         {state.status === "database_saved" && !isSaving ? (
           <dl className="scoreMeta" style={{ marginTop: "12px" }}>
             <SummaryRow label="数据状态" value={formatSaveStatus(state.status)} />
-            <SummaryRow label="已保存书籍 ID" value={state.bookId} />
-            <SummaryRow label="已保存标题" value={state.bookTitle} />
-            <SummaryRow label="已保存章节数" value={state.chapterCount} />
-            <SummaryRow label="已保存 chunk 数" value={state.chunkCount} />
+            <SummaryRow label="开发数据源书籍 ID" value={state.bookId} />
+            <SummaryRow label="预览保存标题" value={state.bookTitle} />
+            <SummaryRow label="预览保存章节数" value={state.chapterCount} />
+            <SummaryRow label="预览保存 chunk 数" value={state.chunkCount} />
             <SummaryRow label="保存时间" value={state.savedAt} />
           </dl>
         ) : null}
@@ -77,11 +77,11 @@ function formatSaveStatus(
   status: BookImportSaveActionState["status"] | "saving",
 ): string {
   const labels: Record<BookImportSaveActionState["status"] | "saving", string> = {
-    database_saved: "已保存到开发数据源",
-    database_unavailable: "数据库不可用",
-    local_preview: "本地预览",
-    save_failed: "保存失败",
-    saving: "保存中",
+    database_saved: "预览已保存到开发数据源",
+    database_unavailable: "开发数据源不可用",
+    local_preview: "本地规则式预览",
+    save_failed: "预览保存失败",
+    saving: "预览保存中",
     validation_error: "校验失败",
   };
 

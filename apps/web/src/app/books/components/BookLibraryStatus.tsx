@@ -5,9 +5,9 @@ interface BookLibraryStatusProps {
 }
 
 const statusLabels: Record<BookLibraryLoadResult["status"], string> = {
-  loaded: "数据库",
+  loaded: "开发数据源",
   empty: "暂无数据",
-  database_unavailable: "数据库不可用",
+  database_unavailable: "开发数据源不可用",
   read_failed: "读取失败",
   mock_fallback: "演示 fallback",
 };

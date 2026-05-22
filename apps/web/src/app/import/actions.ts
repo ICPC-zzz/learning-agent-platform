@@ -49,7 +49,7 @@ export async function saveImportedPlainTextBookAction(
     return {
       ok: false,
       status: "validation_error",
-      message: "导入保存校验失败，未尝试写入数据库。",
+      message: "规则式导入预览保存校验失败，未尝试写入开发数据源。",
       fieldErrors: validationResult.errors,
     };
   }
@@ -60,7 +60,7 @@ export async function saveImportedPlainTextBookAction(
     return {
       ok: false,
       status: "database_unavailable",
-      message: "数据库保存不可用：DATABASE_URL 未配置。",
+      message: "开发数据源保存不可用：DATABASE_URL 未配置。",
     };
   }
 
@@ -72,7 +72,7 @@ export async function saveImportedPlainTextBookAction(
     return {
       ok: false,
       status: "database_unavailable",
-      message: "数据库保存不可用：Prisma client 无法初始化。",
+      message: "开发数据源保存不可用：Prisma client 无法初始化。",
     };
   }
 
@@ -104,14 +104,14 @@ export async function saveImportedPlainTextBookAction(
       detailHref: resultLinks.detailHref,
       readerHref: resultLinks.readerHref,
       libraryHref: resultLinks.libraryHref,
-      message: `已将《${importedBook.document.title}》保存到当前开发环境数据源。`,
+      message: `已将《${importedBook.document.title}》的规则式预览结果保存到当前开发环境数据源，仅包含 Book、Chapter 和 Chunk。`,
     };
   } catch {
     return {
       ok: false,
       status: "save_failed",
       message:
-        "创建 Book、Chapter 和 Chunk 记录时数据库保存失败。",
+        "创建 Book、Chapter 和 Chunk 记录时开发数据源保存失败。",
     };
   }
 }

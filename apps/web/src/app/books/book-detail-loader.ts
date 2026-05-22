@@ -47,7 +47,7 @@ export async function loadBookDetail({
   if (!hasDatabaseUrl()) {
     if (isSampleBookId(normalizedBookId)) {
       return createSampleBookDetailResult(
-        "数据库不可用，因为 DATABASE_URL 未配置。当前展示演示 fallback 书籍详情；这不是生产数据。",
+        "开发数据源不可用，因为 DATABASE_URL 未配置。当前展示演示 fallback 书籍详情；这不是生产数据。",
       );
     }
 
@@ -55,7 +55,7 @@ export async function loadBookDetail({
       status: "database_unavailable",
       book: null,
       message:
-        "数据库不可用，因为 DATABASE_URL 未配置。当前环境无法读取已保存书籍详情。",
+        "开发数据源不可用，因为 DATABASE_URL 未配置。当前环境无法读取已保存书籍详情。",
     };
   }
 
@@ -67,7 +67,7 @@ export async function loadBookDetail({
     if (readerData === null) {
       if (isSampleBookId(normalizedBookId)) {
         return createSampleBookDetailResult(
-          "未找到数据库书籍记录。当前展示演示 fallback 书籍详情；这不是生产数据。",
+          "未找到开发数据源书籍记录。当前展示演示 fallback 书籍详情；这不是生产数据。",
         );
       }
 
@@ -75,7 +75,7 @@ export async function loadBookDetail({
         status: "book_not_found",
         book: null,
         message:
-          "未找到此 ID 对应的已保存书籍。该书可能尚未导入。",
+          "未找到此 ID 对应的开发数据源书籍。该书可能尚未通过文本预览保存入口写入当前环境。",
       };
     }
 
@@ -89,12 +89,12 @@ export async function loadBookDetail({
     return {
       status: "loaded",
       book,
-      message: `已从数据库加载元数据、${book.chapterCount} 个章节和 ${book.chunkCount} 个 chunk。`,
+      message: `已从当前开发数据源加载元数据、${book.chapterCount} 个章节和 ${book.chunkCount} 个 chunk。`,
     };
   } catch {
     if (isSampleBookId(normalizedBookId)) {
       return createSampleBookDetailResult(
-        "无法从数据库读取书籍详情。当前展示演示 fallback 书籍详情；这不是生产数据。",
+        "无法从开发数据源读取书籍详情。当前展示演示 fallback 书籍详情；这不是生产数据。",
       );
     }
 
@@ -102,7 +102,7 @@ export async function loadBookDetail({
       status: "read_failed",
       book: null,
       message:
-        "无法从数据库读取书籍详情。详情页仍可打开，但不会显示数据库数据。",
+        "无法从开发数据源读取书籍详情。详情页仍可打开，但不会显示开发数据源数据。",
     };
   }
 }
@@ -197,7 +197,7 @@ function mapSampleBookDetail(): BookDetailView {
     title: sampleBook.document.title,
     author: sampleBook.document.author ?? undefined,
     description:
-      "这是 Web MVP 的演示 fallback 书籍，仅用于数据库暂无可读内容时验收 books -> reader 最短路径。",
+      "这是 Web MVP 的演示 fallback 书籍，仅用于开发数据源暂无可读内容时预览 books -> reader 最短路径。",
     sourceType: "演示数据 / fallback",
     tags: ["演示数据", "fallback", "preview-only"],
     createdAtLabel: formatDateLabel(sampleBook.document.createdAt),
@@ -243,7 +243,7 @@ async function loadBookReadingProgress({
       return {
         status: "demo_user_missing",
         message:
-          "阅读进度不可用，因为未找到演示用户。",
+          "阅读进度预览不可用，因为未找到演示用户。",
         hasSavedProgress: false,
         completedChapterCount: 0,
         totalChapterCount: readerData.chapters.length,
@@ -266,7 +266,7 @@ async function loadBookReadingProgress({
     return {
       status: "read_failed",
       message:
-        "无法从数据库读取阅读进度。书籍详情数据仍会显示。",
+        "无法从开发数据源读取演示阅读进度。书籍详情数据仍会显示。",
       hasSavedProgress: false,
       completedChapterCount: 0,
       totalChapterCount: readerData.chapters.length,
@@ -293,7 +293,7 @@ function mapReadingProgressSummary({
     return {
       status: "progress_empty",
       message:
-        "未找到演示用户在此书上的已保存阅读进度。",
+        "未找到演示用户在此书上的阅读进度预览记录。",
       hasSavedProgress: false,
       completedChapterCount: 0,
       totalChapterCount,
@@ -315,7 +315,7 @@ function mapReadingProgressSummary({
     return {
       status: "progress_saved",
       message:
-        "存在已保存阅读进度，但最新章节无法匹配到此书的当前章节。",
+        "存在演示阅读进度记录，但最新章节无法匹配到此书的当前章节。",
       hasSavedProgress: true,
       currentChapterProgressLabel:
         latestProgress === undefined
@@ -333,7 +333,7 @@ function mapReadingProgressSummary({
 
   return {
     status: "progress_saved",
-    message: "已找到演示用户的已保存阅读进度。",
+    message: "已找到演示用户的阅读进度预览记录。",
     hasSavedProgress: true,
     currentChapterTitle: latestChapter.title,
     currentChapterLabel: `第 ${latestChapter.orderIndex + 1} 章 / 共 ${totalChapterCount} 章`,

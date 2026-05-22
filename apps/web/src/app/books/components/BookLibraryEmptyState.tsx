@@ -7,10 +7,10 @@ interface BookLibraryEmptyStateProps {
 export function BookLibraryEmptyState({ message }: BookLibraryEmptyStateProps) {
   return (
     <section className="learningEmptyState" aria-label="空书库">
-      <strong>暂无可显示的已保存书籍。</strong>
+      <strong>当前开发数据源暂无可显示的已保存书籍。</strong>
       <p>{message}</p>
       <Link className="secondaryLink" href="/import">
-        导入第一本书
+        打开文本导入预览
       </Link>
     </section>
   );

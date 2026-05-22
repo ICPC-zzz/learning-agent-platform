@@ -21,16 +21,16 @@ export function BookLibraryList({ books }: BookLibraryListProps) {
   const hasActiveFilters =
     trimmedSearchQuery.length > 0 || languageFilter.length > 0;
   const resultSummary = hasActiveFilters
-    ? `正在显示 ${books.length} 本已保存书籍中的 ${filteredBooks.length} 本。`
-    : `正在显示全部 ${books.length} 本已保存书籍。`;
+    ? `正在显示 ${books.length} 本开发数据源或演示书籍中的 ${filteredBooks.length} 本。`
+    : `正在显示全部 ${books.length} 本开发数据源或演示书籍。`;
 
   return (
     <section className="learningPanel" aria-labelledby="book-library-list-title">
       <div className="panelHeader">
-        <p className="eyebrow">已保存书籍</p>
-        <h2 id="book-library-list-title">数据库书籍列表</h2>
+        <p className="eyebrow">书籍入口预览</p>
+        <h2 id="book-library-list-title">开发数据源与演示书籍列表</h2>
         <p className="panelNote">
-          此列表只读取书籍元数据，不加载原始章节或 chunk 内容。
+          此列表只读展示书籍元数据，不加载原始章节或 chunk 全文，也不触发导入、AI 解析或 RAG。
         </p>
       </div>
 
@@ -48,7 +48,7 @@ export function BookLibraryList({ books }: BookLibraryListProps) {
               aria-label="按标题或作者搜索书籍"
               id="book-library-search"
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="搜索已保存书籍"
+              placeholder="搜索书籍预览入口"
               style={{
                 border: "1px solid #cbd5e1",
                 borderRadius: "8px",
@@ -105,9 +105,9 @@ export function BookLibraryList({ books }: BookLibraryListProps) {
           ))
         ) : (
           <div className="learningEmptyState" aria-live="polite">
-            <strong>没有已保存书籍匹配当前筛选条件。</strong>
+            <strong>没有书籍预览入口匹配当前筛选条件。</strong>
             <p>
-              清空搜索文本或语言筛选，即可重新显示完整的已保存书籍列表。
+              清空搜索文本或语言筛选，即可重新显示当前开发数据源或演示 fallback 列表。
             </p>
           </div>
         )}

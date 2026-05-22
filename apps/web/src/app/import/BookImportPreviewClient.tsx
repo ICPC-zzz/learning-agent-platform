@@ -147,8 +147,8 @@ export function BookImportPreviewClient() {
       setPreviewSaveInput(null);
       setImportError(
         error instanceof Error
-          ? error.message
-          : "导入预览失败，原因未知。",
+          ? `规则式导入预览失败：${error.message}`
+          : "规则式导入预览失败，原因未知。未调用 AI、RAG 或真实 provider。",
       );
     }
   }
@@ -156,10 +156,10 @@ export function BookImportPreviewClient() {
   return (
     <div className="dashboardGrid">
       <section className="learningPanel askAiPanel" aria-labelledby="import-form-title">
-        <p className="eyebrow">纯文本导入</p>
+        <p className="eyebrow">纯文本预览</p>
         <h2 id="import-form-title">输入标题和正文</h2>
         <p className="panelNote">
-          在这里粘贴正文文本，并在页面状态中生成导入预览。只有确认预览后才能保存。
+          在这里粘贴正文文本，并在页面状态中生成规则式预览；这里不会读取 URL、上传文件或调用 AI。
         </p>
 
         <form onSubmit={handleSubmit} style={{ ...formStackStyle, marginTop: "18px" }}>
@@ -216,7 +216,7 @@ export function BookImportPreviewClient() {
               value={content}
             />
             <span style={fieldHintStyle}>
-              A133 当前仅支持文本导入。URL 导入和文件导入暂未启用；复杂章节识别仍是 preview，不会调用 AI。
+              A152 当前仅支持粘贴文本的规则式预览。URL、PDF、EPUB、网页和文件导入未启用；复杂章节识别仍是 preview，不会调用 AI、RAG 或真实 provider。
             </span>
           </label>
 
@@ -248,7 +248,7 @@ export function BookImportPreviewClient() {
             </label>
           </div>
 
-          <button type="submit">生成预览</button>
+          <button type="submit">生成规则式预览</button>
         </form>
 
         <ValidationMessages
@@ -258,22 +258,22 @@ export function BookImportPreviewClient() {
       </section>
 
       <section className="learningPanel" aria-labelledby="import-boundary-title">
-        <p className="eyebrow">A133 边界</p>
-        <h2 id="import-boundary-title">文本闭环范围</h2>
+        <p className="eyebrow">A152 边界</p>
+        <h2 id="import-boundary-title">文本预览范围</h2>
         <dl className="scoreMeta">
-          <SummaryRow label="数据来源" value="本地预览" />
+          <SummaryRow label="数据来源" value="本地规则式预览" />
           <SummaryRow label="初始持久化状态" value="未保存" />
-          <SummaryRow label="保存边界" value="服务端 action" />
-          <SummaryRow label="数据库写入范围" value="Book / Chapter / Chunk" />
+          <SummaryRow label="保存边界" value="服务端 action；仅当前开发环境" />
+          <SummaryRow label="开发数据源写入范围" value="Book / Chapter / Chunk" />
           <SummaryRow label="章节策略" value="规则式预览；无标题时使用单章节 fallback" />
         </dl>
         <div className="warningBlock">
           <h3>此页面不会执行的操作</h3>
           <ul>
-            <li>不会保存 ReadingProgress、User、Learning、Recommendation 或 AI 数据。</li>
+            <li>不会保存 ReadingProgress、User、Learning、Recommendation、AI、RAG 或 provider 数据。</li>
             <li>不会创建 API routes、migration、seed 数据、认证、session 或 cookie。</li>
             <li>不会导入 PDF、EPUB、URL、HTML、上传文件或本地文件。</li>
-            <li>不会做复杂章节解析，也不会调用 AI 或任何真实 LLM。</li>
+            <li>不会做复杂章节解析，也不会调用 AI、RAG、provider 或任何真实 LLM。</li>
           </ul>
         </div>
       </section>
@@ -331,7 +331,7 @@ function ImportPreviewResult({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">导入书籍预览</p>
+          <p className="eyebrow">规则式导入预览</p>
           <h2 id="preview-result-title">{preview.title}</h2>
           <p className="panelNote">
             {preview.author ?? "未知作者"} · 语言：{formatImportLanguage(preview.language)}
@@ -358,13 +358,13 @@ function ImportPreviewResult({
         />
         <SummaryRow
           label="解析说明"
-          value="规则式文本预览；未检测到章节标题时会保存为单章节 fallback。"
+          value="规则式文本预览；未检测到章节标题时会作为单章节 fallback 展示，只有点击保存后才写入开发数据源。"
         />
       </dl>
 
       {preview.warnings.length > 0 ? (
         <div className="warningBlock">
-          <h3>导入警告</h3>
+          <h3>预览警告</h3>
           <ul>
             {preview.warnings.map((warning) => (
               <li key={warning}>{warning}</li>
@@ -377,11 +377,11 @@ function ImportPreviewResult({
 
       <div className="chunkPanel">
         <div className="panelHeader">
-          <p className="eyebrow">章节列表</p>
+          <p className="eyebrow">章节预览列表</p>
           <h2>章节与 chunk 预览</h2>
           <p className="panelNote">
             当前显示前 {preview.chapterPreviewLimit} 个章节，且每章最多显示{" "}
-            {preview.chunkPreviewLimitPerChapter} 个 chunk。上方统计基于完整导入结果。
+            {preview.chunkPreviewLimitPerChapter} 个 chunk。上方统计基于完整规则式预览结果。
           </p>
         </div>
 

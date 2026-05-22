@@ -15,8 +15,8 @@ interface BookDetailPageProps {
 }
 
 const statusLabels: Record<BookDetailLoadResult["status"], string> = {
-  loaded: "数据库",
-  database_unavailable: "数据库不可用",
+  loaded: "开发数据源",
+  database_unavailable: "开发数据源不可用",
   book_not_found: "未找到书籍",
   read_failed: "读取失败",
   unavailable: "不可用",
@@ -27,10 +27,10 @@ const progressStatusLabels: Record<
   BookDetailReadingProgressView["status"],
   string
 > = {
-  progress_saved: "已保存进度",
-  progress_empty: "暂无进度",
+  progress_saved: "演示进度",
+  progress_empty: "暂无演示进度",
   demo_user_missing: "缺少演示用户",
-  database_unavailable: "数据库不可用",
+  database_unavailable: "开发数据源不可用",
   read_failed: "读取失败",
 };
 
@@ -47,7 +47,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           <h1>{result.book?.title ?? "书籍详情"}</h1>
           <p className="status">
             {result.book === null
-              ? "只读展示已保存书籍详情。"
+              ? "只读展示开发数据源或演示 fallback 中的书籍详情。"
               : `${result.book.author ?? "未知作者"} · 来源：${
                   result.book.sourceType ?? "saved_book"
                 }`}
@@ -132,7 +132,7 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
       <section className="learningPanel" aria-labelledby="book-metadata-title">
         <div className="panelHeaderRow">
           <div>
-            <p className="eyebrow">书籍元数据</p>
+            <p className="eyebrow">只读书籍元数据</p>
             <h2 id="book-metadata-title">{book.title}</h2>
             {book.subtitle === undefined ? null : (
               <p className="panelNote">{book.subtitle}</p>
@@ -154,7 +154,7 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
             <SummaryRow label="标签" value={book.tags.join(", ")} />
           )}
           {book.sourceUrl === undefined ? null : (
-            <SummaryRow label="来源 URL" value={book.sourceUrl} />
+            <SummaryRow label="来源 URL（只读）" value={book.sourceUrl} />
           )}
           {book.createdAtLabel === undefined ? null : (
             <SummaryRow label="创建时间" value={book.createdAtLabel} />
@@ -190,14 +190,14 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
           <p className="eyebrow">章节</p>
           <h2 id="book-chapters-title">章节列表</h2>
           <p className="panelNote">
-            选择任一章节进入阅读器；链接会携带 bookId 和 chapterId。
+            选择任一章节进入阅读器预览；链接只携带 bookId 和 chapterId，不触发 AI 解析或 RAG。
           </p>
         </div>
         <div className="chunkList" style={{ marginTop: "18px" }}>
           {book.chapters.length === 0 ? (
             <div className="learningEmptyState" aria-live="polite">
-              <strong>这本已保存书籍没有找到章节。</strong>
-              <p>书籍元数据可用，但章节记录为空。</p>
+              <strong>这本书籍预览没有找到章节。</strong>
+              <p>书籍元数据可用，但当前开发数据源中的章节记录为空。</p>
             </div>
           ) : (
             book.chapters.map((chapter) => (
@@ -238,7 +238,7 @@ function BookReadingProgressSummary({
     <section className="learningPanel" aria-labelledby="book-progress-title">
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">阅读进度</p>
+          <p className="eyebrow">阅读进度预览</p>
           <h2 id="book-progress-title">演示用户进度</h2>
           <p className="panelNote">{progress.message}</p>
         </div>
@@ -253,7 +253,7 @@ function BookReadingProgressSummary({
           value={progressStatusLabels[progress.status]}
         />
         <SummaryRow
-          label="已保存进度"
+          label="存在演示进度"
           value={progress.hasSavedProgress ? "是" : "否"}
         />
         <SummaryRow

@@ -12,15 +12,18 @@ export default async function BooksPage() {
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">A131 书籍阅读最短路径</p>
-          <h1>书库 / 可阅读入口</h1>
+          <p className="eyebrow">A152 书库预览边界</p>
+          <h1>书库 / 只读预览入口</h1>
           <p className="status">
-            展示可进入章节列表的书籍入口；演示 fallback 数据会明确标注。
+            仅展示开发数据源或演示 fallback 中可进入章节列表的书籍入口；不会导入新格式或触发 AI 解析。
           </p>
         </div>
         <div className="homeActions">
           <Link className="secondaryLink" href="/">
             返回首页
+          </Link>
+          <Link className="primaryLink" href="/import">
+            打开文本导入预览
           </Link>
         </div>
       </header>

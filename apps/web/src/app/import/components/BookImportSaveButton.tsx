@@ -17,7 +17,7 @@ const initialSaveState: BookImportSaveActionState = {
   ok: null,
   status: "local_preview",
   message:
-    "本地预览已就绪。保存前会在服务端重新校验并重新导入，然后只写入 Book、Chapter 和 Chunk 记录。",
+    "本地规则式预览已就绪。保存前会在服务端按同一规则重新校验并生成结果，然后只写入当前开发环境的 Book、Chapter 和 Chunk 记录。",
 };
 
 export function BookImportSaveButton({ input }: BookImportSaveButtonProps) {
@@ -37,10 +37,10 @@ export function BookImportSaveButton({ input }: BookImportSaveButtonProps) {
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">A133 保存边界</p>
-          <h2 id="import-save-title">保存导入结果</h2>
+          <p className="eyebrow">A152 保存边界</p>
+          <h2 id="import-save-title">保存预览结果</h2>
           <p className="panelNote">
-            仅保存最近一次生成预览对应的 Book、Chapter 和 Chunk 数据；不会保存 URL、文件或 AI 结果。
+            仅保存最近一次规则式预览对应的 Book、Chapter 和 Chunk 数据到当前开发环境；不会保存 URL、文件、AI、RAG 或 provider 结果。
           </p>
         </div>
         <form action={formAction}>
@@ -59,7 +59,7 @@ export function BookImportSaveButton({ input }: BookImportSaveButtonProps) {
             value={input.overlapChars}
           />
           <button disabled={isPending} type="submit">
-            {isPending ? "保存中..." : "保存到当前开发环境数据源"}
+            {isPending ? "保存预览中..." : "保存预览到开发数据源"}
           </button>
         </form>
       </div>
