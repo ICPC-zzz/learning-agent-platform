@@ -195,6 +195,39 @@ h1 {
   background: #8a452d;
 }
 
+
+.demoModeNotice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border: 1px solid #e6d48a;
+  border-radius: 8px;
+  background: #fffbe6;
+  color: #263241;
+}
+
+.demoModeNotice p {
+  margin: 0;
+  color: #445064;
+  line-height: 1.5;
+  max-width: 72ch;
+}
+
+.demoModeBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: #856404;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .readerLayout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 320px;

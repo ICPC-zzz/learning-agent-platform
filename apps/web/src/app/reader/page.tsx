@@ -18,6 +18,21 @@ import {
   type ReaderRawSearchParams,
 } from "./reader-query";
 
+function DemoModeNotice() {
+  return (
+    <section
+      aria-label="演示模式提醒"
+      className="demoModeNotice"
+    >
+      <span className="demoModeBadge">演示模式</span>
+      <p>
+        当前阅读器使用演示/预览数据。阅读进度仅恢复到章节级，暂不包含滚动位置；AI
+        问答、RAG 与真实模型 provider 均未启用。当前展示不代表真实学习闭环已完成。
+      </p>
+    </section>
+  );
+}
+
 interface ReaderPageProps {
   searchParams?: Promise<ReaderRawSearchParams>;
 }
@@ -54,6 +69,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
   ) {
     return (
       <main className="readerPage">
+        <DemoModeNotice />
         <header className="readerHeader">
           <div>
             <p className="eyebrow">阅读器预览</p>
@@ -99,6 +115,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
 
   return (
     <main className="readerPage">
+      <DemoModeNotice />
       <header className="readerHeader">
         <div>
           <p className="eyebrow">阅读器预览</p>
@@ -162,6 +179,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
 function ReaderEmptyState({ message }: { message: string }) {
   return (
     <main className="readerPage">
+      <DemoModeNotice />
       <header className="readerHeader">
         <div>
           <p className="eyebrow">阅读器预览</p>
