@@ -962,46 +962,35 @@ h1 {
   margin-top: 18px;
 }
 
-@media (max-width: 760px) {
-  .page {
-    padding: 40px 0;
-  }
-
-  h1 {
-    font-size: 2.125rem;
-  }
-
-  .placeholderGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .readerHeader,
-  .readerLayout,
-  .chunkList,
-  .learningHero,
-  .dashboardGrid,
-  .problemList {
-    grid-template-columns: 1fr;
-  }
-
-  .readerSidebar {
-    position: static;
-  }
-
-  .readerContent {
-    padding: 22px;
-  }
-
-  .aiContextList div {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-
-  .learningHero {
-    align-items: start;
-  }
-
-  .scoreValue {
-    font-size: 3.25rem;
-  }
+.readerScrollProgress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 16px;
+  margin-top: 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #263241;
 }
+
+.readerScrollProgressLabel {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.readerScrollProgressValue {
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: #244a73;
+  min-width: 3ch;
+}
+
+.readerScrollProgressBar {
+  flex: 1 1 120px;
+  height: 8px;
+  border: none;
+  border-radius: 999px;
+  overflow: hidden;
+  accent-colo

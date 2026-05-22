@@ -12,6 +12,11 @@ import {
 import { ReaderChapterNavigation } from "./components/ReaderChapterNavigation";
 import { ReaderChapterSelectionNotice } from "./components/ReaderChapterSelectionNotice";
 import { ReadingProgressSaveForm } from "./components/ReadingProgressSaveForm";
+import { ReaderScrollPositionTracker } from "./ReaderScrollPositionTracker";
+import { ReaderReadingTimer } from "./ReaderReadingTimer";
+import { ReaderChapterCompletionToggle } from "./ReaderChapterCompletionToggle";
+import { ReaderScrollProgressIndicator } from "./ReaderScrollProgressIndicator";
+import { ReaderVisibleBlockIndicator } from "./ReaderVisibleBlockIndicator";
 import {
   readReaderSearchQuery,
   resolveReaderChapterSelection,
@@ -26,8 +31,9 @@ function DemoModeNotice() {
     >
       <span className="demoModeBadge">演示模式</span>
       <p>
-        当前阅读器使用演示/预览数据。阅读进度仅恢复到章节级，暂不包含滚动位置；AI
-        问答、RAG 与真实模型 provider 均未启用。当前展示不代表真实学习闭环已完成。
+        当前阅读器使用演示/预览数据。阅读进度仍以章节级预览为主；
+        本章已读、滚动位置、阅读计时和当前可见内容块提示均为当前浏览器本地预览能力，
+        不进行数据库同步，不代表真实学习闭环。AI 问答、RAG 与真实模型 provider 均未启用。
       </p>
     </section>
   );
@@ -116,6 +122,20 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
   return (
     <main className="readerPage">
       <DemoModeNotice />
+      <ReaderScrollPositionTracker
+        bookId={readerData.book.id}
+        chapterId={currentChapter.id}
+      />
+      <ReaderReadingTimer
+        bookId={readerData.book.id}
+        chapterId={currentChapter.id}
+      />
+      <ReaderChapterCompletionToggle
+        bookId={readerData.book.id}
+        chapterId={currentChapter.id}
+      />
+      <ReaderScrollProgressIndicator />
+      <ReaderVisibleBlockIndicator />
       <header className="readerHeader">
         <div>
           <p className="eyebrow">阅读器预览</p>

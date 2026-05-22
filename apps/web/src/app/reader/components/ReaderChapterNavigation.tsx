@@ -1,58 +1,97 @@
 import Link from "next/link";
 
-import type { ReaderChapterView } from "../../../lib/reader-types";
+export interface ReaderChapterNavigationLink {
+  href: string;
+  title: string;
+  disabled?: boolean;
+}
 
-interface ReaderChapterNavigationProps {
+export interface ReaderChapterNavigationProps {
   bookId: string;
-  chapters: readonly ReaderChapterView[];
+  chapters: readonly { id: string; title: string }[];
   currentChapterId: string;
 }
 
+/**
+ * Renders "上一章 / 下一章" navigation for the reader page.
+ *
+ * Computes adjacent chapters from the provided `chapters` array.
+ * When the array has at least 2 chapters and the current chapter is not at an edge,
+ * the links point to `/reader?bookId=...&chapterId=...`.
+ *
+ * Disabled states are shown with a clear message when:
+ * - The current chapter is the first chapter (no previous)
+ * - The current chapter is the last chapter (no next)
+ * - The chapters array does not provide enough data to resolve adjacent chapters
+ */
 export function ReaderChapterNavigation({
   bookId,
   chapters,
   currentChapterId,
 }: ReaderChapterNavigationProps) {
-  const currentChapterIndex = chapters.findIndex(
+  const currentIndex = chapters.findIndex(
     (chapter) => chapter.id === currentChapterId,
   );
 
+  const previous =
+    currentIndex > 0 ? chapters[currentIndex - 1] : undefined;
+  const next =
+    currentIndex >= 0 && currentIndex < chapters.length - 1
+      ? chapters[currentIndex + 1]
+      : undefined;
+
+  const buildHref = (chapterId: string) =>
+    `/reader?bookId=${encodeURIComponent(bookId)}&chapterId=${encodeURIComponent(chapterId)}`;
+
   return (
-    <aside className="readerSidebar" aria-label="章节列表">
-      <h2>章节</h2>
-      <p className="panelNote">
-        第 {currentChapterIndex >= 0 ? currentChapterIndex + 1 : 1} 章 / 共{" "}
-        {chapters.length} 章
-      </p>
-      <ol className="chapterList">
-        {chapters.map((chapter, chapterIndex) => {
-          const isCurrent = chapter.id === currentChapterId;
+    <nav aria-label="章节导航" className="readerChapterNavigation">
+      <div className="readerChapterNavItem">
+        {previous !== undefined ? (
+          <Link
+            className="readerChapterNavLink"
+            href={buildHref(previous.id)}
+          >
+            <span className="readerChapterNavDirection">上一章</span>
+            <span className="readerChapterNavTitle">{previous.title}</span>
+          </Link>
+        ) : (
+          <span
+            className="readerChapterNavLink readerChapterNavDisabled"
+            aria-disabled="true"
+          >
+            <span className="readerChapterNavDirection">上一章</span>
+            <span className="readerChapterNavTitle">
+              {currentIndex < 0
+                ? "当前预览数据未提供上一章"
+                : "已是第一章"}
+            </span>
+          </span>
+        )}
+      </div>
 
-          return (
-            <li
-              aria-current={isCurrent ? "page" : undefined}
-              className={
-                isCurrent
-                  ? "chapterListItem chapterListItemActive"
-                  : "chapterListItem"
-              }
-              key={chapter.id}
-            >
-              <span className="chapterOrder">{chapterIndex + 1}</span>
-              <Link href={createReaderChapterHref(bookId, chapter.id)}>
-                {chapter.title}
-              </Link>
-              {isCurrent ? <span className="eyebrow">当前</span> : null}
-            </li>
-          );
-        })}
-      </ol>
-    </aside>
+      <div className="readerChapterNavItem readerChapterNavNext">
+        {next !== undefined ? (
+          <Link
+            className="readerChapterNavLink"
+            href={buildHref(next.id)}
+          >
+            <span className="readerChapterNavDirection">下一章</span>
+            <span className="readerChapterNavTitle">{next.title}</span>
+          </Link>
+        ) : (
+          <span
+            className="readerChapterNavLink readerChapterNavDisabled"
+            aria-disabled="true"
+          >
+            <span className="readerChapterNavDirection">下一章</span>
+            <span className="readerChapterNavTitle">
+              {currentIndex < 0
+                ? "当前预览数据未提供下一章"
+                : "已是最后一章"}
+            </span>
+          </span>
+        )}
+      </div>
+    </nav>
   );
-}
-
-function createReaderChapterHref(bookId: string, chapterId: string): string {
-  return `/reader?bookId=${encodeURIComponent(bookId)}&chapterId=${encodeURIComponent(
-    chapterId,
-  )}`;
 }

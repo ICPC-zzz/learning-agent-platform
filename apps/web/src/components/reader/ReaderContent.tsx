@@ -15,8 +15,10 @@ export function ReaderContent({ chapter }: ReaderContentProps) {
       <p className="eyebrow">当前章节</p>
       <h2>{chapter.title}</h2>
       <div className="chapterBody">
-        {paragraphs.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
+        {paragraphs.map((paragraph, index) => (
+          <p key={paragraph} data-reader-block data-reader-block-index={index + 1}>
+            {paragraph}
+          </p>
         ))}
       </div>
     </article>
