@@ -40,7 +40,7 @@ export async function loadLearningRecommendationProblemAttemptStatusPreview({
       recommendedProblems,
       status: "unavailable",
       message:
-        "没有可用推荐题目，因此未读取卡片级 ProblemAttempt 状态。",
+        "没有可用推荐题目，因此未读取卡片级 ProblemAttempt 状态预览。",
     });
   }
 
@@ -57,7 +57,7 @@ export async function loadLearningRecommendationProblemAttemptStatusPreview({
       recommendedProblems,
       status: "database_unavailable",
       message:
-        "ProblemAttempt 卡片状态不可用，因为 DATABASE_URL 未配置。",
+        "ProblemAttempt 卡片状态预览不可用，因为 DATABASE_URL 未配置。",
     });
   }
 
@@ -72,7 +72,7 @@ export async function loadLearningRecommendationProblemAttemptStatusPreview({
         recommendedProblems,
         status: "demo_user_missing",
         message:
-          "ProblemAttempt 卡片状态无法在数据库中找到 demo@example.com。",
+          "ProblemAttempt 卡片状态预览无法在数据库中找到演示用户 demo@example.com。",
       });
     }
 
@@ -91,7 +91,7 @@ export async function loadLearningRecommendationProblemAttemptStatusPreview({
       recommendedProblems,
       status: "read_failed",
       message:
-        "读取数据库时 ProblemAttempt 卡片状态失败。推荐仍可渲染。",
+        "读取数据库时 ProblemAttempt 卡片状态预览失败。推荐预览仍可渲染。",
     });
   }
 }
@@ -118,15 +118,15 @@ function getMessageForFallbackReason(
 ): string {
   switch (reason) {
     case "missing_database_url":
-      return "ProblemAttempt 卡片状态不可用，因为 DATABASE_URL 未配置。";
+      return "ProblemAttempt 卡片状态预览不可用，因为 DATABASE_URL 未配置。";
     case "no_demo_user_found":
-      return "ProblemAttempt 卡片状态不可用，因为未找到 demo@example.com。";
+      return "ProblemAttempt 卡片状态预览不可用，因为未找到演示用户 demo@example.com。";
     case "database_read_failed":
-      return "ProblemAttempt 卡片状态不可用，因为仪表盘数据库读取失败。";
+      return "ProblemAttempt 卡片状态预览不可用，因为仪表盘数据库读取失败。";
     case "no_ability_profile_found":
     case "no_daily_recommendations_found":
     case undefined:
-      return "仪表盘正在显示回退推荐，ProblemAttempt 卡片状态不可用。";
+      return "仪表盘正在显示回退推荐，ProblemAttempt 卡片状态预览不可用。";
   }
 }
 

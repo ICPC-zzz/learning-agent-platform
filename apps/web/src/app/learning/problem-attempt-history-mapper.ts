@@ -20,14 +20,14 @@ export function createRecentProblemAttemptHistoryViewModel({
   if (records.length === 0) {
     return createRecentProblemAttemptHistoryStatusViewModel({
       status: "attempts_empty",
-      message: "暂无做题记录。",
+      message: "暂无可用于预览的做题记录。",
       limit,
     });
   }
 
   return {
     status: "attempts_loaded",
-    message: `已为演示用户加载 ${records.length} 条最近 ProblemAttempt 记录。`,
+    message: `已为演示用户读取 ${records.length} 条最近 ProblemAttempt 记录，仅用于只读历史预览。`,
     recentAttemptCount: records.length,
     limit,
     items: records.map(mapProblemAttemptRecordToHistoryItem),

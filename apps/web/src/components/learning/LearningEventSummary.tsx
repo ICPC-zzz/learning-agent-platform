@@ -13,8 +13,8 @@ export function LearningEventSummary({
     <section className="learningPanel" aria-labelledby="event-summary-title">
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">最近</p>
-          <h2 id="event-summary-title">最近学习事件</h2>
+          <p className="eyebrow">只读预览</p>
+          <h2 id="event-summary-title">最近学习事件预览</h2>
         </div>
         <strong className="eventTotal">{summary.totalEvents}</strong>
       </div>
@@ -35,15 +35,15 @@ export function LearningEventSummary({
       </dl>
 
       {summary.latestEventAt !== undefined ? (
-        <p className="panelNote">最新事件：{summary.latestEventAt}</p>
+        <p className="panelNote">最新预览事件：{summary.latestEventAt}</p>
       ) : (
         <p className="panelNote">
-          当前数据源暂无最近学习事件。
+          当前数据源暂无最近学习事件预览。
         </p>
       )}
 
       <div className="warningBlock">
-        <h3>评分警告</h3>
+        <h3>评分预览警告</h3>
         {warnings.length > 0 ? (
           <ul>
             {warnings.map((warning) => (
@@ -51,7 +51,7 @@ export function LearningEventSummary({
             ))}
           </ul>
         ) : (
-          <p>当前数据源没有评分警告。</p>
+          <p>当前数据源没有评分预览警告。</p>
         )}
       </div>
     </section>

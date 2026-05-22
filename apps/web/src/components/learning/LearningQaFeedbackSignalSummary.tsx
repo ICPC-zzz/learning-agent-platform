@@ -11,7 +11,7 @@ function formatPercent(value: number): string {
 function formatStatus(status: LearningQaFeedbackSignalPreview["status"]): string {
   switch (status) {
     case "loaded":
-      return "已加载";
+      return "预览已加载";
     case "empty":
       return "暂无数据";
     case "database_unavailable":
@@ -50,7 +50,7 @@ export function LearningQaFeedbackSignalSummary({
 
       <dl className="eventStats">
         <div>
-          <dt>已加载记录</dt>
+          <dt>预览读取记录</dt>
           <dd>{preview.recordsLoaded}</dd>
         </div>
         <div>
@@ -72,11 +72,11 @@ export function LearningQaFeedbackSignalSummary({
       </dl>
 
       <div className="recommendationContext">
-        <span>real_openai</span>
+        <span>历史真实模型来源记录</span>
         <strong>{preview.answerSourceCounts.real_openai}</strong>
-        <span>mock</span>
+        <span>历史模拟来源记录</span>
         <strong>{preview.answerSourceCounts.mock}</strong>
-        <span>fallback_mock</span>
+        <span>历史回退模拟来源记录</span>
         <strong>{preview.answerSourceCounts.fallback_mock}</strong>
         <span>受回退影响</span>
         <strong>{fallbackCount}</strong>
@@ -106,9 +106,9 @@ export function LearningQaFeedbackSignalSummary({
       <div className="warningBlock">
         <h3>预览边界</h3>
         <ul>
-          <li>这些信号来自问答反馈，只影响当前仪表盘预览。</li>
+          <li>这些信号来自历史问答反馈记录，只影响当前仪表盘预览。</li>
           <li>此摘要不会执行数据库写入。</li>
-          <li>它们不会替代已保存的能力画像记录。</li>
+          <li>它们不会替代已保存的能力画像记录，也不会触发真实 AI 反馈闭环。</li>
         </ul>
       </div>
     </section>
@@ -120,8 +120,8 @@ function formatAbilityPreviewImpactStatus(
 ): string {
   switch (status) {
     case "included":
-      return "已纳入";
+      return "纳入本次预览";
     case "not_included":
-      return "未纳入";
+      return "仅汇总预览";
   }
 }

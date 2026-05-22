@@ -22,13 +22,13 @@ export function createRecommendationProblemAttemptStatusPreview(input: {
       recommendedProblems: input.recommendedProblems,
       status: "attempts_empty",
       message:
-        "演示用户没有最近 ProblemAttempt 记录。推荐题目卡片会显示为未尝试。",
+        "演示用户没有最近 ProblemAttempt 记录。推荐题目卡片会显示为未尝试预览状态。",
     });
   }
 
   return {
     status: "attempts_loaded",
-    message: `已加载 ${input.records.length} 条最近 ProblemAttempt 记录，用于匹配推荐卡片状态。`,
+    message: `已为演示用户读取 ${input.records.length} 条最近 ProblemAttempt 记录，用于只读匹配推荐卡片状态预览。`,
     recentAttemptCount: input.records.length,
     statuses: input.recommendedProblems.map((problem) =>
       createStatusForRecommendedProblem(problem, input.records),
@@ -66,7 +66,7 @@ function createStatusForRecommendedProblem(
       recommendedProblem,
       status: "unavailable",
       description:
-        "尝试状态不可用，因为此推荐没有稳定题目标识符。",
+        "尝试状态预览不可用，因为此推荐没有稳定题目标识符。",
       matchedBy: "none",
       source: "unavailable",
     });
@@ -102,7 +102,7 @@ function createStatusForRecommendedProblem(
     recommendedProblem,
     status: "not_attempted",
     description:
-      "最近 ProblemAttempt 中没有按 problemId 或 externalProblemId 匹配到此推荐。",
+      "最近 ProblemAttempt 中没有按 problemId 或 externalProblemId 匹配到此推荐；显示为未尝试预览状态。",
     matchedBy: "none",
     source: "problem_attempt_history",
     attemptCount: 0,
@@ -128,7 +128,7 @@ function createMatchedStatus({
     return createBaseStatus({
       recommendedProblem,
       status: "not_attempted",
-      description: "最近 ProblemAttempt 中没有匹配到此推荐。",
+      description: "最近 ProblemAttempt 中没有匹配到此推荐；显示为未尝试预览状态。",
       matchedBy: "none",
       source: "problem_attempt_history",
       attemptCount: 0,
@@ -158,7 +158,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "not_attempted",
         description:
-          "没有可用于匹配的最近 ProblemAttempt 记录。",
+          "没有可用于匹配的最近 ProblemAttempt 记录；显示为未尝试预览状态。",
         matchedBy: "none",
         source: "problem_attempt_history",
         attemptCount: 0,
@@ -168,7 +168,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "database_unavailable",
         description:
-          "尝试状态不可用，因为 DATABASE_URL 未配置。",
+          "尝试状态预览不可用，因为 DATABASE_URL 未配置。",
         matchedBy: "none",
         source: "unavailable",
       });
@@ -177,7 +177,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "demo_user_missing",
         description:
-          "尝试状态不可用，因为未找到 demo@example.com。",
+          "尝试状态预览不可用，因为未找到演示用户 demo@example.com。",
         matchedBy: "none",
         source: "unavailable",
       });
@@ -186,7 +186,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "read_failed",
         description:
-          "无法读取尝试状态，但推荐仍可渲染。",
+          "无法读取尝试状态预览，但推荐预览仍可渲染。",
         matchedBy: "none",
         source: "unavailable",
       });
@@ -195,7 +195,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "unavailable",
         description:
-          "当前推荐数据源的尝试状态不可用。",
+          "当前推荐数据源的尝试状态预览不可用。",
         matchedBy: "none",
         source: "unavailable",
       });
@@ -204,7 +204,7 @@ function createStatusForReadStatus(
         recommendedProblem,
         status: "not_attempted",
         description:
-          "最近 ProblemAttempt 中没有按稳定标识符匹配到此推荐。",
+          "最近 ProblemAttempt 中没有按稳定标识符匹配到此推荐；显示为未尝试预览状态。",
         matchedBy: "none",
         source: "problem_attempt_history",
         attemptCount: 0,
@@ -287,17 +287,17 @@ function createMatchedDescription(
 ): string {
   switch (status) {
     case "solved":
-      return `最新匹配的 ProblemAttempt 已解决，匹配方式：${matchedBy}。`;
+      return `最新匹配的演示 ProblemAttempt 记录为已解决，匹配方式：${matchedBy}。`;
     case "failed":
-      return `最新匹配的 ProblemAttempt 失败，匹配方式：${matchedBy}。`;
+      return `最新匹配的演示 ProblemAttempt 记录为失败，匹配方式：${matchedBy}。`;
     case "attempted":
-      return `最新匹配的 ProblemAttempt 为已尝试，尚无已解决/失败结果，匹配方式：${matchedBy}。`;
+      return `最新匹配的演示 ProblemAttempt 记录为已尝试，尚无已解决/失败结果，匹配方式：${matchedBy}。`;
     case "not_attempted":
     case "unavailable":
     case "read_failed":
     case "demo_user_missing":
     case "database_unavailable":
-      return `尝试状态为 ${formatProblemAttemptStatusLabel(status)}。`;
+      return `尝试状态预览为 ${formatProblemAttemptStatusLabel(status)}。`;
   }
 }
 

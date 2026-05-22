@@ -95,9 +95,9 @@ export function LearningDailyRecommendationSaveControls({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">显式保存</p>
+          <p className="eyebrow">开发演示保存</p>
           <h2 id="daily-recommendation-save-title">
-            每日推荐快照
+            每日推荐演示快照
           </h2>
         </div>
         <span className="difficultyBadge">
@@ -109,12 +109,12 @@ export function LearningDailyRecommendationSaveControls({
         <span>{isPending ? "保存中" : formatDailySaveStatus(displayedResult?.status)}</span>
         <p>
           {isPending
-            ? "正在根据当前能力画像、候选题目和最近 ProblemAttempt 历史生成今日推荐。"
+            ? "正在根据演示用户的当前能力画像、候选题目和最近 ProblemAttempt 历史生成今日推荐预览；不会调用真实 AI。"
             : displayedResult?.message ??
-              "已准备好生成并保存今日 DailyRecommendation 记录。"}
+              "已准备好手动生成并保存今日 DailyRecommendation 预览快照。"}
         </p>
         {displayedResult?.recommendationId !== undefined ? (
-          <p>已保存推荐 ID：{displayedResult.recommendationId}</p>
+          <p>演示快照推荐 ID：{displayedResult.recommendationId}</p>
         ) : null}
         {displayedResult?.savedAt !== undefined ? (
           <p>保存时间：{displayedResult.savedAt}</p>
@@ -134,11 +134,11 @@ export function LearningDailyRecommendationSaveControls({
 
       <dl className="eventStats">
         <div>
-          <dt>已生成</dt>
+          <dt>预览生成</dt>
           <dd>{displayRecommendationCount}</dd>
         </div>
         <div>
-          <dt>已保存</dt>
+          <dt>演示保存</dt>
           <dd>{displaySavedRecommendationCount}</dd>
         </div>
         <div>
@@ -150,7 +150,7 @@ export function LearningDailyRecommendationSaveControls({
           <dd>{formatAbilityProfileSource(displayAbilityProfileSource)}</dd>
         </div>
         <div>
-          <dt>已保存画像</dt>
+          <dt>已保存演示画像</dt>
           <dd>{displaySavedProfileAvailable ? "是" : "否"}</dd>
         </div>
         <div>
@@ -182,17 +182,17 @@ export function LearningDailyRecommendationSaveControls({
       <div className="warningBlock">
         <h3>保存边界</h3>
         <ul>
-          <li>通过 server action 保存 DailyRecommendation 记录。</li>
-          <li>优先使用最新已保存的 AbilityProfile 和数据库候选题目。</li>
-          <li>读取最近 ProblemAttempt 历史，并传入推荐生成过程。</li>
-          <li>仅在没有已保存 AbilityProfile 时使用 engine_preview。</li>
+          <li>通过 server action 为演示用户保存 DailyRecommendation 开发快照。</li>
+          <li>优先使用最新已保存的演示 AbilityProfile 和数据库候选题目。</li>
+          <li>只读取最近 ProblemAttempt 历史作为预览输入，不启动自动训练或推荐闭环。</li>
+          <li>仅在没有已保存 AbilityProfile 时使用 engine_preview 内存态预览。</li>
           <li>不会保存 AbilityProfile、ProblemAttempt、问答反馈或 ReadingProgress。</li>
         </ul>
       </div>
 
       {displayedResult?.usedQaFeedbackSignals ? (
         <p className="panelNote">
-          本次保存在引擎预览能力画像中使用了问答反馈信号。
+          本次演示保存使用了引擎预览能力画像中的问答反馈信号。
         </p>
       ) : null}
 
@@ -203,8 +203,8 @@ export function LearningDailyRecommendationSaveControls({
         disabled={isPending || isBlocked}
       >
         {isPending
-          ? "正在保存每日推荐..."
-          : "生成并保存今日推荐"}
+          ? "正在保存每日推荐演示快照..."
+          : "手动保存今日推荐预览快照"}
       </button>
     </section>
   );
@@ -233,7 +233,7 @@ function createBlockingResult({
         ...historyDefaults,
         status: "database_unavailable",
         message:
-          "每日推荐保存不可用，因为 DATABASE_URL 未配置。",
+          "每日推荐演示保存不可用，因为 DATABASE_URL 未配置。",
         candidateProblemCount,
         qaFeedbackSignalCount,
         fallbackReason: "database_unavailable",
@@ -245,7 +245,7 @@ function createBlockingResult({
         ...historyDefaults,
         status: "demo_user_missing",
         message:
-          "每日推荐保存不可用，因为未找到演示用户。",
+          "每日推荐演示保存不可用，因为未找到演示用户。",
         candidateProblemCount,
         qaFeedbackSignalCount,
         fallbackReason: "demo_user_missing",
@@ -256,7 +256,7 @@ function createBlockingResult({
       ...historyDefaults,
       status: "unavailable_for_mock_fallback",
       message:
-        "仪表盘正在显示模拟回退数据，每日推荐保存不可用。",
+        "仪表盘正在显示模拟回退数据，每日推荐演示保存不可用。",
       candidateProblemCount,
       abilityProfileSource: "mock_fallback",
       fallbackUsed: true,
@@ -270,7 +270,7 @@ function createBlockingResult({
       ...historyDefaults,
       status: "missing_ability_profile",
       message:
-        "在存在已保存或预览能力画像前，每日推荐保存不可用。",
+        "在存在已保存或预览能力画像前，每日推荐演示保存不可用。",
       candidateProblemCount,
       abilityProfileSource: initialAbilityProfileSource,
       fallbackReason: "no_preview_learning_events",
@@ -283,7 +283,7 @@ function createBlockingResult({
       ...historyDefaults,
       status: "missing_candidate_problems",
       message:
-        "在数据库候选题目存在前，每日推荐保存不可用。",
+        "在演示数据库候选题目存在前，每日推荐演示保存不可用。",
       candidateProblemCount,
       abilityProfileSource: initialAbilityProfileSource,
       savedProfileAvailable: initialAbilityProfileSource === "database_saved",
@@ -314,7 +314,7 @@ function formatDailySaveStatus(
     missing_candidate_problems: "缺少候选题目",
     recommendation_failed: "推荐生成失败",
     save_failed: "保存失败",
-    saved: "已保存",
+    saved: "演示已保存",
     unavailable_for_mock_fallback: "模拟回退不可保存",
     validation_error: "校验失败",
   };

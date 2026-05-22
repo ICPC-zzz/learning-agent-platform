@@ -29,9 +29,9 @@ const feedbackOptions: readonly {
   result: LearningProblemAttemptFeedbackResult;
   label: string;
 }[] = [
-  { result: "attempted", label: "标记已尝试" },
-  { result: "solved", label: "已解决" },
-  { result: "failed", label: "失败" },
+  { result: "attempted", label: "演示标记已尝试" },
+  { result: "solved", label: "演示标记已解决" },
+  { result: "failed", label: "演示标记失败" },
 ];
 
 export function LearningProblemAttemptSaveControls({
@@ -111,8 +111,8 @@ export function LearningProblemAttemptSaveControls({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">手动反馈</p>
-          <h2 id="problem-attempt-save-title">题目尝试保存</h2>
+          <p className="eyebrow">手动演示反馈</p>
+          <h2 id="problem-attempt-save-title">题目尝试演示保存</h2>
         </div>
         <span className="difficultyBadge">
           {isPending ? "保存中" : formatProblemAttemptSaveStatus(displayedResult?.status)}
@@ -125,9 +125,9 @@ export function LearningProblemAttemptSaveControls({
         </span>
         <p>
           {isPending
-            ? "正在为选中的推荐题目保存一条手动 ProblemAttempt。"
+            ? "正在为选中的推荐题目保存一条演示用户手动 ProblemAttempt；不会评判代码或调用 AI。"
             : displayedResult?.message ??
-              "为一个推荐题目选择手动结果。"}
+              "为一个推荐题目选择手动演示结果。"}
         </p>
       </div>
 
@@ -137,7 +137,7 @@ export function LearningProblemAttemptSaveControls({
           <dd>{isPending ? "保存中" : formatProblemAttemptSaveStatus(displayedResult?.status)}</dd>
         </div>
         <div>
-          <dt>已保存</dt>
+          <dt>演示保存</dt>
           <dd>{displayedResult?.saved === true ? "是" : "否"}</dd>
         </div>
         <div>
@@ -182,10 +182,10 @@ export function LearningProblemAttemptSaveControls({
                       {problem.id} - {problem.difficulty}
                     </p>
                   </div>
-                  <strong>{problem.source ?? "recommendation"}</strong>
+                  <strong>{problem.source ?? "推荐预览"}</strong>
                 </div>
 
-                <ul className="tagList" aria-label={`${problem.title} tags`}>
+                <ul className="tagList" aria-label={`${problem.title} 标签`}>
                   {problem.tags.map((tag) => (
                     <li key={tag}>{tag}</li>
                   ))}
@@ -229,9 +229,9 @@ export function LearningProblemAttemptSaveControls({
       <div className="warningBlock">
         <h3>保存边界</h3>
         <ul>
-          <li>通过 server action 保存一条 ProblemAttempt。</li>
-          <li>使用演示用户和当前推荐题目 ID。</li>
-          <li>不会评判代码，也不会重新计算能力或推荐。</li>
+          <li>通过 server action 为演示用户保存一条开发环境 ProblemAttempt。</li>
+          <li>只使用当前推荐题目 ID 和手动选择结果，不上传或评判代码。</li>
+          <li>不会调用真实 AI，也不会自动重新计算能力或推荐。</li>
         </ul>
       </div>
     </section>
@@ -278,7 +278,7 @@ function createBlockingResult({
       return createLocalResult({
         status: "database_unavailable",
         message:
-          "ProblemAttempt 保存不可用，因为 DATABASE_URL 未配置。",
+        "ProblemAttempt 演示保存不可用，因为 DATABASE_URL 未配置。",
       });
     }
 
@@ -286,14 +286,14 @@ function createBlockingResult({
       return createLocalResult({
         status: "demo_user_missing",
         message:
-          "ProblemAttempt 保存不可用，因为未找到 demo@example.com。",
+          "ProblemAttempt 演示保存不可用，因为未找到演示用户 demo@example.com。",
       });
     }
 
     return createLocalResult({
       status: "recommendation_unavailable",
       message:
-        "仪表盘正在显示模拟回退推荐，ProblemAttempt 保存不可用。",
+        "仪表盘正在显示模拟回退推荐，ProblemAttempt 演示保存不可用。",
     });
   }
 
@@ -301,7 +301,7 @@ function createBlockingResult({
     return createLocalResult({
       status: "recommendation_unavailable",
       message:
-        "在推荐题目可用前，ProblemAttempt 保存不可用。",
+        "在推荐题目可用前，ProblemAttempt 演示保存不可用。",
     });
   }
 
@@ -321,7 +321,7 @@ function formatProblemAttemptSaveStatus(
     problem_unavailable: "题目不可用",
     recommendation_unavailable: "推荐不可用",
     save_failed: "保存失败",
-    saved: "已保存",
+    saved: "演示已保存",
     validation_error: "校验失败",
   };
 

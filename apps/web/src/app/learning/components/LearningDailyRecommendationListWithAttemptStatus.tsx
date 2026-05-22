@@ -37,7 +37,7 @@ function formatRecommendationSource(
 ): string {
   switch (source) {
     case "database_saved":
-      return "数据库已保存";
+      return "数据库只读记录";
     case "engine_preview":
       return "引擎预览";
     case "mock_fallback":
@@ -52,7 +52,7 @@ function formatRecommendationScore(
   score: number,
 ): string {
   if (source === "database_saved") {
-    return "已保存";
+    return "只读记录";
   }
 
   return formatScore(score);
@@ -75,8 +75,8 @@ export function LearningDailyRecommendationListWithAttemptStatus({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">今日</p>
-          <h2 id="daily-list-title">每日推荐</h2>
+          <p className="eyebrow">今日预览</p>
+          <h2 id="daily-list-title">每日推荐预览</h2>
         </div>
         <span className="difficultyBadge">{targetDifficulty ?? "无"}</span>
       </div>
@@ -129,7 +129,7 @@ export function LearningDailyRecommendationListWithAttemptStatus({
                 </div>
 
                 <div className="recommendationContext">
-                  <span>尝试状态</span>
+                  <span>尝试状态预览</span>
                   <strong>{attemptStatus.label}</strong>
                   <span>匹配方式</span>
                   <strong>{formatMatchedBy(attemptStatus.matchedBy)}</strong>
@@ -140,14 +140,14 @@ export function LearningDailyRecommendationListWithAttemptStatus({
                 </div>
                 <p className="panelNote">{attemptStatus.description}</p>
 
-                <ul className="tagList" aria-label={`${item.problem.title} tags`}>
+                <ul className="tagList" aria-label={`${item.problem.title} 标签`}>
                   {item.problem.tags.map((tag) => (
                     <li key={tag}>{tag}</li>
                   ))}
                 </ul>
                 <ul
                   className="reasonList"
-                  aria-label={`${item.problem.title} reasons`}
+                  aria-label={`${item.problem.title} 推荐原因`}
                 >
                   {item.reasons.map((reason, reasonIndex) => (
                     <li key={`${item.problem.id}-${reason.code}-${reasonIndex}`}>
@@ -164,12 +164,12 @@ export function LearningDailyRecommendationListWithAttemptStatus({
         </ol>
       ) : (
         <p className="panelNote recommendationEmptyState">
-          当前数据源暂无每日推荐。
+          当前数据源暂无每日推荐预览。
         </p>
       )}
 
       <div className="warningBlock">
-        <h3>推荐警告</h3>
+        <h3>推荐预览警告</h3>
         {warnings.length > 0 ? (
           <ul>
             {warnings.map((warning) => (
@@ -177,7 +177,7 @@ export function LearningDailyRecommendationListWithAttemptStatus({
             ))}
           </ul>
         ) : (
-          <p>当前数据源没有推荐警告。</p>
+          <p>当前数据源没有推荐预览警告。</p>
         )}
       </div>
     </section>
@@ -192,7 +192,7 @@ function createFallbackAttemptStatus(
     status: "unavailable",
     label: "不可用",
     description:
-      "尝试状态不可用，因为此推荐没有生成状态视图。",
+      "尝试状态预览不可用，因为此推荐没有生成状态视图。",
     source: "unavailable",
     matchedBy: "none",
   };
@@ -218,7 +218,7 @@ function formatProblemAttemptPreviewStatus(
 ): string {
   switch (status) {
     case "attempts_loaded":
-      return "已加载";
+      return "状态预览已加载";
     case "attempts_empty":
       return "暂无数据";
     case "database_unavailable":

@@ -57,7 +57,7 @@ export function getLearningDashboardDataFromMock(
     ),
     recommendationSource: "mock_fallback",
     recommendationSourceDetail:
-      "推荐由确定性的模拟事件和模拟候选题目生成。",
+      "推荐预览由确定性的模拟事件和模拟候选题目生成，不使用真实账户数据。",
     recommendationWarnings: recommendationResult.warnings,
     candidateProblems: mockCandidateProblems.map(toLearningDashboardProblemView),
     targetDifficulty: recommendationResult.targetDifficulty,

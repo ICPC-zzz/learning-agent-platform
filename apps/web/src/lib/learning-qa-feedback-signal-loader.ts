@@ -153,7 +153,7 @@ export async function loadLearningQaFeedbackSignalPreviewForUser({
       return createLearningQaFeedbackSignalPreviewStatus({
         status: "empty",
         recordsLoaded: historyRecords.length,
-        message: `已扫描 ${historyRecords.length} 条最近问答历史记录，但尚无用户反馈。`,
+      message: `已扫描 ${historyRecords.length} 条最近问答历史记录，但尚无用户反馈。`,
       });
     }
 
@@ -170,7 +170,7 @@ export async function loadLearningQaFeedbackSignalPreviewForUser({
         feedbackCounts: countFeedbackRatings(feedbackPairs),
         answerSourceCounts: countAnswerSources(feedbackPairs),
         message:
-          "已找到最近问答反馈，但无法从可用历史记录创建有效学习信号。",
+          "已找到最近问答反馈，但无法从可用历史记录创建有效学习信号预览。",
       });
     }
 
@@ -184,7 +184,7 @@ export async function loadLearningQaFeedbackSignalPreviewForUser({
       signalReasons: uniqueSignalReasons(signals),
       learningEvents: signals.map((signal) => signal.learningEvent),
       signals,
-      message: `已加载 ${historyRecords.length} 条最近问答历史记录，并将 ${signals.length} 条反馈记录映射为学习信号。`,
+      message: `已为演示用户读取 ${historyRecords.length} 条最近问答历史记录，并将 ${signals.length} 条反馈记录映射为学习信号预览。`,
       abilityPreviewImpact: createDefaultAbilityPreviewImpact("loaded"),
     };
   } catch {

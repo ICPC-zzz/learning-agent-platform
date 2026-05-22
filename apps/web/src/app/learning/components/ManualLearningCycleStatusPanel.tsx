@@ -18,9 +18,9 @@ export function ManualLearningCycleStatusPanel({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">手动流程</p>
+          <p className="eyebrow">只读手动流程预览</p>
           <h2 id="manual-learning-cycle-status-title">
-            手动学习循环状态 / 下一步
+            手动学习循环预览 / 下一步
           </h2>
         </div>
         <span className="difficultyBadge">{formatCycleStatus(status.status)}</span>
@@ -32,9 +32,9 @@ export function ManualLearningCycleStatusPanel({
       </div>
 
       <ol className="reasonList" aria-label="手动学习循环顺序">
-        <li>完成或标记一个推荐题目的 ProblemAttempt。</li>
-        <li>使用现有按钮重新计算并保存 AbilityProfile。</li>
-        <li>使用现有按钮重新生成并保存 DailyRecommendation。</li>
+        <li>手动演示标记一个推荐题目的 ProblemAttempt。</li>
+        <li>手动保存 AbilityProfile 预览快照。</li>
+        <li>手动保存 DailyRecommendation 预览快照。</li>
       </ol>
 
       <dl className="eventStats">
@@ -43,11 +43,11 @@ export function ManualLearningCycleStatusPanel({
           <dd>{formatCycleStatus(status.status)}</dd>
         </div>
         <div>
-          <dt>已保存 AbilityProfile</dt>
+          <dt>已保存演示 AbilityProfile</dt>
           <dd>{formatKnownBoolean(status.hasSavedAbilityProfile, status.status)}</dd>
         </div>
         <div>
-          <dt>已保存 DailyRecommendation</dt>
+          <dt>已保存演示 DailyRecommendation</dt>
           <dd>
             {formatKnownBoolean(status.hasSavedDailyRecommendation, status.status)}
           </dd>
@@ -83,15 +83,15 @@ export function ManualLearningCycleStatusPanel({
       </dl>
 
       <p className="panelNote">
-        此面板为只读：只建议手动顺序，不会自动执行保存、重新计算或推荐生成。
+        此面板为只读预览：只建议手动演示顺序，不会自动执行保存、重新计算或推荐生成。
       </p>
 
       <div className="warningBlock">
         <h3>读取边界</h3>
         <ul>
-          <li>使用现有仪表盘数据和信号预览。</li>
+          <li>使用现有仪表盘演示数据和信号预览。</li>
           <li>不会新增 server action 或 API route。</li>
-          <li>不会写入 ProblemAttempt、AbilityProfile、DailyRecommendation 或 ReadingProgress 记录。</li>
+          <li>不会写入 ProblemAttempt、AbilityProfile、DailyRecommendation 或 ReadingProgress 记录，也不会启动自动学习闭环。</li>
         </ul>
       </div>
     </section>
@@ -103,11 +103,11 @@ function formatNextAction(
 ): string {
   switch (action) {
     case "mark_problem_attempt":
-      return "标记 ProblemAttempt";
+      return "演示标记 ProblemAttempt";
     case "recompute_ability_profile":
-      return "重新计算 AbilityProfile";
+      return "保存 AbilityProfile 预览快照";
     case "regenerate_daily_recommendation":
-      return "重新生成 DailyRecommendation";
+      return "保存 DailyRecommendation 预览快照";
     case "continue_learning":
       return "继续学习";
     case "unavailable":

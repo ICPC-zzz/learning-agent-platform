@@ -188,13 +188,13 @@ function createLoadedMessage({
   mappedSignalCount: number;
   previewAppliedToAbility: boolean;
 }): string {
-  const baseMessage = `已加载 ${progressCount} 条 ReadingProgress 记录，并映射 ${mappedSignalCount} 条 reading_progress 信号。`;
+  const baseMessage = `已为演示用户读取 ${progressCount} 条 ReadingProgress 记录，并映射 ${mappedSignalCount} 条 reading_progress 预览信号。`;
 
   if (previewAppliedToAbility) {
-    return `${baseMessage} 这些信号已纳入本次渲染的内存态能力预览。`;
+    return `${baseMessage} 这些信号仅纳入本次渲染的内存态能力预览，不会写入数据库。`;
   }
 
-  return `${baseMessage} 这些信号会单独汇总，不会替代已保存的数据库能力画像。`;
+  return `${baseMessage} 这些信号会单独汇总，不会替代已保存的数据库能力画像，也不会触发自动画像闭环。`;
 }
 
 function normalizeProgressLimit(limit: number): number {

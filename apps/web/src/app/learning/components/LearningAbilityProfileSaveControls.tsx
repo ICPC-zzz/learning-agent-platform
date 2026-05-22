@@ -80,8 +80,8 @@ export function LearningAbilityProfileSaveControls({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">显式保存</p>
-          <h2 id="ability-profile-save-title">能力画像快照</h2>
+          <p className="eyebrow">开发演示保存</p>
+          <h2 id="ability-profile-save-title">能力画像演示快照</h2>
         </div>
         <span className="difficultyBadge">
           {isPending ? "保存中" : formatAbilitySaveStatus(displayedResult?.status)}
@@ -92,12 +92,12 @@ export function LearningAbilityProfileSaveControls({
         <span>{isPending ? "保存中" : formatAbilitySaveStatus(displayedResult?.status)}</span>
         <p>
           {isPending
-            ? "正在根据当前学习事件、问答反馈信号、ReadingProgress 信号和 ProblemAttempt 信号重新计算能力画像。"
+            ? "正在根据演示用户的当前学习事件、问答反馈信号、ReadingProgress 信号和 ProblemAttempt 信号重新计算演示能力画像；不会调用真实 AI。"
             : displayedResult?.message ??
-              "已准备好重新计算并保存当前 AbilityProfile 预览。"}
+              "已准备好手动重新计算并保存当前 AbilityProfile 预览快照。"}
         </p>
         {displayedResult?.profileId !== undefined ? (
-          <p>已保存画像 ID：{displayedResult.profileId}</p>
+          <p>演示快照画像 ID：{displayedResult.profileId}</p>
         ) : null}
         {displayedResult?.savedAt !== undefined ? (
           <p>保存时间：{displayedResult.savedAt}</p>
@@ -142,9 +142,9 @@ export function LearningAbilityProfileSaveControls({
       <div className="warningBlock">
         <h3>保存边界</h3>
         <ul>
-          <li>通过 server action 保存一条 AbilityProfile 快照。</li>
-          <li>使用当前数据库学习事件、已映射问答反馈信号、ReadingProgress 信号和 ProblemAttempt 信号。</li>
-          <li>不会保存推荐记录，也不会刷新每日题目列表。</li>
+          <li>通过 server action 为演示用户保存一条开发环境 AbilityProfile 快照。</li>
+          <li>只使用当前可读的演示数据和已映射预览信号，不调用真实 AI 或外部 provider。</li>
+          <li>不会保存推荐记录，也不会刷新每日题目列表或启动自动学习闭环。</li>
           <li>不会写入 ProblemAttempt 或 ReadingProgress 记录。</li>
         </ul>
       </div>
@@ -155,7 +155,7 @@ export function LearningAbilityProfileSaveControls({
         onClick={handleSave}
         disabled={isPending || isBlocked}
       >
-        {isPending ? "正在保存能力画像..." : "重新计算并保存 AbilityProfile"}
+        {isPending ? "正在保存演示能力画像..." : "手动保存 AbilityProfile 预览快照"}
       </button>
     </section>
   );
@@ -176,7 +176,7 @@ function createBlockingResult({
       return createResult({
         status: "database_unavailable",
         message:
-          "能力画像保存不可用，因为 DATABASE_URL 未配置。",
+        "能力画像演示保存不可用，因为 DATABASE_URL 未配置。",
         inputEventCount,
         qaFeedbackSignalCount,
         readingProgressSignalCount,
@@ -190,7 +190,7 @@ function createBlockingResult({
       return createResult({
         status: "demo_user_missing",
         message:
-          "能力画像保存不可用，因为未找到演示用户。",
+          "能力画像演示保存不可用，因为未找到演示用户。",
         inputEventCount,
         qaFeedbackSignalCount,
         readingProgressSignalCount,
@@ -203,7 +203,7 @@ function createBlockingResult({
     return createResult({
       status: "unavailable_for_mock_fallback",
       message:
-        "仪表盘正在显示模拟回退数据，能力画像保存不可用。",
+        "仪表盘正在显示模拟回退数据，能力画像演示保存不可用。",
       inputEventCount,
       qaFeedbackSignalCount,
       readingProgressSignalCount,
@@ -222,7 +222,7 @@ function createBlockingResult({
     return createResult({
       status: "insufficient_data",
       message:
-        "在数据库学习事件、问答反馈信号、ReadingProgress 信号或 ProblemAttempt 信号存在前，能力画像保存不可用。",
+        "在演示数据库学习事件、问答反馈信号、ReadingProgress 信号或 ProblemAttempt 信号存在前，能力画像演示保存不可用。",
       inputEventCount,
       qaFeedbackSignalCount,
       readingProgressSignalCount,
@@ -248,7 +248,7 @@ function formatAbilitySaveStatus(
     demo_user_missing: "缺少演示用户",
     insufficient_data: "数据不足",
     save_failed: "保存失败",
-    saved: "已保存",
+    saved: "演示已保存",
     unavailable_for_mock_fallback: "模拟回退不可保存",
     validation_error: "校验失败",
   };

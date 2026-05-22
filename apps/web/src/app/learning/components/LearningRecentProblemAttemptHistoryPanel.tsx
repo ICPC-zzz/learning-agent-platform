@@ -14,9 +14,9 @@ export function LearningRecentProblemAttemptHistoryPanel({
     >
       <div className="panelHeaderRow">
         <div>
-          <p className="eyebrow">最近历史</p>
+          <p className="eyebrow">只读历史预览</p>
           <h2 id="recent-problem-attempt-history-title">
-            最近 ProblemAttempt 历史
+            最近 ProblemAttempt 历史预览
           </h2>
         </div>
         <span className="difficultyBadge">{formatHistoryStatus(history.status)}</span>
@@ -29,7 +29,7 @@ export function LearningRecentProblemAttemptHistoryPanel({
 
       <dl className="eventStats">
         <div>
-          <dt>最近尝试数</dt>
+          <dt>预览读取尝试数</dt>
           <dd>{history.recentAttemptCount}</dd>
         </div>
         <div>
@@ -85,9 +85,9 @@ export function LearningRecentProblemAttemptHistoryPanel({
       <div className="warningBlock">
         <h3>读取边界</h3>
         <ul>
-          <li>仅读取演示用户最近的 ProblemAttempt 记录。</li>
+          <li>仅读取演示用户最近的 ProblemAttempt 记录作为只读预览。</li>
           <li>使用有上限的最近记录查询，不分页读取历史。</li>
-          <li>不会写入或重新计算学习数据。</li>
+          <li>不会写入、重新计算学习数据或触发推荐反馈闭环。</li>
       </ul>
       </div>
     </section>
@@ -99,7 +99,7 @@ function formatHistoryStatus(
 ): string {
   switch (status) {
     case "attempts_loaded":
-      return "已加载尝试";
+      return "只读预览已加载";
     case "attempts_empty":
       return "暂无尝试";
     case "database_unavailable":

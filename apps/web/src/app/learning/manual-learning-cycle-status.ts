@@ -182,7 +182,7 @@ function recommendNextAction({
     return {
       action: "unavailable",
       reason:
-        "学习循环建议不可用，因为必需的演示用户数据库读取不可用。",
+        "手动学习循环预览不可用，因为必需的演示用户数据库读取不可用。",
     };
   }
 
@@ -190,7 +190,7 @@ function recommendNextAction({
     return {
       action: "mark_problem_attempt",
       reason:
-        "未找到最近 ProblemAttempt，因此下一步适合完成或标记一个推荐题目。",
+        "未找到最近 ProblemAttempt 预览记录，因此下一步适合手动演示标记一个推荐题目。",
     };
   }
 
@@ -198,7 +198,7 @@ function recommendNextAction({
     return {
       action: "recompute_ability_profile",
       reason:
-        "已存在最近尝试，但还没有已保存的 AbilityProfile 快照。",
+        "已存在最近尝试预览，但还没有已保存的演示 AbilityProfile 快照。",
     };
   }
 
@@ -206,7 +206,7 @@ function recommendNextAction({
     return {
       action: "recompute_ability_profile",
       reason:
-        "最新 ProblemAttempt 看起来晚于已保存的 AbilityProfile 快照。",
+        "最新 ProblemAttempt 预览记录看起来晚于已保存的演示 AbilityProfile 快照。",
     };
   }
 
@@ -214,7 +214,7 @@ function recommendNextAction({
     return {
       action: "regenerate_daily_recommendation",
       reason:
-        "已有已保存 AbilityProfile，但当前未显示已保存 DailyRecommendation。",
+        "已有已保存演示 AbilityProfile，但当前未显示已保存 DailyRecommendation 快照。",
     };
   }
 
@@ -225,14 +225,14 @@ function recommendNextAction({
     return {
       action: "regenerate_daily_recommendation",
       reason:
-        "已保存 DailyRecommendation 看起来早于最新保存的 AbilityProfile 或 ProblemAttempt。",
+        "已保存 DailyRecommendation 快照看起来早于最新保存的演示 AbilityProfile 或 ProblemAttempt 预览记录。",
     };
   }
 
   return {
     action: "continue_learning",
     reason:
-      "根据当前可用的只读状态数据，已保存学习快照看起来可继续使用。",
+      "根据当前可用的只读预览状态数据，已保存演示学习快照看起来可继续使用。",
   };
 }
 

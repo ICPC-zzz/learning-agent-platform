@@ -58,7 +58,7 @@ export async function loadLearningRecentProblemAttemptHistory({
     return createRecentProblemAttemptHistoryStatusViewModel({
       status: "database_unavailable",
       message:
-        "最近 ProblemAttempt 历史不可用，因为 DATABASE_URL 未配置。",
+        "最近 ProblemAttempt 历史预览不可用，因为 DATABASE_URL 未配置。",
       limit: normalizedLimit,
     });
   }
@@ -73,7 +73,7 @@ export async function loadLearningRecentProblemAttemptHistory({
       return createRecentProblemAttemptHistoryStatusViewModel({
         status: "demo_user_missing",
         message:
-          "最近 ProblemAttempt 历史无法在数据库中找到 demo@example.com。",
+          "最近 ProblemAttempt 历史预览无法在数据库中找到演示用户 demo@example.com。",
         limit: normalizedLimit,
       });
     }
@@ -87,7 +87,7 @@ export async function loadLearningRecentProblemAttemptHistory({
     return createRecentProblemAttemptHistoryStatusViewModel({
       status: "read_failed",
       message:
-        "读取数据库时最近 ProblemAttempt 历史失败。仪表盘其余部分仍可渲染。",
+        "读取数据库时最近 ProblemAttempt 历史预览失败。仪表盘其余部分仍可渲染。",
       limit: normalizedLimit,
     });
   }
@@ -115,7 +115,7 @@ export async function loadLearningRecentProblemAttemptHistoryForUser({
     return createRecentProblemAttemptHistoryStatusViewModel({
       status: "read_failed",
       message:
-        "读取最近尝试时最近 ProblemAttempt 历史失败。",
+        "读取最近尝试时最近 ProblemAttempt 历史预览失败。",
       limit: normalizedLimit,
     });
   }
@@ -143,15 +143,15 @@ function getMessageForFallbackReason(
 ): string {
   switch (reason) {
     case "missing_database_url":
-      return "最近 ProblemAttempt 历史不可用，因为 DATABASE_URL 未配置。";
+      return "最近 ProblemAttempt 历史预览不可用，因为 DATABASE_URL 未配置。";
     case "no_demo_user_found":
-      return "最近 ProblemAttempt 历史不可用，因为未找到 demo@example.com。";
+      return "最近 ProblemAttempt 历史预览不可用，因为未找到演示用户 demo@example.com。";
     case "database_read_failed":
-      return "最近 ProblemAttempt 历史不可用，因为仪表盘数据库读取失败。";
+      return "最近 ProblemAttempt 历史预览不可用，因为仪表盘数据库读取失败。";
     case "no_ability_profile_found":
     case "no_daily_recommendations_found":
     case undefined:
-      return "仪表盘正在显示回退数据，最近 ProblemAttempt 历史不可用。";
+      return "仪表盘正在显示回退数据，最近 ProblemAttempt 历史预览不可用。";
   }
 }
 

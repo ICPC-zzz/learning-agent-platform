@@ -314,8 +314,8 @@ function createAbilityProfileBundle({
     return {
       profile: mapDatabaseAbilityProfile(storedAbilityProfile),
       scoringWarnings: [
-        "数据库能力画像按已保存数据展示；此仪表盘不会持久化重新计算的分数。",
-        "数据库能力画像暂未保存置信度；置信度显示为 0%。",
+        "数据库能力画像按演示用户已保存快照只读展示；此仪表盘展示不会持久化重新计算的分数。",
+        "数据库能力画像快照暂未保存置信度；置信度显示为 0%。",
       ],
       partialReasons: [],
     };
@@ -325,7 +325,7 @@ function createAbilityProfileBundle({
     return {
       profile: null,
       scoringWarnings: [
-        "没有可用的已保存数据库能力画像或最近可读学习事件。",
+        "没有可用的已保存数据库能力画像快照或最近可读学习事件。",
       ],
       partialReasons: [
         "no_stored_ability_profile",
@@ -349,7 +349,7 @@ function createAbilityProfileBundle({
       ...scoringResult.warnings,
       `能力画像是由 ${previewSources.join(
         " 和 ",
-      )} 计算得到的内存态预览；它没有写入数据库。`,
+      )} 计算得到的内存态预览；它没有写入数据库，也不代表真实能力画像闭环已完成。`,
     ],
     partialReasons: uniquePartialReasons([
       "no_stored_ability_profile",
@@ -386,9 +386,9 @@ function createRecommendationBundle(input: {
       ),
       recommendationSource: "database_saved",
       recommendationSourceDetail:
-        "推荐来自从数据库读取的现有 DailyRecommendation 记录。",
+        "推荐来自演示数据库中已保存的 DailyRecommendation 快照，只读展示。",
       recommendationWarnings: [
-        "已保存的数据库推荐以只读方式展示；此仪表盘不会刷新或写入推荐记录。",
+        "已保存的数据库推荐以只读方式展示；此仪表盘展示不会刷新或写入推荐记录。",
       ],
       targetDifficulty: baseTargetDifficulty,
       weakDimensions: baseWeakDimensions,
@@ -410,7 +410,7 @@ function createRecommendationBundle(input: {
       ),
       recommendationSource: "engine_preview",
       recommendationSourceDetail:
-        "推荐是 learning-engine 的内存态预览，未保存到数据库。",
+        "推荐是 learning-engine 的内存态预览，未保存到数据库，不代表真实个性化推荐系统已上线。",
       recommendationWarnings: recommendationResult.warnings,
       targetDifficulty: recommendationResult.targetDifficulty,
       weakDimensions: recommendationResult.weakDimensions,
@@ -422,7 +422,7 @@ function createRecommendationBundle(input: {
     recommendedProblems: [],
     recommendationSource: "unavailable",
     recommendationSourceDetail:
-      "数据库学习数据不足，无法展示已保存或预览推荐。",
+      "演示数据库学习数据不足，无法展示已保存快照或预览推荐。",
     recommendationWarnings: createUnavailableRecommendationWarnings(input),
     targetDifficulty: baseTargetDifficulty,
     weakDimensions: baseWeakDimensions,
@@ -439,7 +439,7 @@ function createUnavailableRecommendationWarnings(input: {
   candidateProblems: readonly RecommendationProblem[];
 }): readonly string[] {
   const warnings: string[] = [
-    "最近推荐窗口内未找到已保存的数据库推荐。",
+    "最近推荐窗口内未找到已保存的数据库推荐快照。",
   ];
 
   if (input.abilityProfile === null) {
@@ -493,7 +493,7 @@ function mapDatabaseRecommendation(
     reasons: [
       {
           code: "stored_daily_recommendation",
-          message: record.reason ?? "来自数据库的已保存每日推荐。",
+          message: record.reason ?? "来自演示数据库的已保存每日推荐快照。",
       },
     ],
   };
@@ -543,7 +543,7 @@ function createEmptyStateMessages(input: {
 
   if (input.abilityProfile === null) {
     messages.push(
-      "能力画像不可用，因为数据库中没有已保存画像或足够的最近学习事件。",
+      "能力画像预览不可用，因为演示数据库中没有已保存画像快照或足够的最近学习事件。",
     );
   }
 
@@ -553,7 +553,7 @@ function createEmptyStateMessages(input: {
 
   if (input.recommendationBundle.recommendationSource === "unavailable") {
     messages.push(
-      "在数据库拥有能力画像和候选题目，或拥有已保存推荐记录前，每日推荐不可用。",
+      "在演示数据库拥有能力画像快照和候选题目，或拥有已保存推荐快照前，每日推荐预览不可用。",
     );
   }
 
@@ -587,7 +587,7 @@ function createQaFeedbackAbilityPreviewImpact(input: {
     return {
       status: "included" as const,
       message:
-        "问答反馈信号已纳入本次渲染的内存态能力预览。没有写入数据库。",
+        "问答反馈信号仅纳入本次渲染的内存态能力预览。没有写入数据库。",
     };
   }
 
@@ -595,7 +595,7 @@ function createQaFeedbackAbilityPreviewImpact(input: {
     return {
       status: "not_included" as const,
       message:
-        "已保存数据库能力画像以只读方式展示，因此问答反馈信号会单独汇总，不会替代已保存分数。",
+        "已保存数据库能力画像快照以只读方式展示，因此问答反馈信号会单独汇总，不会替代已保存分数。",
     };
   }
 

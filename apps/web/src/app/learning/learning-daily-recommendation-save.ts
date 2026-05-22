@@ -562,14 +562,14 @@ function createSavedMessage(
   usedProblemAttemptHistory: boolean,
 ): string {
   const historyMessage = usedProblemAttemptHistory
-    ? " 已纳入最近 ProblemAttempt 历史。"
+    ? " 已将最近 ProblemAttempt 历史作为预览输入。"
     : "";
 
   if (source === "database_saved") {
-    return `已基于最新保存的 AbilityProfile 保存每日推荐。${historyMessage}刷新页面即可查看最新已保存推荐列表。`;
+    return `已基于最新保存的演示 AbilityProfile 保存每日推荐快照。${historyMessage}刷新页面即可查看最新已保存推荐列表；这不代表真实个性化推荐系统已上线。`;
   }
 
-  return `已基于可用的能力画像回退结果保存每日推荐。${historyMessage}刷新页面即可查看最新已保存推荐列表。`;
+  return `已基于可用的能力画像回退结果保存每日推荐快照。${historyMessage}刷新页面即可查看最新已保存推荐列表；这不代表真实个性化推荐系统已上线。`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

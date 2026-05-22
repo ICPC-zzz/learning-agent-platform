@@ -32,12 +32,12 @@ export function AbilityScoreCard({ profile, source }: AbilityScoreCardProps) {
       >
         <div>
           <p className="eyebrow">{formatSourceLabel(source)}</p>
-          <h2 id="ability-score-title">能力分数</h2>
+          <h2 id="ability-score-title">能力分数预览</h2>
         </div>
         <strong className="scoreValue scoreValueUnavailable">N/A</strong>
         <p className="panelNote">
-          数据库数据中暂时没有可用的能力画像。仪表盘保持可读，并让推荐保持不可用，
-          不会写入新记录。
+          演示数据库中暂时没有可用的能力画像。仪表盘保持可读，并让推荐预览保持不可用，
+          不会写入新记录或启动画像闭环。
         </p>
       </section>
     );
@@ -47,7 +47,7 @@ export function AbilityScoreCard({ profile, source }: AbilityScoreCardProps) {
     <section className="learningPanel scoreCard" aria-labelledby="ability-score-title">
       <div>
         <p className="eyebrow">{formatSourceLabel(source)}</p>
-        <h2 id="ability-score-title">能力分数</h2>
+      <h2 id="ability-score-title">能力分数预览</h2>
       </div>
       <strong className="scoreValue">{profile.overallScore}</strong>
       <dl className="scoreMeta">
@@ -63,7 +63,7 @@ export function AbilityScoreCard({ profile, source }: AbilityScoreCardProps) {
       <p className="panelNote">
         {source === "mock_fallback"
           ? "由确定性的模拟学习事件计算得到，不使用真实账户数据。"
-          : "来自只读数据库数据或内存态预览；仪表盘不会执行写入。"}
+          : "来自演示数据库只读数据或内存态预览；仪表盘展示本身不会执行写入。"}
       </p>
     </section>
   );

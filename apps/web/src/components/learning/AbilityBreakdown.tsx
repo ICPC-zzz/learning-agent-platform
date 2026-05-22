@@ -11,7 +11,7 @@ export function AbilityBreakdown({ dimensions }: AbilityBreakdownProps) {
 
   return (
     <section className="learningPanel" aria-labelledby="ability-breakdown-title">
-      <h2 id="ability-breakdown-title">能力维度</h2>
+      <h2 id="ability-breakdown-title">能力维度预览</h2>
 
       {visibleDimensions.length > 0 ? (
         <div className="dimensionList">
@@ -35,7 +35,7 @@ export function AbilityBreakdown({ dimensions }: AbilityBreakdownProps) {
         </div>
       ) : (
         <p className="panelNote">
-          在数据库拥有已保存的能力画像，或有足够可读学习事件用于内存态预览前，维度分数不可用。
+          在演示数据库拥有已保存的能力画像，或有足够可读学习事件用于内存态预览前，维度分数预览不可用。
         </p>
       )}
     </section>

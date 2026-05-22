@@ -197,7 +197,7 @@ export async function recomputeAndSaveLearningAbilityProfile(): Promise<Learning
     return createSaveResult({
       status: "saved",
       message:
-        "能力画像已保存。刷新页面即可在仪表盘中查看最新已保存快照。",
+        "能力画像演示快照已保存。刷新页面即可在仪表盘中查看最新已保存快照；这不会启动自动画像闭环。",
       profileId: savedProfile.id,
       inputEventCount: scoringResult.eventCount,
       qaFeedbackSignalCount,

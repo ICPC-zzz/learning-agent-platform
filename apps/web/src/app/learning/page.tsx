@@ -41,10 +41,10 @@ import {
 export const dynamic = "force-dynamic";
 
 const currentLimitations = [
-  "当前没有登录或真实用户身份",
-  "能力画像保存必须显式触发，且仅限演示用户",
-  "每日推荐保存必须显式触发，且仅限演示用户",
-  "ProblemAttempt 历史只会通过显式重新计算并保存的操作影响已保存快照",
+  "当前没有登录或真实用户身份，页面只读取演示用户或模拟回退数据",
+  "能力画像保存是开发环境演示快照，必须手动触发，未形成自动画像闭环",
+  "每日推荐保存是开发环境演示快照，必须手动触发，不代表真实个性化推荐系统已上线",
+  "ProblemAttempt 历史只作为预览信号显示；需要手动重新计算并保存后才会影响演示快照",
 ];
 
 export default async function LearningPage() {
@@ -82,11 +82,12 @@ export default async function LearningPage() {
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">A22 数据库 + 引擎预览边界 MVP</p>
-          <h1>学习仪表盘</h1>
+          <p className="eyebrow">学习预览 / 演示数据边界</p>
+          <h1>学习仪表盘预览</h1>
           <p className="status">
-            在数据库可用时读取演示学习数据，结合安全的内存态 learning-engine 预览；
-            当数据库不可用时，回退到确定性的模拟数据。
+            在数据库可用时仅读取演示用户的开发数据，并结合内存态
+            learning-engine 预览；当数据库不可用时，回退到确定性的模拟数据。
+            本页不会调用真实 AI、不会自动生成学习闭环。
           </p>
         </div>
         <Link className="secondaryLink" href="/">

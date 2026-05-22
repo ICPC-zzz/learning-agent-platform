@@ -223,17 +223,17 @@ function createLoadedMessage({
   attemptedOnlyCount: number;
   previewAppliedToAbility: boolean;
 }): string {
-  const baseMessage = `已加载 ${attemptCount} 条最近 ProblemAttempt 记录，并映射 ${mappedSignalCount} 条 problem_attempt 信号。`;
+  const baseMessage = `已为演示用户读取 ${attemptCount} 条最近 ProblemAttempt 记录，并映射 ${mappedSignalCount} 条 problem_attempt 预览信号。`;
   const attemptedOnlyMessage =
     attemptedOnlyCount > 0
       ? ` ${attemptedOnlyCount} 条仅尝试记录的正确性未知，未映射为评分信号。`
       : "";
 
   if (previewAppliedToAbility) {
-    return `${baseMessage}${attemptedOnlyMessage} 这些信号仅纳入本次渲染的内存态能力预览。`;
+    return `${baseMessage}${attemptedOnlyMessage} 这些信号仅纳入本次渲染的内存态能力预览，不会写入数据库。`;
   }
 
-  return `${baseMessage}${attemptedOnlyMessage} 这些信号会单独汇总，不会替代已保存的数据库能力画像。`;
+  return `${baseMessage}${attemptedOnlyMessage} 这些信号会单独汇总，不会替代已保存的数据库能力画像，也不会触发自动反馈闭环。`;
 }
 
 function normalizeAttemptLimit(limit: number): number {

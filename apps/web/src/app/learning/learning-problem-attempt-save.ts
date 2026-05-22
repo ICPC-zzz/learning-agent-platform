@@ -122,7 +122,7 @@ export async function saveRecommendedProblemAttempt(
     return createSaveResult({
       status: "saved",
       message:
-        "题目尝试已保存。AbilityProfile 和 DailyRecommendation 未重新计算。",
+        "题目尝试演示记录已保存。AbilityProfile 和 DailyRecommendation 未重新计算，也不会触发自动反馈闭环。",
       saved: true,
       attemptId: savedAttempt.id,
       problemId: savedAttempt.problemId ?? normalizedInput.problemId ?? undefined,

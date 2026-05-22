@@ -22,7 +22,7 @@ export function LearningReadingProgressSignalSummary({
 
       <div className="recommendationSourceRow">
         <span>
-          {preview.previewAppliedToAbility ? "已纳入" : "未纳入"}
+          {preview.previewAppliedToAbility ? "纳入本次预览" : "仅汇总预览"}
         </span>
         <p>{preview.message}</p>
       </div>
@@ -37,7 +37,7 @@ export function LearningReadingProgressSignalSummary({
           <dd>{preview.mappedSignalCount}</dd>
         </div>
         <div>
-          <dt>已完成章节</dt>
+          <dt>已完成章节记录</dt>
           <dd>{preview.completedChapterCount}</dd>
         </div>
         <div>
@@ -45,7 +45,7 @@ export function LearningReadingProgressSignalSummary({
           <dd>{preview.activeBookCount}</dd>
         </div>
         <div>
-          <dt>预览已应用</dt>
+          <dt>纳入本次预览</dt>
           <dd>{preview.previewAppliedToAbility ? "是" : "否"}</dd>
         </div>
       </dl>
@@ -63,9 +63,9 @@ export function LearningReadingProgressSignalSummary({
       <div className="warningBlock">
         <h3>预览边界</h3>
         <ul>
-          <li>仅读取演示用户的 ReadingProgress 记录。</li>
+          <li>仅读取演示用户的 ReadingProgress 记录作为预览信号。</li>
           <li>将记录映射为 learning-engine 的 reading_progress 事件。</li>
-          <li>不会写入 ReadingProgress、AbilityProfile 或 DailyRecommendation 记录。</li>
+          <li>不会写入 ReadingProgress、AbilityProfile 或 DailyRecommendation 记录，也不会触发自动画像闭环。</li>
         </ul>
       </div>
     </section>
@@ -77,7 +77,7 @@ function formatReadingProgressStatus(
 ): string {
   switch (status) {
     case "progress_loaded":
-      return "已加载进度";
+      return "进度预览已加载";
     case "progress_empty":
       return "暂无进度";
     case "database_unavailable":
