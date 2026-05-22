@@ -1,33 +1,38 @@
 # CURRENT_HANDOFF
 
 ## 1. 当前状态
-- 最新完成轮次：A153。
-- 当前代码基准来自 A152 提交 `87a9f17`，A153 已完成 `/learning` 页面整体 preview 文案边界审查与最小修正。
-- `/learning` 页面现在明确为学习仪表盘预览：演示用户、开发数据库、模拟回退、只读预览、手动演示保存、未启用自动学习闭环。
-- 项目主线仍为 **Web 网页端 + 软件端/Desktop**，Skill 社区仅占位。
+- 最新完成轮次：A154。
+- A154 已完成 `/reader` 页面及 reader 相关 helper/component 的遗留代码基线审查。
+- 本轮未发现 reader 范围内未提交遗留 diff；未做 reader 代码改动。
+- `/reader` 当前页面入口保持 preview-only / mock-only：缺少 `bookId` 时显示清晰空态；Ask AI / QA / RAG / 推荐 / 历史能力未作为真实能力上线。
+- 项目主线仍为 **Web 网页端 + 软件端/Desktop**；Skill 社区仅占位 scaffold。
+- 工作区仍存在 A154 范围外遗留改动（旧轮次文档删除、未跟踪历史文档、`packages/ai-core` 修改等），本轮未处理。
 
-## 2. A153 修改摘要
-- 收紧 `/learning` 页面标题、说明、空态、数据源、每日推荐、尝试状态、能力分数、信号摘要、保存按钮和状态说明。
-- 将 AbilityProfile、DailyRecommendation、ProblemAttempt 的保存入口明确为开发环境演示快照和手动触发，不描述为真实推荐系统、真实能力画像闭环或自动反馈闭环。
-- 未新增真实推荐算法、真实能力画像闭环、真实题单反馈循环、LLM/RAG/provider/tool/agent loop。
+## 2. A154 结果
+- **代码改动**：无 reader 代码改动。
+- **文档改动**：新增 `docs/rounds/codex/A154_codex.md`，更新本交接文件。
+- **验证通过**：`pnpm typecheck`、`pnpm lint` 通过。
+- **reader 测试**：未发现 reader 相关最小测试文件。
+- **浏览器验证**：本地 dev server 打开 `http://localhost:3000/reader`，页面 200，空态文案清楚，console error 为 0，未出现真实 AI / RAG 已启用误导文案。
+- **提交状态**：A154 文档与 handoff 将精确暂存并提交；reader 代码不暂存。
 
-## 3. 验证结果
-- `pnpm typecheck`：通过。
-- `pnpm lint`：通过。
-- learning 相关最小测试搜索：未发现 `*.test.*` 或 `*.spec.*`。
-- 浏览器验证 `/learning`：页面正常打开，console error 为 0，preview/mock/placeholder/disabled 边界可见。
+## 3. 下一轮 Codex 必读
+- `docs/codex-context/CURRENT_HANDOFF.md`
+- `docs/codex-context/CODEX_RULES.md`
+- `docs/codex-context/SAFETY_BOUNDARIES.md`
+- `docs/codex-context/ARCHITECTURE_BOUNDARIES.md`
+- 如任务要求审计或全局规划，才读 `docs/status/PROJECT_COMPLETION_SUMMARY.md`
 
-## 4. 提交
-- A153 提交：提交后以最新 `git log -1 --oneline` 为准。
-- 本轮只应暂存 A153 learning 范围文件、`docs/rounds/codex/A153_codex.md` 和本文件。
+## 4. 下一轮 Codex 禁止
+- 不要把 A154 范围外遗留文件与新业务任务混在同一轮处理。
+- 不要接入真实 LLM、真实 RAG、真实工具执行或 Agent loop。
+- 不要将 preview/mock/disabled 能力描述为已上线。
+- 不要修改 `packages/ai-core` 遗留文件，除非新任务明确授权。
+- 不要使用 `git add .` 或 `git add -A`。
 
-## 5. 未处理遗留
-- 工作区仍有 A153 范围外的历史文档删除/未跟踪文档、`PROJECT_COMPLETION_SUMMARY.md` 修改，以及 `packages/ai-core` 四个文件修改。
-- 这些遗留文件本轮未处理、未暂存、未提交。
+## 5. 下一步建议
+- 建议新开 A155，只选一个小任务：可处理一个明确页面或一个明确遗留清理任务。
+- 如要处理当前无关遗留文件，建议单独授权一轮，只做遗留文件归类、确认与精确暂存/回退方案，不混入业务开发。
 
-## 6. 下一轮建议
-- 新开 A154，只选一个小任务。
-- 建议继续审查另一个 Web 页面 preview 文案边界，或单独授权处理遗留文件；不要混合执行。
-
-## 7. 项目总进度
-- 项目总进度：30.00%。
+## 6. 项目总进度
+项目总进度：30.00%
