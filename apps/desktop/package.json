@@ -1,0 +1,15 @@
+{
+  "name": "@learning-agent-platform/desktop",
+  "version": "0.0.0",
+  "private": true,
+  "description": "编程学习桌面版 - Desktop client (minimal skeleton)",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "typecheck": "echo 'Desktop: no TypeScript yet (minimal JS skeleton) - skipping typecheck'",
+    "lint": "echo 'Desktop: no lint configured yet - skipping lint'"
+  },
+  "devDependencies": {
+    "electron": "^34.0.0"
+  }
+}

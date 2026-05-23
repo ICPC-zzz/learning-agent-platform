@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Security: no external CDN, no network requests, no scripts, no preload. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'none'; img-src 'none'; connect-src 'none'; font-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
+  <title>编程学习桌面版 — Desktop Preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+    .page {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      padding: 40px 32px 32px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .header .subtitle {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .header .disclaimer {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #8d6e00;
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: left;
+    }
+    .header .disclaimer strong {
+      color: #5d4037;
+    }
+
+    /* ── Status Cards ── */
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    }
+    .card .card-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .card .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .card .card-status {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .status-ready    { background: #e8f5e9; color: #2e7d32; }
+    .status-placeholder { background: #e3f2fd; color: #1565c0; }
+    .status-disabled { background: #fce4ec; color: #c62828; }
+    .card .card-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #666;
+    }
+
+    /* ── Security Section ── */
+    .security {
+      background: #fff;
+      border-radius: 10px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    .security .security-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 14px;
+    }
+    .security .rule-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
+    .security .rule-item {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .security .rule-item .icon {
+      display: inline-block;
+      width: 16px;
+      text-align: center;
+      margin-right: 4px;
+      color: #4caf50;
+      font-weight: 700;
+    }
+
+    /* ── Next Steps ── */
+    .next-steps {
+      background: #fff;
+      border-radius: 10px;
+      padding: 24px 28px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    .next-steps .steps-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 14px;
+    }
+    .next-steps code {
+      display: block;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .next-steps .steps-note {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #bbb;
+      padding: 16px 0 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .security .rule-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══════════ Header ═══════════ -->
+    <div class="header">
+      <h1>编程学习桌面版</h1>
+      <div class="subtitle">Desktop Preview &middot; v0.0.0 &middot; 最小启动骨架</div>
+      <div class="disclaimer">
+        <strong>当前状态：</strong>本页面为 Desktop 端最小产品入口首页，仅用于验证 Electron 壳加载本地静态内容。当前版本<b>未连接</b>真实 Agent、工具、LLM 或数据库。所有功能入口均为占位预览，不可执行实际操作。
+      </div>
+    </div>
+
+    <!-- ═══════════ Status Cards ═══════════ -->
+    <div class="section-title">Desktop 组件状态</div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">&#x1f5a5;</div>
+        <div class="card-title">Electron 壳</div>
+        <div class="card-status status-ready">源码就位</div>
+        <div class="card-desc">package.json、main.js、index.html 已就位，安全配置正确（nodeIntegration: false，contextIsolation: true，sandbox: true）。依赖等待本地网络环境安装。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x1f4d6;</div>
+        <div class="card-title">阅读工作台</div>
+        <div class="card-status status-placeholder">计划接入</div>
+        <div class="card-desc">计划接入 Web Reader 本地预览能力（滚动恢复、阅读计时、已读标记、进度百分比、章节导航）。本轮未连接。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x1f916;</div>
+        <div class="card-title">Agent 工作台</div>
+        <div class="card-status status-disabled">预览占位</div>
+        <div class="card-desc">Agent 运行时、工具执行、LLM 调用、RAG 检索、Provider 网关均处于 disabled 状态。所有入口仅展示 UI 骨架，不执行任何真实操作。</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x2699;</div>
+        <div class="card-title">本地设置</div>
+        <div class="card-status status-placeholder">占位</div>
+        <div class="card-desc">本地设置面板为占位入口，不保存任何配置、不连接数据库、不读写本地文件系统、不上传任何数据。</div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Security Boundaries ═══════════ -->
+    <div class="security">
+      <div class="security-title">安全边界声明</div>
+      <div class="rule-list">
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不执行真实工具</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不调用真实 LLM / 模型</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不连接数据库</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不读取本地文件系统</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不上传任何数据</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不保存 raw prompt / response</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不访问外部网络</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不加载 preload 脚本</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 不开启 Node 集成</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 上下文隔离已启用</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 沙箱模式已启用</div>
+        <div class="rule-item"><span class="icon">&#x2714;</span> 无 IPC / 无远程模块</div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Next Steps ═══════════ -->
+    <div class="next-steps">
+      <div class="steps-title">下一步操作（需在本地可联网环境执行）</div>
+      <code>pnpm install</code>
+      <code>pnpm --filter @learning-agent-platform/desktop dev</code>
+      <p class="steps-note">以上命令需要在非 VM 沙箱、可访问 npm registry 的本地环境中执行。当前页面仅用于验证 Desktop 壳是否可正常加载本地 HTML 内容。成功启动后将显示本页面。</p>
+    </div>
+
+    <!-- ═══════════ Footer ═══════════ -->
+    <div class="footer">
+      编程学习桌面版 &middot; Desktop Preview &middot; 未连接真实能力
+    </div>
+
+  </div>
+</body>
+</html>
