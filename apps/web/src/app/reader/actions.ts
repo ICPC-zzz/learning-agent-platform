@@ -213,3 +213,107 @@ function readOptionalFormText(formData: FormData, key: string): string | null {
 function formatPercent(progressRatio: number): string {
   return `${Math.round(progressRatio * 100)}%`;
 }
+
+// ── Minimal scroll-progress sync (called from ReaderScrollPositionTracker) ──
+
+export type SyncScrollProgressResult =
+  | { status: "saved"; progressRatio: number }
+  | { status: "skipped"; reason: string }
+  | { status: "error"; reason: string; message: string };
+
+export async function syncScrollProgressAction(
+  bookId: string,
+  chapterId: string,
+  progressRatio: number,
+): Promise<SyncScrollProgressResult> {
+  const envStatus = getDatabaseEnvStatus();
+
+  if (!envStatus.hasDatabaseUrl) {
+    return { status: "skipped", reason: "database_unavailable" };
+  }
+
+  if (!Number.isFinite(progressRatio) || progressRatio < 0 || progressRatio > 1) {
+    return { status: "skipped", reason: "invalid_progress_ratio" };
+  }
+
+  try {
+    const prisma = getPrismaClient();
+    const userRepository = new PrismaUserRepository(prisma);
+    const readingProgressRepository = new PrismaReadingProgressRepository(prisma);
+    const demoUser = await userRepository.getUserByEmail(demoUserEmail);
+
+    if (demoUser === null) {
+      return { status: "skipped", reason: "demo_user_missing" };
+    }
+
+    const progress = await readingProgressRepository.upsertReadingProgress(
+      createReadingProgressUpdateFromReaderState({
+        userId: demoUser.id,
+        bookId,
+        chapterId,
+        progressRatio,
+      }),
+    );
+
+    return { status: "saved", progressRatio: progress.progressRatio };
+  } catch {
+    return {
+      status: "error",
+      reason: "db_error",
+      message: "滚动进度数据库同步失败，本地进度仍然有效。",
+    };
+  }
+}
+
+// ── Minimal chapter-completion sync (called from ReaderChapterCompletionToggle) ──
+
+export type SyncChapterCompletionResult =
+  | { status: "saved"; completed: boolean }
+  | { status: "skipped"; reason: string }
+  | { status: "error"; reason: string; message: string };
+
+export async function syncChapterCompletionAction(
+  bookId: string,
+  chapterId: string,
+  completed: boolean,
+): Promise<SyncChapterCompletionResult> {
+  const envStatus = getDatabaseEnvStatus();
+
+  if (!envStatus.hasDatabaseUrl) {
+    return { status: "skipped", reason: "database_unavailable" };
+  }
+
+  try {
+    const prisma = getPrismaClient();
+    const userRepository = new PrismaUserRepository(prisma);
+    const readingProgressRepository = new PrismaReadingProgressRepository(prisma);
+    const demoUser = await userRepository.getUserByEmail(demoUserEmail);
+
+    if (demoUser === null) {
+      return { status: "skipped", reason: "demo_user_missing" };
+    }
+
+    if (completed) {
+      await readingProgressRepository.markChapterCompleted({
+        userId: demoUser.id,
+        bookId,
+        chapterId,
+      });
+    } else {
+      await readingProgressRepository.upsertReadingProgress({
+        userId: demoUser.id,
+        bookId,
+        chapterId,
+        progressRatio: 0,
+      });
+    }
+
+    return { status: "saved", completed };
+  } catch {
+    return {
+      status: "error",
+      reason: "db_error",
+      message: "已读状态数据库同步失败，本地状态仍然有效。",
+    };
+  }
+}

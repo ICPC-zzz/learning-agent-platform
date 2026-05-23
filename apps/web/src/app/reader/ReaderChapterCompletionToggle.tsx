@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { syncChapterCompletionAction } from "./actions";
+
 export interface ReaderChapterCompletionToggleProps {
   bookId?: string | null;
   chapterId?: string | null;
@@ -47,6 +49,7 @@ export function ReaderChapterCompletionToggle({
 }: ReaderChapterCompletionToggleProps) {
   const storageKey = buildStorageKey(bookId, chapterId);
   const [completed, setCompleted] = useState(false);
+  const [dbSyncMessage, setDbSyncMessage] = useState<string | null>(null);
 
   // Read from localStorage on mount
   useEffect(() => {
@@ -56,17 +59,52 @@ export function ReaderChapterCompletionToggle({
 
   const handleToggle = useCallback(() => {
     if (!storageKey) return;
+    if (!bookId || !chapterId) return;
 
     setCompleted((prev: boolean) => {
       const next = !prev;
+
+      // Update localStorage immediately (optimistic, also serves as fallback)
       if (next) {
         setCompletedStatus(storageKey);
       } else {
         removeCompletedStatus(storageKey);
       }
+
+      // Attempt DB sync in background
+      syncChapterCompletionAction(bookId, chapterId, next)
+        .then((result) => {
+          if (result.status === "saved") {
+            setDbSyncMessage(
+              next
+                ? "已读状态已同步到数据库（开发预览）。"
+                : "已读状态已从数据库清除（开发预览）。",
+            );
+          } else if (result.status === "skipped") {
+            setDbSyncMessage(
+              "数据库不可用，已读状态仅保存在当前浏览器。",
+            );
+          } else {
+            setDbSyncMessage(
+              result.message ??
+                "数据库同步失败，已读状态仅保存在当前浏览器。",
+            );
+          }
+        })
+        .catch(() => {
+          setDbSyncMessage(
+            "数据库同步失败，已读状态仅保存在当前浏览器。",
+          );
+        });
+
       return next;
     });
-  }, [storageKey]);
+  }, [storageKey, bookId, chapterId]);
+
+  // Clear sync message when book/chapter changes
+  useEffect(() => {
+    setDbSyncMessage(null);
+  }, [bookId, chapterId]);
 
   // Don't render if no chapter is loaded (empty state)
   if (!chapterId) {
@@ -101,8 +139,13 @@ export function ReaderChapterCompletionToggle({
         {completed ? "取消本地已读标记" : "标记本章已读"}
       </button>
       <span className="readerChapterCompletionNote">
-        仅保存在当前浏览器，不会写入数据库。
+        数据库同步为开发预览能力。保存失败时继续使用当前浏览器本地存储。
       </span>
+      {dbSyncMessage !== null ? (
+        <span aria-live="polite" className="readerChapterCompletionNote">
+          {dbSyncMessage}
+        </span>
+      ) : null}
     </section>
   );
 }

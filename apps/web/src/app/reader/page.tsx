@@ -15,6 +15,10 @@ import { ReadingProgressSaveForm } from "./components/ReadingProgressSaveForm";
 import { ReaderScrollPositionTracker } from "./ReaderScrollPositionTracker";
 import { ReaderReadingTimer } from "./ReaderReadingTimer";
 import { ReaderChapterCompletionToggle } from "./ReaderChapterCompletionToggle";
+import { ReaderFontSizeControl } from "./ReaderFontSizeControl";
+import { ReaderRecentChaptersPanel } from "./ReaderRecentChaptersPanel";
+import { ReaderReadingStatsPanel } from "./ReaderReadingStatsPanel";
+import { ReaderBookmarksPanel } from "./ReaderBookmarksPanel";
 import { ReaderScrollProgressIndicator } from "./ReaderScrollProgressIndicator";
 import { ReaderVisibleBlockIndicator } from "./ReaderVisibleBlockIndicator";
 import {
@@ -134,6 +138,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
         bookId={readerData.book.id}
         chapterId={currentChapter.id}
       />
+      <ReaderFontSizeControl />
       <ReaderScrollProgressIndicator />
       <ReaderVisibleBlockIndicator />
       <header className="readerHeader">
@@ -187,6 +192,24 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
             bookTitle={readerData.book.title}
             chapterTitle={currentChapter.title}
             chunkCount={currentChapterChunks.length}
+          />
+          <ReaderRecentChaptersPanel
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+            bookTitle={readerData.book.title}
+            chapterTitle={currentChapter.title}
+          />
+          <ReaderReadingStatsPanel
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+            bookTitle={readerData.book.title}
+            chapterTitle={currentChapter.title}
+          />
+          <ReaderBookmarksPanel
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+            bookTitle={readerData.book.title}
+            chapterTitle={currentChapter.title}
           />
         </aside>
       </div>

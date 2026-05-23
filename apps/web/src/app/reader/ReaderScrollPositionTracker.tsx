@@ -2,14 +2,18 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
+import { syncScrollProgressAction } from "./actions";
+
 export interface ReaderScrollPositionTrackerProps {
   bookId?: string | null;
   chapterId?: string | null;
   enabled?: boolean;
+  dbSyncEnabled?: boolean;
 }
 
 const STORAGE_KEY_PREFIX = "learning-agent-platform:reader-scroll";
-const THROTTLE_MS = 250;
+const LOCAL_THROTTLE_MS = 250;
+const DB_DEBOUNCE_MS = 5000;
 
 function buildStorageKey(bookId?: string | null, chapterId?: string | null): string {
   const book = bookId ?? "unknown-book";
@@ -37,14 +41,32 @@ function saveScrollY(key: string, top: number): void {
   }
 }
 
+function computeProgressRatio(): number {
+  const scrollHeight = document.body.scrollHeight;
+  const clientHeight = window.innerHeight;
+  const maxScroll = Math.max(scrollHeight - clientHeight, 1);
+  const ratio = window.scrollY / maxScroll;
+  return Math.min(Math.max(ratio, 0), 1);
+}
+
 export function ReaderScrollPositionTracker({
   bookId,
   chapterId,
   enabled = true,
+  dbSyncEnabled = true,
 }: ReaderScrollPositionTrackerProps) {
   const keyRef = useRef<string>(buildStorageKey(bookId, chapterId));
-  const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const localThrottleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dbDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoredRef = useRef(false);
+  const bookIdRef = useRef(bookId);
+  const chapterIdRef = useRef(chapterId);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    bookIdRef.current = bookId;
+    chapterIdRef.current = chapterId;
+  }, [bookId, chapterId]);
 
   // Update key when bookId or chapterId change
   useEffect(() => {
@@ -52,7 +74,7 @@ export function ReaderScrollPositionTracker({
     restoredRef.current = false;
   }, [bookId, chapterId]);
 
-  // Restore scroll position on mount / key change
+  // Restore scroll position on mount / key change (localStorage only)
   useEffect(() => {
     if (!enabled || restoredRef.current) return;
 
@@ -65,25 +87,59 @@ export function ReaderScrollPositionTracker({
     }
   }, [enabled, bookId, chapterId]);
 
+  // Persist scroll progress to DB (long debounce)
+  const persistToDb = useCallback(() => {
+    if (!dbSyncEnabled) return;
+    const currentBookId = bookIdRef.current;
+    const currentChapterId = chapterIdRef.current;
+    if (!currentBookId || !currentChapterId) return;
+
+    const progressRatio = computeProgressRatio();
+
+    syncScrollProgressAction(
+      currentBookId,
+      currentChapterId,
+      progressRatio,
+    ).catch(() => {
+      // DB sync failures are silently ignored — localStorage remains the fallback.
+    });
+  }, [dbSyncEnabled]);
+
   // Throttled scroll listener
   const handleScroll = useCallback(() => {
     if (!enabled) return;
 
-    if (throttleRef.current !== null) {
-      clearTimeout(throttleRef.current);
+    // LocalStorage: 250ms throttle
+    if (localThrottleRef.current !== null) {
+      clearTimeout(localThrottleRef.current);
     }
 
-    throttleRef.current = setTimeout(() => {
-      throttleRef.current = null;
+    localThrottleRef.current = setTimeout(() => {
+      localThrottleRef.current = null;
       saveScrollY(keyRef.current, window.scrollY);
-    }, THROTTLE_MS);
-  }, [enabled]);
+    }, LOCAL_THROTTLE_MS);
 
-  // Save on beforeunload
+    // DB: 5000ms debounce (resets on every scroll)
+    if (dbSyncEnabled) {
+      if (dbDebounceRef.current !== null) {
+        clearTimeout(dbDebounceRef.current);
+      }
+
+      dbDebounceRef.current = setTimeout(() => {
+        dbDebounceRef.current = null;
+        persistToDb();
+      }, DB_DEBOUNCE_MS);
+    }
+  }, [enabled, dbSyncEnabled, persistToDb]);
+
+  // Save on beforeunload (both localStorage and DB)
   const handleBeforeUnload = useCallback(() => {
     if (!enabled) return;
     saveScrollY(keyRef.current, window.scrollY);
-  }, [enabled]);
+    if (dbSyncEnabled) {
+      persistToDb();
+    }
+  }, [enabled, dbSyncEnabled, persistToDb]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -94,9 +150,13 @@ export function ReaderScrollPositionTracker({
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (throttleRef.current !== null) {
-        clearTimeout(throttleRef.current);
-        throttleRef.current = null;
+      if (localThrottleRef.current !== null) {
+        clearTimeout(localThrottleRef.current);
+        localThrottleRef.current = null;
+      }
+      if (dbDebounceRef.current !== null) {
+        clearTimeout(dbDebounceRef.current);
+        dbDebounceRef.current = null;
       }
     };
   }, [enabled, handleScroll, handleBeforeUnload]);

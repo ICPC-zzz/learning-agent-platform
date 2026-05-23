@@ -78,7 +78,7 @@ export function ReaderReadingTimer({
         {formatElapsed(elapsedSeconds)}
       </span>
       <span className="readerReadingTimerNote">
-        仅在当前页面内统计，不会写入数据库。
+        仅在当前页面内统计。阅读进度（滚动位置、已读标记）已支持数据库同步开发预览。
       </span>
     </section>
   );
