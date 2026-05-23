@@ -12,6 +12,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@learning-agent-platform/ai-core": ["packages/ai-core/src/index.ts"],
+      "@learning-agent-platform/book-engine": ["packages/book-engine/src/index.ts"],
+      "@learning-agent-platform/db": ["packages/db/src/index.ts"],
+      "@learning-agent-platform/learning-engine": ["packages/learning-engine/src/index.ts"],
+      "@learning-agent-platform/shared": ["packages/shared/src/index.ts"]
+    }
   }
 }
