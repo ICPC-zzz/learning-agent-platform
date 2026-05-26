@@ -1,4 +1,4 @@
-import type { ProblemAttemptRecord } from "@learning-agent-platform/db";
+﻿import type { ProblemAttemptRecord } from "@learning-agent-platform/db";
 
 export type LearningProblemAttemptDisplayStatus =
   | "attempted"
@@ -24,6 +24,8 @@ export function mapProblemAttemptRecordStatusToDisplayStatus(
     case "ATTEMPTED":
     case "SKIPPED":
       return "attempted";
+    default:
+      return "attempted";
   }
 }
 
@@ -32,20 +34,20 @@ export function formatProblemAttemptStatusLabel(
 ): string {
   switch (status) {
     case "not_attempted":
-      return "未尝试";
+      return "\u672A\u5C1D\u8BD5";
     case "attempted":
-      return "已尝试";
+      return "\u5DF2\u5C1D\u8BD5";
     case "solved":
-      return "已解决";
+      return "\u5DF2\u89E3\u51B3";
     case "failed":
-      return "失败";
+      return "\u5931\u8D25";
     case "unavailable":
-      return "不可用";
+      return "\u4E0D\u53EF\u7528";
     case "read_failed":
-      return "读取失败";
+      return "\u8BFB\u53D6\u5931\u8D25";
     case "demo_user_missing":
-      return "缺少演示用户";
+      return "\u7F3A\u5C11\u6F14\u793A\u7528\u6237";
     case "database_unavailable":
-      return "数据库不可用";
+      return "\u6570\u636E\u5E93\u4E0D\u53EF\u7528";
   }
 }

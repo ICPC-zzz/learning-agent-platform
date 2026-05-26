@@ -111,6 +111,8 @@ function mapProblemDifficultyToLearningDifficulty(
     case "HARD":
     case "CHALLENGE":
       return "hard";
+    default:
+      return "medium";
   }
 }
 
@@ -137,6 +139,8 @@ function mapCorrectnessToBoolean(
       return false;
     case "UNKNOWN":
       return null;
+    default:
+      return null;
   }
 }
 
@@ -148,6 +152,8 @@ function mapStatusToBoolean(status: ProblemAttemptStatus): boolean | null {
       return false;
     case "ATTEMPTED":
     case "SKIPPED":
+      return null;
+    default:
       return null;
   }
 }

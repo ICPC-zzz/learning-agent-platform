@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { syncChapterCompletionAction } from "./actions";
-
 export interface ReaderChapterCompletionToggleProps {
   bookId?: string | null;
   chapterId?: string | null;
@@ -61,45 +59,22 @@ export function ReaderChapterCompletionToggle({
     if (!storageKey) return;
     if (!bookId || !chapterId) return;
 
-    setCompleted((prev: boolean) => {
-      const next = !prev;
+    // Compute next state outside of setState updater to keep the
+    // Server Action call out of React's render phase.
+    const next = !completed;
 
-      // Update localStorage immediately (optimistic, also serves as fallback)
-      if (next) {
-        setCompletedStatus(storageKey);
-      } else {
-        removeCompletedStatus(storageKey);
-      }
+    // Update localStorage immediately (optimistic, also serves as fallback)
+    if (next) {
+      setCompletedStatus(storageKey);
+    } else {
+      removeCompletedStatus(storageKey);
+    }
 
-      // Attempt DB sync in background
-      syncChapterCompletionAction(bookId, chapterId, next)
-        .then((result) => {
-          if (result.status === "saved") {
-            setDbSyncMessage(
-              next
-                ? "已读状态已同步到数据库（开发预览）。"
-                : "已读状态已从数据库清除（开发预览）。",
-            );
-          } else if (result.status === "skipped") {
-            setDbSyncMessage(
-              "数据库不可用，已读状态仅保存在当前浏览器。",
-            );
-          } else {
-            setDbSyncMessage(
-              result.message ??
-                "数据库同步失败，已读状态仅保存在当前浏览器。",
-            );
-          }
-        })
-        .catch(() => {
-          setDbSyncMessage(
-            "数据库同步失败，已读状态仅保存在当前浏览器。",
-          );
-        });
-
-      return next;
-    });
-  }, [storageKey, bookId, chapterId]);
+    setCompleted(next);
+    setDbSyncMessage(
+      "已更新本地已读标记。开发预览数据库同步需在同步面板手动触发。",
+    );
+  }, [storageKey, bookId, chapterId, completed]);
 
   // Clear sync message when book/chapter changes
   useEffect(() => {

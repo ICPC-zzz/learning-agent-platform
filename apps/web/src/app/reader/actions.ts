@@ -309,11 +309,222 @@ export async function syncChapterCompletionAction(
     }
 
     return { status: "saved", completed };
-  } catch {
+  } catch (error: unknown) {
+    // Log error type for server-side diagnostics — never connection strings
+    const brief =
+      error instanceof Error
+        ? `${error.constructor.name}: ${error.message.slice(0, 200)}`
+        : String(error).slice(0, 200);
+    console.error("[syncChapterCompletion] DB error:", brief);
     return {
       status: "error",
       reason: "db_error",
       message: "已读状态数据库同步失败，本地状态仍然有效。",
+    };
+  }
+}
+
+export interface ReaderPreviewManualSyncInput {
+  syncEnabled: boolean;
+  bookId?: string | null;
+  chapterId?: string | null;
+  bookmark: {
+    exists: boolean;
+    scrollPercent: number | null;
+    updatedAt: string | null;
+  };
+  note: {
+    exists: boolean;
+    charCount: number;
+    updatedAt: string | null;
+  };
+  timer: {
+    totalSeconds: number;
+    updatedAt: string | null;
+  };
+  latestLocalUpdatedAt: string | null;
+}
+
+export type ReaderPreviewManualSyncResult = {
+  ok: boolean;
+  status: "synced" | "partial" | "disabled" | "invalid" | "fallback" | "noop";
+  message: string;
+  syncedFields?: string[];
+  skippedFields?: string[];
+};
+
+function normalizeOptionalText(value?: string | null): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function clampProgressRatio(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.min(Math.max(value, 0), 1);
+}
+
+export async function manualSyncReaderPreviewToDbAction(
+  input: ReaderPreviewManualSyncInput,
+): Promise<ReaderPreviewManualSyncResult> {
+  if (!input.syncEnabled) {
+    return {
+      ok: false,
+      status: "disabled",
+      message: "同步开关未开启：开发预览同步需要手动开启后再触发。",
+    };
+  }
+
+  const bookId = normalizeOptionalText(input.bookId);
+  const chapterId = normalizeOptionalText(input.chapterId);
+
+  if (bookId === null || chapterId === null) {
+    return {
+      ok: false,
+      status: "invalid",
+      message: "开发预览同步不可用：缺少 bookId 或 chapterId。",
+    };
+  }
+
+  const hasAnyLocalRecord =
+    input.bookmark.exists ||
+    input.note.exists ||
+    input.note.charCount > 0 ||
+    input.timer.totalSeconds > 0 ||
+    input.latestLocalUpdatedAt !== null;
+
+  if (!hasAnyLocalRecord) {
+    return {
+      ok: true,
+      status: "noop",
+      message: "无本地记录可同步。",
+    };
+  }
+
+  const skippedFields: string[] = [];
+
+  if (input.note.exists || input.note.charCount > 0) {
+    skippedFields.push("noteDraft.content");
+  }
+
+  if (input.timer.totalSeconds > 0) {
+    skippedFields.push("readingTimer.totalSeconds");
+  }
+
+  if (input.bookmark.updatedAt !== null) {
+    skippedFields.push("bookmark.updatedAt");
+  }
+
+  if (input.note.updatedAt !== null) {
+    skippedFields.push("noteDraft.updatedAt");
+  }
+
+  if (input.timer.updatedAt !== null) {
+    skippedFields.push("readingTimer.updatedAt");
+  }
+
+  if (input.latestLocalUpdatedAt !== null) {
+    skippedFields.push("local.latestUpdatedAt");
+  }
+
+  const bookmarkProgressRatio =
+    typeof input.bookmark.scrollPercent === "number" &&
+    Number.isFinite(input.bookmark.scrollPercent)
+      ? clampProgressRatio(input.bookmark.scrollPercent / 100)
+      : null;
+
+  if (input.bookmark.exists && bookmarkProgressRatio === null) {
+    skippedFields.push("bookmark.scrollPercent");
+  }
+
+  if (bookmarkProgressRatio === null) {
+    return {
+      ok: true,
+      status: "partial",
+      message:
+        "部分本地记录暂未同步：笔记/书签/计时仍仅保存在当前浏览器。当前章节缺少可映射的阅读进度百分比。",
+      syncedFields: [],
+      skippedFields,
+    };
+  }
+
+  const envStatus = getDatabaseEnvStatus();
+  if (!envStatus.hasDatabaseUrl) {
+    return {
+      ok: false,
+      status: "fallback",
+      message: "同步预览失败，本地记录未受影响。",
+      syncedFields: [],
+      skippedFields,
+    };
+  }
+
+  try {
+    const prisma = getPrismaClient();
+    const userRepository = new PrismaUserRepository(prisma);
+    const bookRepository = new PrismaBookRepository(prisma);
+    const readingProgressRepository = new PrismaReadingProgressRepository(prisma);
+
+    const demoUser = await userRepository.getUserByEmail(demoUserEmail);
+    if (demoUser === null) {
+      return {
+        ok: false,
+        status: "fallback",
+        message: "同步预览失败，本地记录未受影响。",
+        syncedFields: [],
+        skippedFields,
+      };
+    }
+
+    const readerData = await bookRepository.getBookReaderData(bookId);
+    if (
+      readerData === null ||
+      !readerData.chapters.some((chapter) => chapter.id === chapterId)
+    ) {
+      return {
+        ok: false,
+        status: "invalid",
+        message: "开发预览同步不可用：未找到当前书籍或章节。",
+        syncedFields: [],
+        skippedFields,
+      };
+    }
+
+    await readingProgressRepository.upsertReadingProgress({
+      userId: demoUser.id,
+      bookId,
+      chapterId,
+      progressRatio: bookmarkProgressRatio,
+    });
+
+    revalidatePath("/reader");
+    revalidatePath(`/books/${bookId}`);
+
+    const syncedFields = ["readingProgress.progressRatio"];
+
+    return {
+      ok: true,
+      status: skippedFields.length > 0 ? "partial" : "synced",
+      message:
+        skippedFields.length > 0
+          ? "开发预览同步完成：已写入可支持的阅读进度字段。本地记录仍保留。部分本地记录暂未同步：笔记/书签/计时仍仅保存在当前浏览器。"
+          : "开发预览同步完成：已写入可支持的阅读进度字段。本地记录仍保留。",
+      syncedFields,
+      skippedFields,
+    };
+  } catch {
+    return {
+      ok: false,
+      status: "fallback",
+      message: "同步预览失败，本地记录未受影响。",
+      syncedFields: [],
+      skippedFields,
     };
   }
 }

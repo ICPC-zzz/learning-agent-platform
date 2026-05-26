@@ -19,8 +19,11 @@ import { ReaderFontSizeControl } from "./ReaderFontSizeControl";
 import { ReaderRecentChaptersPanel } from "./ReaderRecentChaptersPanel";
 import { ReaderReadingStatsPanel } from "./ReaderReadingStatsPanel";
 import { ReaderBookmarksPanel } from "./ReaderBookmarksPanel";
+import { ReaderNoteDraftPanel } from "./ReaderNoteDraftPanel";
+import { ReaderReadingStateSourceNotice } from "./ReaderReadingStateSourceNotice";
 import { ReaderScrollProgressIndicator } from "./ReaderScrollProgressIndicator";
 import { ReaderVisibleBlockIndicator } from "./ReaderVisibleBlockIndicator";
+import { ReaderSyncPreviewPanel } from "./ReaderSyncPreviewPanel";
 import {
   readReaderSearchQuery,
   resolveReaderChapterSelection,
@@ -37,7 +40,7 @@ function DemoModeNotice() {
       <p>
         当前阅读器使用演示/预览数据。阅读进度仍以章节级预览为主；
         本章已读、滚动位置、阅读计时和当前可见内容块提示均为当前浏览器本地预览能力，
-        不进行数据库同步，不代表真实学习闭环。AI 问答、RAG 与真实模型 provider 均未启用。
+        数据库同步能力仅限开发预览，不代表真实学习闭环。AI 问答、RAG 与真实模型 provider 均未启用。
       </p>
     </section>
   );
@@ -94,6 +97,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
           fallbackReason={readerData.fallbackReason}
           source={readerData.source}
         />
+        <ReaderReadingStateSourceNotice source={readerData.source} />
         <section
           aria-label="阅读器章节选择"
           className="readerDataSourceNotice readerDataSourceNoticeFallback"
@@ -129,6 +133,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
       <ReaderScrollPositionTracker
         bookId={readerData.book.id}
         chapterId={currentChapter.id}
+        dbSyncEnabled={false}
       />
       <ReaderReadingTimer
         bookId={readerData.book.id}
@@ -161,6 +166,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
         fallbackReason={readerData.fallbackReason}
         source={readerData.source}
       />
+      <ReaderReadingStateSourceNotice source={readerData.source} />
       <ReaderChapterSelectionNotice
         chapterTitle={currentChapter.title}
         currentChapterIndex={currentChapterIndex}
@@ -177,6 +183,10 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
         />
         <ReaderContent chapter={currentChapter} />
         <aside className="readerRightRail" aria-label="阅读器上下文">
+          <ReaderSyncPreviewPanel
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+          />
           <ReadingProgressSaveForm
             bookId={readerData.book.id}
             chapterId={currentChapter.id}
@@ -211,6 +221,10 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
             bookTitle={readerData.book.title}
             chapterTitle={currentChapter.title}
           />
+          <ReaderNoteDraftPanel
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+          />
         </aside>
       </div>
 
@@ -233,8 +247,9 @@ function ReaderEmptyState({ message }: { message: string }) {
           返回书库
         </Link>
       </header>
+      <ReaderReadingStateSourceNotice source="local_fallback" />
       <section
-        aria-label="阅读器参数不可用"
+        aria-label="阅读器错误提示"
         className="readerDataSourceNotice readerDataSourceNoticeFallback"
       >
         <span className="readerDataSourceBadge">不可阅读</span>

@@ -186,6 +186,8 @@ function mapAnswerSourceFromPrisma(
       return "real_openai";
     case "FALLBACK_MOCK":
       return "fallback_mock";
+    default:
+      return "mock";
   }
 }
 

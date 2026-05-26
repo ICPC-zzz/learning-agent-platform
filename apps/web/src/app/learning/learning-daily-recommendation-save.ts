@@ -486,6 +486,8 @@ function mapDatabaseDifficulty(
     case "HARD":
     case "CHALLENGE":
       return "hard";
+    default:
+      return "medium";
   }
 }
 

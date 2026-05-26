@@ -1248,4 +1248,614 @@ h1 {
   padding: 16px;
   border: 1px solid #d8dee8;
   border-radius: 8px;
-  background: #ff
+  background: #ffffff;
+}
+
+.readerFontSizeControlTitle {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #263241;
+}
+
+.readerFontSizeControlDisclaimer {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerFontSizeControlOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.readerFontSizeBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #263241;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.readerFontSizeBtn:hover:not(:disabled) {
+  background: #edf3f8;
+  border-color: #8a452d;
+}
+
+.readerFontSizeBtn:focus-visible {
+  outline: 2px solid #8a452d;
+  outline-offset: 2px;
+}
+
+.readerFontSizeBtnActive {
+  border-color: #4f6f52;
+  background: #eef5ef;
+  color: #243b27;
+  cursor: default;
+}
+
+.readerFontSizeBtn:disabled {
+  cursor: default;
+}
+
+.readerFontSizeControlStatus {
+  margin: 10px 0 0;
+  font-size: 0.8125rem;
+  color: #7a8395;
+}
+
+/* ── Reader Recent Chapters Panel ── */
+
+.readerRecentChapters {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.readerRecentChaptersTitle {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #263241;
+}
+
+.readerRecentChaptersDisclaimer {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerRecentChaptersEmpty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerRecentChaptersList {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.readerRecentChapterItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid #e5e9f0;
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.readerRecentChapterItemCurrent {
+  border-color: #4f6f52;
+  background: #eef5ef;
+}
+
+.readerRecentChapterLink {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  flex: 1;
+}
+
+.readerRecentChapterLink:hover {
+  color: #8a452d;
+}
+
+.readerRecentChapterBookTitle {
+  font-weight: 500;
+  color: #263241;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readerRecentChapterChapterTitle {
+  color: #7a8395;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readerRecentChapterLink:hover .readerRecentChapterBookTitle {
+  color: #8a452d;
+}
+
+.readerRecentChapterCurrentBadge {
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #4f6f52;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.readerRecentChaptersClearBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #7a8395;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.readerRecentChaptersClearBtn:hover {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+}
+
+.readerRecentChaptersClearBtn:focus-visible {
+  outline: 2px solid #8a452d;
+  outline-offset: 2px;
+}
+
+/* ── Reader Reading Stats Panel ── */
+
+.readerReadingStats {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.readerReadingStatsTitle {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #263241;
+}
+
+.readerReadingStatsDisclaimer {
+  margin: 0 0 14px;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerReadingStatsEmpty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerReadingStatsGroup {
+  margin: 0 0 10px;
+}
+
+.readerReadingStatsLabel {
+  margin: 0 0 2px;
+  font-size: 0.75rem;
+  color: #7a8395;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.readerReadingStatsValue {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #263241;
+}
+
+.readerReadingStatsTimestamp {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #4a5568;
+}
+
+.readerReadingStatsList {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.readerReadingStatsItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: 1px solid #e5e9f0;
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.readerReadingStatsItemCurrent {
+  border-color: #4f6f52;
+  background: #eef5ef;
+}
+
+.readerReadingStatsItemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #263241;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.readerReadingStatsItemTime {
+  color: #4a5568;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.readerReadingStatsActions {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.readerReadingStatsBtn {
+  padding: 6px 12px;
+  border: 1px solid #c4cdd9;
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 0.8125rem;
+  color: #4a5568;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.45;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.readerReadingStatsBtn:hover {
+  background: #f0f2f5;
+  border-color: #a0a9b5;
+}
+
+.readerReadingStatsBtn:focus-visible {
+  outline: 2px solid #4f6f52;
+  outline-offset: 2px;
+}
+
+.readerReadingStatsBtnClear {
+  color: #5a6577;
+}
+
+.readerReadingStatsBtnClearAll {
+  color: #7a8395;
+}
+
+.readerReadingStatsBtnDanger {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+  font-weight: 500;
+}
+
+.readerReadingStatsBtnDanger:hover {
+  background: #fde3dd;
+  border-color: #7a3d28;
+}
+
+/* ── Reader Bookmarks Panel ── */
+
+.readerBookmarks {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.readerBookmarksTitle {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #263241;
+}
+
+.readerBookmarksDisclaimer {
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerBookmarksEmpty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #7a8395;
+  line-height: 1.5;
+}
+
+.readerBookmarksList {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.readerBookmarksItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #e5e9f0;
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.readerBookmarksItemCurrent {
+  border-color: #4f6f52;
+  background: #eef5ef;
+}
+
+.readerBookmarksLink {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  flex: 1;
+}
+
+.readerBookmarksLink:hover {
+  color: #8a452d;
+}
+
+.readerBookmarksLabel {
+  font-weight: 500;
+  color: #263241;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readerBookmarksLink:hover .readerBookmarksLabel {
+  color: #8a452d;
+}
+
+.readerBookmarksChapterTitle {
+  color: #7a8395;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readerBookmarksBookTitle {
+  color: #9ca3b0;
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readerBookmarksMeta {
+  color: #9ca3b0;
+  font-size: 0.6875rem;
+  margin-top: 2px;
+}
+
+.readerBookmarksItemActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.readerBookmarksCurrentBadge {
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #4f6f52;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.readerBookmarksDeleteBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #7a8395;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.readerBookmarksDeleteBtn:hover {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+}
+
+.readerBookmarksDeleteBtn:focus-visible {
+  outline: 2px solid #8a452d;
+  outline-offset: 2px;
+}
+
+.readerBookmarksActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.readerBookmarksBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.readerBookmarksBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.readerBookmarksBtn:focus-visible {
+  outline: 2px solid #8a452d;
+  outline-offset: 2px;
+}
+
+.readerBookmarksBtnAdd {
+  border: 1px solid #4f6f52;
+  background: #eef5ef;
+  color: #4f6f52;
+  font-weight: 500;
+}
+
+.readerBookmarksBtnAdd:hover:not(:disabled) {
+  background: #d4e7d5;
+  border-color: #3d5a40;
+}
+
+.readerBookmarksBtnClearChapter {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #7a8395;
+}
+
+.readerBookmarksBtnClearChapter:hover {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+}
+
+.readerBookmarksBtnClearAll {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #7a8395;
+}
+
+.readerBookmarksBtnClearAll:hover {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+}
+
+.readerBookmarksBtnDanger {
+  background: #fef0ed;
+  border-color: #8a452d;
+  color: #8a452d;
+  font-weight: 500;
+}
+
+.readerBookmarksBtnDanger:hover {
+  background: #fde3dd;
+  border-color: #7a3d28;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 40px 0;
+  }
+
+  h1 {
+    font-size: 2.125rem;
+  }
+
+  .placeholderGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .readerHeader,
+  .readerLayout,
+  .chunkList,
+  .learningHero,
+  .dashboardGrid,
+  .problemList {
+    grid-template-columns: 1fr;
+  }
+
+  .readerSidebar {
+    position: static;
+  }
+
+  .readerContent {
+    padding: 22px;
+  }
+
+  .aiContextList div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .learningHero {
+    align-items: start;
+  }
+
+  .scoreValue {
+    font-size: 3.25rem;
+  }
+}
