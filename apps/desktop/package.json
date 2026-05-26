@@ -5,9 +5,12 @@
   "description": "编程学习桌面版 - Desktop client (minimal skeleton)",
   "main": "main.js",
   "scripts": {
-    "dev": "electron .",
+    "dev": "pnpm --filter @learning-agent-platform/db run build && electron .",
     "typecheck": "echo 'Desktop: no TypeScript yet (minimal JS skeleton) - skipping typecheck'",
     "lint": "echo 'Desktop: no lint configured yet - skipping lint'"
+  },
+  "dependencies": {
+    "@learning-agent-platform/db": "workspace:*"
   },
   "devDependencies": {
     "electron": "^34.0.0"
