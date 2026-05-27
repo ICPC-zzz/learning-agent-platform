@@ -56,6 +56,8 @@ import { AgentPermissionRequestPreviewPanel } from "./agent-permission-request-p
 import { loadAgentPreviewHistory } from "./agent-preview-history";
 import { AgentPreviewHistoryPanel } from "./agent-preview-history-panel";
 import { AgentPreviewSavePanel } from "./agent-preview-save-panel";
+import { AgentSafetyBoundaryPanel } from "./agent-safety-boundary-panel";
+import { AgentTaskDryRunPanel } from "./agent-task-dry-run-panel";
 import { loadAgentRuntimePreviewHistory } from "./agent-runtime-preview-history";
 import { AgentRuntimePreviewHistoryPanel } from "./agent-runtime-preview-history-panel";
 import { AgentRuntimePreviewSavePanel } from "./agent-runtime-preview-save-panel";
@@ -421,6 +423,8 @@ export default async function AgentWorkspacePage({
   searchParams,
 }: AgentWorkspacePageProps) {
   const resolvedSearchParams = await searchParams;
+  const modeValue = getSearchParamValue(resolvedSearchParams?.mode);
+  const modeLabel = modeValue.length > 0 ? modeValue : "未指定";
   const taskText = getSearchParamValue(resolvedSearchParams?.task);
   const planPreview = createAgentTaskPlanPreview({
     taskText,
@@ -524,6 +528,9 @@ export default async function AgentWorkspacePage({
             </p>
           </aside>
         </header>
+
+        <AgentSafetyBoundaryPanel modeLabel={modeLabel} />
+        <AgentTaskDryRunPanel modeLabel={modeLabel} />
 
         <section className={styles.section} aria-labelledby="module-status">
           <div className={styles.sectionHeader}>

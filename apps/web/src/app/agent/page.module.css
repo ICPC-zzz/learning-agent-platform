@@ -42,7 +42,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
   gap: 24px;
-  align-items: start;
+  align-items: flex-start;
   margin-bottom: 32px;
 }
 
@@ -101,7 +101,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   margin-bottom: 16px;
 }
@@ -353,6 +353,24 @@
   background: #254a6b;
 }
 
+.secondaryButton {
+  border: 1px solid #b9c5d3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344257;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.secondaryButton:hover,
+.secondaryButton:focus-visible {
+  border-color: #98a8bc;
+  background: #f7f9fc;
+}
+
 .disabledButton {
   border: 0;
   border-radius: 8px;
@@ -410,6 +428,14 @@
 .planPreviewCard {
   margin-top: 16px;
   padding: 20px;
+}
+
+.dryRunResultPanel {
+  margin-top: 0;
+  padding: 20px;
+  border: 1px solid #dde3eb;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .planHeader {
@@ -682,3 +708,4 @@
     grid-template-columns: 1fr;
   }
 }
+
