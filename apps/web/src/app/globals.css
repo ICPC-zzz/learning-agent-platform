@@ -131,7 +131,7 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 400px);
   gap: 24px;
-  align-items: end;
+  align-items: flex-end;
   padding: 24px 0 28px;
   border-bottom: 1px solid #d8dee8;
 }
@@ -232,7 +232,7 @@ h1 {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 320px;
   gap: 24px;
-  align-items: start;
+  align-items: flex-start;
   padding-top: 28px;
 }
 
@@ -574,7 +574,7 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
-  align-items: end;
+  align-items: flex-end;
   padding: 24px 0 28px;
 }
 
@@ -680,7 +680,7 @@ h1 {
   display: grid;
   grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
   gap: 18px;
-  align-items: start;
+  align-items: flex-start;
   margin-top: 18px;
 }
 
@@ -775,7 +775,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .dimensionHeader span {
@@ -1852,10 +1852,11 @@ h1 {
   }
 
   .learningHero {
-    align-items: start;
+    align-items: flex-start;
   }
 
   .scoreValue {
     font-size: 3.25rem;
   }
 }
+
