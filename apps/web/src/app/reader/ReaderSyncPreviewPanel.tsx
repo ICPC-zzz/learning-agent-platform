@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   manualSyncReaderPreviewToDbAction,
   type ReaderPreviewManualSyncResult,
+  type ReaderPreviewSkippedField,
 } from "./actions";
 import {
   buildReaderBookmarkStorageKey,
@@ -44,6 +45,29 @@ interface SyncPreviewSummary {
 }
 
 type ManualSyncViewStatus = "idle" | "loading";
+
+function formatManualSyncStatus(status: ReaderPreviewManualSyncResult["status"]): string {
+  switch (status) {
+    case "synced":
+      return "已同步";
+    case "partial":
+      return "部分同步";
+    case "disabled":
+      return "未启用";
+    case "invalid":
+      return "参数无效";
+    case "fallback":
+      return "同步失败（已回退）";
+    case "noop":
+      return "无需同步";
+    default:
+      return status;
+  }
+}
+
+function formatSkippedField(item: ReaderPreviewSkippedField): string {
+  return `${item.field}（${item.reason}）`;
+}
 
 function latestTimestamp(timestamps: Array<string | null | undefined>): string | null {
   let latest: string | null = null;
@@ -286,8 +310,9 @@ export function ReaderSyncPreviewPanel({
         setManualSyncResult({
           ok: false,
           status: "fallback",
-          message: "同步预览失败，本地记录未受影响。",
+          message: "同步失败：数据库异常或不可用，本地记录未受影响。",
           syncedFields: [],
+          skippedFields: [],
         });
       })
       .finally(() => {
@@ -472,16 +497,26 @@ export function ReaderSyncPreviewPanel({
             )}
             {manualSyncResult !== null && (
               <>
-                <p className="readerReadingStatsTimestamp">状态：{manualSyncResult.message}</p>
-                {manualSyncResult.syncedFields && manualSyncResult.syncedFields.length > 0 && (
+                <p className="readerReadingStatsTimestamp">
+                  状态：{formatManualSyncStatus(manualSyncResult.status)}。{manualSyncResult.message}
+                </p>
+                {manualSyncResult.syncedFields.length > 0 && (
                   <p className="readerReadingStatsTimestamp">
                     已同步字段：{manualSyncResult.syncedFields.join("、")}
                   </p>
                 )}
-                {manualSyncResult.skippedFields && manualSyncResult.skippedFields.length > 0 && (
-                  <p className="readerReadingStatsTimestamp">
-                    暂未同步字段：{manualSyncResult.skippedFields.join("、")}
-                  </p>
+                {manualSyncResult.skippedFields.length > 0 && (
+                  <>
+                    <p className="readerReadingStatsTimestamp">暂未同步字段：</p>
+                    {manualSyncResult.skippedFields.map((item) => (
+                      <p
+                        className="readerReadingStatsTimestamp"
+                        key={`${item.field}-${item.reason}`}
+                      >
+                        - {formatSkippedField(item)}
+                      </p>
+                    ))}
+                  </>
                 )}
               </>
             )}
