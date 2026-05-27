@@ -40,7 +40,18 @@
 3. `node --test apps/desktop/route-policy.test.mjs`：通过（28/28）
 
 ## 6. 提交列表
-- 待补充（提交完成后回填 hash / message / 模块）
+1. `ffd5257` - `desktop: 固化导航壳与壳内跳转稳定性修复`
+   - 模块：`apps/desktop`（固定入口、route policy 测试、壳内跳转稳定性修复）
+2. `00676e7` - `learning: 提交本地任务/周报/导出与Reader入口闭环积压`
+   - 模块：`apps/web/src/app/learning`（任务、趋势、周报、导出、继续阅读入口）
+3. `922f333` - `reader: 提交同步预览与跳转相关改动`
+   - 模块：`apps/web/src/app/reader`（同步预览与动作）
+4. `ddd5db7` - `agent: 提交 dry-run/mock-only 面板与安全边界展示`
+   - 模块：`apps/web/src/app/agent`（dry-run/mock-only 面板与安全提示）
+5. `7d9e18b` - `chore: 提交依赖锁定与全局样式支撑更新`
+   - 模块：`package.json`、`pnpm-lock.yaml`、`globals.css`、`favicon.ico`
+6. `18ebc7b` - `docs: 入库A242-A253轮次记录并更新CURRENT_HANDOFF`
+   - 模块：`docs/rounds/codex`、`docs/rounds/deepseek`、`docs/codex-context/CURRENT_HANDOFF.md`
 
 ## 7. CURRENT_HANDOFF 更新摘要
 - 已补充 A252/A253 GUI 闭环结论。
@@ -50,10 +61,10 @@
 - 已写入下一轮业务推进建议。
 
 ## 8. 最终 git 状态
-- 待补充（提交完成后回填）。
+- `git status --short` 为空（工作区干净）。
 
 ## 9. 未提交/未处理事项
-- 待补充（提交完成后回填）。
+- 本轮范围内无未提交事项。
 
 ## 10. 安全边界确认
 - 未接入真实 LLM provider，未调用真实 LLM API。
