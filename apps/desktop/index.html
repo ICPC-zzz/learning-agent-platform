@@ -73,9 +73,81 @@
       margin-top: 14px;
     }
 
+    .navigation-shell {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+      background: #f8fafc;
+    }
+
+    .navigation-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .navigation-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 36px;
+      padding: 0 12px;
+    }
+
+    .navigation-action:hover,
+    .navigation-action:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent);
+      outline: none;
+    }
+
     .entry-list {
       display: grid;
       gap: 10px;
+    }
+
+    .status-card {
+      border: 1px solid var(--line);
+      border-left-width: 6px;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      background: #f8fafc;
+    }
+
+    .status-message {
+      margin-top: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .status-checking {
+      border-left-color: #0f6ccf;
+      background: #eef6ff;
+    }
+
+    .status-online {
+      border-left-color: #2e7d32;
+      background: #effaf1;
+    }
+
+    .status-offline {
+      border-left-color: #b26a00;
+      background: #fff6e6;
+    }
+
+    .status-error {
+      border-left-color: #ad1457;
+      background: #fff0f6;
     }
 
     .entry-item {
@@ -150,6 +222,28 @@
       padding-top: 8px;
     }
 
+    .diagnostic-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .diagnostic-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    .diagnostic-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .diagnostic-value {
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
     @media (max-width: 640px) {
       h1 {
         font-size: 21px;
@@ -169,6 +263,30 @@
       <p class="warning">
         当前仅为开发预览，不连接真实 Agent / Tool / LLM，不连接真实数据库，不执行真实自动化。
       </p>
+      <div id="desktop-navigation-shell" class="navigation-shell" aria-live="polite">
+        <p class="entry-title">导航壳（开发预览）</p>
+        <p id="desktop-current-page-status" class="muted" style="margin-top: 6px;">
+          当前页面：Desktop 首页
+        </p>
+        <div class="navigation-actions">
+          <a class="navigation-action" href="lap://desktop-home">返回首页</a>
+          <a class="navigation-action" href="lap://desktop-back">后退</a>
+          <a class="navigation-action" href="lap://desktop-refresh">刷新当前预览</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Web 服务状态（开发预览）</h2>
+      <div id="web-service-status" class="status-card status-checking" aria-live="polite">
+        <p class="muted">仅本地检测，不上传、不持久化、不写入数据库。</p>
+        <p class="muted" id="web-service-target" style="margin-top: 6px;">
+          检测目标：http://localhost:3000
+        </p>
+        <p class="status-message" id="web-service-status-message">
+          正在检测本地 Web 服务...
+        </p>
+      </div>
     </section>
 
     <section class="panel">
@@ -202,6 +320,87 @@
         <p class="muted" style="margin-top: 8px;">
           目标路由：<span class="entry-route">/agent?mode=preview</span>
         </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>学习中心（开发预览）</h2>
+      <div class="entry-item">
+        <p class="entry-title">进入 Learning 本地学习闭环预览</p>
+        <p class="muted" style="margin-top: 6px;">
+          打开 Learning 页面，查看最近阅读进度、下一步学习建议、今日任务、本地完成统计、历史趋势与周报预览。
+        </p>
+        <p class="muted" style="margin-top: 6px;">
+          当前仍为开发预览，Learning 任务和统计主要来自规则推断与本地浏览器记录，不代表真实 AI 推荐系统。
+        </p>
+        <a class="entry-action" href="lap://open-learning-preview">打开学习中心</a>
+        <p class="muted" style="margin-top: 8px;">
+          目标路由：<span class="entry-route">/learning</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>系统诊断中心（开发预览）</h2>
+      <div class="entry-item">
+        <p class="entry-title">查看本地 Web 服务、固定路由入口、Desktop 安全配置和数据库探活状态。</p>
+        <p class="muted" style="margin-top: 6px;">
+          该诊断仅用于开发预览，不会读取密钥，不会执行工具，不会写入数据库。
+        </p>
+        <a class="entry-action" href="lap://open-diagnostics-preview">打开诊断中心</a>
+      </div>
+    </section>
+
+    <section id="desktop-diagnostics-panel" class="panel" aria-live="polite">
+      <h2>系统诊断中心（开发预览）</h2>
+      <p class="muted">仅展示安全摘要与只读状态，不触发业务执行能力。</p>
+
+      <div class="diagnostic-grid" style="margin-top: 12px;">
+        <div class="diagnostic-item">
+          <p class="diagnostic-label">Web 服务状态</p>
+          <p id="diagnostics-web-service-status" class="diagnostic-value">检测中</p>
+          <p id="diagnostics-web-service-message" class="muted" style="margin-top: 6px;">正在检测本地 Web 服务...</p>
+          <p id="diagnostics-web-service-target" class="muted" style="margin-top: 6px;">检测目标：http://localhost:3000</p>
+        </div>
+
+        <div class="diagnostic-item">
+          <p class="diagnostic-label">固定入口状态</p>
+          <ul style="margin-top: 8px;">
+            <li>Reader：固定动作可用（<code>lap://open-reader-preview</code>）</li>
+            <li>Agent：固定动作可用（<code>lap://open-agent-preview</code>）</li>
+            <li>Learning：固定动作可用（<code>lap://open-learning-preview</code>）</li>
+            <li>Diagnostics：固定动作可用（<code>lap://open-diagnostics-preview</code>）</li>
+            <li>导航壳：固定动作可用（<code>lap://desktop-home</code> / <code>lap://desktop-back</code> / <code>lap://desktop-refresh</code>）</li>
+          </ul>
+        </div>
+
+        <div class="diagnostic-item">
+          <p class="diagnostic-label">Desktop 安全配置摘要</p>
+          <ul style="margin-top: 8px;">
+            <li><code>nodeIntegration: false</code></li>
+            <li><code>contextIsolation: true</code></li>
+            <li><code>sandbox: true</code></li>
+            <li>外部 URL：拒绝</li>
+            <li>任意 URL 输入：未开放</li>
+          </ul>
+        </div>
+
+        <div class="diagnostic-item">
+          <p class="diagnostic-label">DB 探活摘要（只读）</p>
+          <p id="diagnostics-db-status" class="diagnostic-value">检测中</p>
+          <p id="diagnostics-db-message" class="muted" style="margin-top: 6px;">正在执行只读探活检查...</p>
+        </div>
+
+        <div class="diagnostic-item">
+          <p class="diagnostic-label">安全边界摘要</p>
+          <ul style="margin-top: 8px;">
+            <li>不调用真实 LLM</li>
+            <li>不执行工具</li>
+            <li>不启动 Agent loop</li>
+            <li>不保存 raw prompt/raw response</li>
+            <li>不读取或展示密钥</li>
+          </ul>
+        </div>
       </div>
     </section>
 

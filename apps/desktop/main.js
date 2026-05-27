@@ -1,6 +1,9 @@
 ﻿const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const { resolveDesktopWebTarget } = require("./route-policy");
+const {
+  resolveDesktopWebTarget,
+  getAllowedWebUrlFromValue,
+} = require("./route-policy");
 
 const PREVIEW_DEFAULT_WEB_URL = "http://localhost:3000";
 const READER_PREVIEW_ROUTE = "/reader";
@@ -8,6 +11,35 @@ const READER_PREVIEW_BOOK_ID = "reader-db-sync-verification-book";
 const READER_PREVIEW_CHAPTER_ID = "sample-chapter-long-scroll";
 const AGENT_PREVIEW_ROUTE = "/agent";
 const AGENT_PREVIEW_MODE = "preview";
+const LEARNING_PREVIEW_ROUTE = "/learning";
+const DESKTOP_HOME_ACTION = "desktop-home";
+const DESKTOP_BACK_ACTION = "desktop-back";
+const DESKTOP_REFRESH_ACTION = "desktop-refresh";
+const DESKTOP_DIAGNOSTICS_ACTION = "open-diagnostics-preview";
+const NAVIGATION_SHELL_SYNC_INTERVAL_MS = 1200;
+const WEB_SERVICE_PROBE_TIMEOUT_MS = 1800;
+const WEB_SERVICE_STATUS_CLASSES = [
+  "status-checking",
+  "status-online",
+  "status-offline",
+  "status-error",
+];
+const DB_PROBE_STATUS_LABELS = Object.freeze({
+  checking: "检测中",
+  available: "可用",
+  unavailable: "不可用",
+  unconfigured: "未配置",
+});
+const DEFAULT_DB_PROBE_MESSAGE = "正在执行只读探活检查...";
+
+var shouldFocusDiagnosticsOnNextStaticLoad = false;
+var staticHomeViewKind = "home";
+var lastWebServiceStatusKind = "checking";
+var lastBlockedExternalNavigation = false;
+var dbProbeSummary = {
+  statusKind: "checking",
+  message: DEFAULT_DB_PROBE_MESSAGE,
+};
 
 // Desktop skeleton - no Agent, no Tool, no LLM, no DB, no network.
 // Security: nodeIntegration off, contextIsolation on, sandbox on, no preload, no remote.
@@ -100,6 +132,152 @@ function logWebEntryConstruction(launchConfig) {
   }
 }
 
+function resolveDesktopViewKindFromLoadedUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") {
+    return staticHomeViewKind;
+  }
+
+  var parsed;
+  try {
+    parsed = new URL(rawUrl);
+  } catch (_error) {
+    return "external";
+  }
+
+  if (parsed.protocol === "file:") {
+    return staticHomeViewKind;
+  }
+
+  if (!currentAllowedOrigin || parsed.origin !== currentAllowedOrigin) {
+    return "external";
+  }
+
+  if (parsed.pathname === READER_PREVIEW_ROUTE) {
+    return "reader";
+  }
+
+  if (
+    parsed.pathname === AGENT_PREVIEW_ROUTE &&
+    parsed.searchParams.get("mode") === AGENT_PREVIEW_MODE
+  ) {
+    return "agent";
+  }
+
+  if (parsed.pathname === LEARNING_PREVIEW_ROUTE) {
+    return "learning";
+  }
+
+  return "home";
+}
+
+function resolveDesktopPageStatusLabel(win) {
+  if (lastBlockedExternalNavigation) {
+    return "外部页面已拒绝";
+  }
+
+  var currentUrl =
+    win && !win.isDestroyed() ? win.webContents.getURL() : "";
+  var viewKind = resolveDesktopViewKindFromLoadedUrl(currentUrl);
+
+  if (viewKind === "diagnostics") {
+    return "系统诊断中心";
+  }
+
+  if (viewKind === "reader") {
+    return "Reader";
+  }
+
+  if (viewKind === "agent") {
+    return "Agent";
+  }
+
+  if (viewKind === "learning") {
+    return "Learning";
+  }
+
+  if (
+    viewKind === "home" &&
+    (lastWebServiceStatusKind === "offline" || lastWebServiceStatusKind === "error")
+  ) {
+    return "Web 不可用";
+  }
+
+  return "Desktop 首页";
+}
+
+async function publishDesktopPageStatus(win, statusLabel) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var safeStatusLabel =
+    typeof statusLabel === "string" && statusLabel.trim().length > 0
+      ? statusLabel.trim()
+      : "Desktop 首页";
+
+  var script = "(function () {" +
+    "var body = document.body;" +
+    "if (!body) { return false; }" +
+    "var navRoot = document.getElementById('desktop-navigation-shell');" +
+    "if (!navRoot) {" +
+      "navRoot = document.createElement('div');" +
+      "navRoot.id = 'desktop-navigation-shell';" +
+      "navRoot.setAttribute('aria-live', 'polite');" +
+      "var title = document.createElement('p');" +
+      "title.textContent = '导航壳（开发预览）';" +
+      "title.style.fontWeight = '600';" +
+      "var status = document.createElement('p');" +
+      "status.id = 'desktop-current-page-status';" +
+      "status.style.marginTop = '6px';" +
+      "var actions = document.createElement('div');" +
+      "actions.style.display = 'flex';" +
+      "actions.style.flexWrap = 'wrap';" +
+      "actions.style.gap = '8px';" +
+      "actions.style.marginTop = '8px';" +
+      "var actionItems = [" +
+        "{ label: '返回首页', href: 'lap://desktop-home' }," +
+        "{ label: '后退', href: 'lap://desktop-back' }," +
+        "{ label: '刷新当前预览', href: 'lap://desktop-refresh' }" +
+      "];" +
+      "for (var i = 0; i < actionItems.length; i += 1) {" +
+        "var action = document.createElement('a');" +
+        "action.textContent = actionItems[i].label;" +
+        "action.href = actionItems[i].href;" +
+        "action.style.display = 'inline-flex';" +
+        "action.style.alignItems = 'center';" +
+        "action.style.padding = '6px 10px';" +
+        "action.style.border = '1px solid #d9dee7';" +
+        "action.style.borderRadius = '8px';" +
+        "action.style.color = '#1f2937';" +
+        "action.style.textDecoration = 'none';" +
+        "actions.appendChild(action);" +
+      "}" +
+      "navRoot.appendChild(title);" +
+      "navRoot.appendChild(status);" +
+      "navRoot.appendChild(actions);" +
+      "if (body.firstChild) {" +
+        "body.insertBefore(navRoot, body.firstChild);" +
+      "} else {" +
+        "body.appendChild(navRoot);" +
+      "}" +
+    "}" +
+    "var statusNode = document.getElementById('desktop-current-page-status');" +
+    "if (!statusNode) { return false; }" +
+    "statusNode.textContent = '当前页面：' + " + JSON.stringify(safeStatusLabel) + ";" +
+    "return true;" +
+  "})();";
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to publish navigation shell status");
+  }
+}
+
+function refreshDesktopPageStatus(win) {
+  void publishDesktopPageStatus(win, resolveDesktopPageStatusLabel(win));
+}
+
 // -------------------------------------------------
 // 2. Load entry point
 // -------------------------------------------------
@@ -164,6 +342,19 @@ function resolveAgentPreviewLaunchConfig() {
   });
 }
 
+function resolveLearningPreviewLaunchConfig() {
+  var webUrlValue =
+    typeof process.env.LAP_DESKTOP_WEB_URL === "string" &&
+    process.env.LAP_DESKTOP_WEB_URL.trim().length > 0
+      ? process.env.LAP_DESKTOP_WEB_URL
+      : PREVIEW_DEFAULT_WEB_URL;
+
+  return resolveDesktopWebTarget({
+    webUrlValue: webUrlValue,
+    routeValue: LEARNING_PREVIEW_ROUTE,
+  });
+}
+
 /**
  * Open the fixed Reader development preview target through existing route-policy checks.
  *
@@ -185,6 +376,8 @@ function openReaderPreview(win) {
     return false;
   }
 
+  lastBlockedExternalNavigation = false;
+  staticHomeViewKind = "home";
   currentAllowedOrigin = previewLaunchConfig.allowedUrl.origin;
   console.log(
     "[desktop] Opening Reader preview route: " + previewLaunchConfig.targetUrl
@@ -214,6 +407,8 @@ function openAgentPreview(win) {
     return false;
   }
 
+  lastBlockedExternalNavigation = false;
+  staticHomeViewKind = "home";
   currentAllowedOrigin = previewLaunchConfig.allowedUrl.origin;
   console.log(
     "[desktop] Opening Agent preview route: " + previewLaunchConfig.targetUrl
@@ -222,8 +417,375 @@ function openAgentPreview(win) {
   return true;
 }
 
+/**
+ * Open the fixed Learning development preview target through existing route-policy checks.
+ *
+ * @param {import("electron").BrowserWindow} win
+ * @returns {boolean}
+ */
+function openLearningPreview(win) {
+  var previewLaunchConfig = resolveLearningPreviewLaunchConfig();
+  logWebUrlValidation(previewLaunchConfig);
+  logRouteValidation(previewLaunchConfig);
+  logWebEntryConstruction(previewLaunchConfig);
+
+  if (!previewLaunchConfig.allowedUrl || !previewLaunchConfig.targetUrl) {
+    console.warn(
+      "[desktop] Learning preview entry unavailable. Ensure local web dev server is running at " +
+        PREVIEW_DEFAULT_WEB_URL
+    );
+    return false;
+  }
+
+  lastBlockedExternalNavigation = false;
+  staticHomeViewKind = "home";
+  currentAllowedOrigin = previewLaunchConfig.allowedUrl.origin;
+  console.log(
+    "[desktop] Opening Learning preview route: " + previewLaunchConfig.targetUrl
+  );
+  win.loadURL(previewLaunchConfig.targetUrl);
+  return true;
+}
+
+function openDesktopHome(win) {
+  if (!win || win.isDestroyed()) {
+    return false;
+  }
+
+  console.log("[desktop] Returning to Desktop static home");
+  shouldFocusDiagnosticsOnNextStaticLoad = false;
+  staticHomeViewKind = "home";
+  lastBlockedExternalNavigation = false;
+  currentAllowedOrigin = null;
+  win
+    .loadFile(path.join(__dirname, "index.html"))
+    .catch(function () {
+      console.warn("[desktop] Failed to open Desktop static home");
+    });
+  return true;
+}
+
+function openDesktopBack(win) {
+  if (!win || win.isDestroyed()) {
+    return false;
+  }
+
+  var navigationHistory = win.webContents.navigationHistory;
+  var canGoBack =
+    navigationHistory &&
+    typeof navigationHistory.canGoBack === "function"
+      ? navigationHistory.canGoBack()
+      : win.webContents.canGoBack();
+
+  if (!canGoBack) {
+    console.log("[desktop] Back navigation ignored (no history entry)");
+    refreshDesktopPageStatus(win);
+    return true;
+  }
+
+  lastBlockedExternalNavigation = false;
+  if (
+    navigationHistory &&
+    typeof navigationHistory.goBack === "function"
+  ) {
+    navigationHistory.goBack();
+  } else {
+    win.webContents.goBack();
+  }
+  return true;
+}
+
+function refreshDesktopPreview(win) {
+  if (!win || win.isDestroyed()) {
+    return false;
+  }
+
+  if (!win.webContents.getURL()) {
+    return openDesktopHome(win);
+  }
+
+  lastBlockedExternalNavigation = false;
+  win.webContents.reload();
+  return true;
+}
+
+async function focusDiagnosticsPanel(win) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var script = "(function () {" +
+    "var panel = document.getElementById('desktop-diagnostics-panel');" +
+    "if (!panel) { return false; }" +
+    "panel.scrollIntoView({ behavior: 'smooth', block: 'start' });" +
+    "panel.style.outline = '2px solid #0f6ccf';" +
+    "setTimeout(function () { panel.style.outline = 'none'; }, 900);" +
+    "return true;" +
+  "})();";
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to focus diagnostics panel");
+  }
+}
+
+function openDiagnosticsPreview(win) {
+  if (!win || win.isDestroyed()) {
+    return false;
+  }
+
+  console.log("[desktop] Opening diagnostics center (dev preview)");
+  staticHomeViewKind = "diagnostics";
+  lastBlockedExternalNavigation = false;
+  shouldFocusDiagnosticsOnNextStaticLoad = true;
+
+  if (currentAllowedOrigin) {
+    currentAllowedOrigin = null;
+    win
+      .loadFile(path.join(__dirname, "index.html"))
+      .catch(function () {
+        console.warn("[desktop] Failed to open diagnostics center static home fallback");
+      });
+    return true;
+  }
+
+  void focusDiagnosticsPanel(win);
+  refreshDesktopPageStatus(win);
+  return true;
+}
+
 // -------------------------------------------------
-// 3. Navigation guard helpers
+// 3. Local web-service status diagnosis (static home only)
+// -------------------------------------------------
+var webServiceProbeSequence = 0;
+
+function resolveWebServiceProbeTargetFromEnv() {
+  var rawTarget =
+    typeof process.env.LAP_DESKTOP_WEB_URL === "string" &&
+    process.env.LAP_DESKTOP_WEB_URL.trim().length > 0
+      ? process.env.LAP_DESKTOP_WEB_URL.trim()
+      : PREVIEW_DEFAULT_WEB_URL;
+
+  var allowedTarget = getAllowedWebUrlFromValue(rawTarget);
+  if (!allowedTarget.url) {
+    return {
+      probeTargetOrigin: null,
+      displayTarget: rawTarget,
+    };
+  }
+
+  return {
+    probeTargetOrigin: allowedTarget.url.origin,
+    displayTarget: allowedTarget.url.origin,
+  };
+}
+
+/**
+ * @param {import("electron").BrowserWindow} win
+ * @param {"checking"|"online"|"offline"|"error"} statusKind
+ * @param {string} message
+ * @param {string} displayTarget
+ */
+async function publishWebServiceStatus(win, statusKind, message, displayTarget) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var safeStatusKind = ["checking", "online", "offline", "error"].includes(statusKind)
+    ? statusKind
+    : "error";
+  var safeMessage =
+    typeof message === "string"
+      ? message
+      : "检测失败，Desktop 仍可显示本地首页。";
+  var safeTarget =
+    typeof displayTarget === "string" && displayTarget.length > 0
+      ? displayTarget
+      : PREVIEW_DEFAULT_WEB_URL;
+  var diagnosticsStatusLabel = {
+    checking: "检测中",
+    online: "在线",
+    offline: "不可用",
+    error: "检测失败",
+  }[safeStatusKind] || "检测失败";
+  lastWebServiceStatusKind = safeStatusKind;
+
+  var script = "(function () {" +
+    "var root = document.getElementById('web-service-status');" +
+    "var target = document.getElementById('web-service-target');" +
+    "var messageNode = document.getElementById('web-service-status-message');" +
+    "if (!root || !target || !messageNode) { return false; }" +
+    "var classes = " + JSON.stringify(WEB_SERVICE_STATUS_CLASSES) + ";" +
+    "for (var i = 0; i < classes.length; i += 1) { root.classList.remove(classes[i]); }" +
+    "root.classList.add('status-' + " + JSON.stringify(safeStatusKind) + ");" +
+    "target.textContent = '检测目标：' + " + JSON.stringify(safeTarget) + ";" +
+    "messageNode.textContent = " + JSON.stringify(safeMessage) + ";" +
+    "var diagnosticsStatus = document.getElementById('diagnostics-web-service-status');" +
+    "var diagnosticsMessage = document.getElementById('diagnostics-web-service-message');" +
+    "var diagnosticsTarget = document.getElementById('diagnostics-web-service-target');" +
+    "if (diagnosticsStatus) { diagnosticsStatus.textContent = " + JSON.stringify(diagnosticsStatusLabel) + "; }" +
+    "if (diagnosticsMessage) { diagnosticsMessage.textContent = " + JSON.stringify(safeMessage) + "; }" +
+    "if (diagnosticsTarget) { diagnosticsTarget.textContent = '检测目标：' + " + JSON.stringify(safeTarget) + "; }" +
+    "return true;" +
+  "})();";
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to update static home web-service status UI");
+  }
+
+  refreshDesktopPageStatus(win);
+}
+
+function getDbProbeLabel(statusKind) {
+  if (statusKind in DB_PROBE_STATUS_LABELS) {
+    return DB_PROBE_STATUS_LABELS[statusKind];
+  }
+
+  return DB_PROBE_STATUS_LABELS.unavailable;
+}
+
+async function publishDbProbeStatus(win) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var safeStatusKind = dbProbeSummary.statusKind;
+  var safeMessage =
+    typeof dbProbeSummary.message === "string" && dbProbeSummary.message.length > 0
+      ? dbProbeSummary.message
+      : DEFAULT_DB_PROBE_MESSAGE;
+  var statusLabel = getDbProbeLabel(safeStatusKind);
+
+  var script = "(function () {" +
+    "var statusNode = document.getElementById('diagnostics-db-status');" +
+    "var messageNode = document.getElementById('diagnostics-db-message');" +
+    "if (!statusNode || !messageNode) { return false; }" +
+    "statusNode.textContent = " + JSON.stringify(statusLabel) + ";" +
+    "messageNode.textContent = " + JSON.stringify(safeMessage) + ";" +
+    "return true;" +
+  "})();";
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to update diagnostics DB probe status UI");
+  }
+}
+
+function publishDbProbeStatusToOpenWindows() {
+  var windows = BrowserWindow.getAllWindows();
+  for (var i = 0; i < windows.length; i += 1) {
+    void publishDbProbeStatus(windows[i]);
+  }
+}
+
+function setDbProbeSummary(statusKind, message) {
+  dbProbeSummary = {
+    statusKind: statusKind,
+    message: message,
+  };
+  publishDbProbeStatusToOpenWindows();
+}
+
+async function probeLocalWebService(probeTargetOrigin) {
+  var controller = new AbortController();
+  var timeoutHandle = setTimeout(function () {
+    controller.abort();
+  }, WEB_SERVICE_PROBE_TIMEOUT_MS);
+
+  try {
+    var response = await fetch(probeTargetOrigin, {
+      method: "GET",
+      redirect: "manual",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+
+    return Boolean(response);
+  } catch (_error) {
+    return false;
+  } finally {
+    clearTimeout(timeoutHandle);
+  }
+}
+
+/**
+ * Runs a one-shot, local-only status probe for static index.html.
+ *
+ * @param {import("electron").BrowserWindow} win
+ */
+async function runWebServiceDiagnosisForStaticHome(win) {
+  var probeId = webServiceProbeSequence + 1;
+  webServiceProbeSequence = probeId;
+
+  var probeTarget = resolveWebServiceProbeTargetFromEnv();
+  console.log("[desktop] Diagnosing local web-service status for " + probeTarget.displayTarget);
+  await publishWebServiceStatus(
+    win,
+    "checking",
+    "正在检测本地 Web 服务...",
+    probeTarget.displayTarget
+  );
+
+  if (probeId !== webServiceProbeSequence || win.isDestroyed()) {
+    return;
+  }
+
+  if (!probeTarget.probeTargetOrigin) {
+    console.warn(
+      "[desktop] Web-service diagnosis skipped because LAP_DESKTOP_WEB_URL is not a safe local target"
+    );
+    await publishWebServiceStatus(
+      win,
+      "error",
+      "检测失败，Desktop 仍可显示本地首页。",
+      probeTarget.displayTarget
+    );
+    console.log("[desktop] Web-service status: error");
+    return;
+  }
+
+  try {
+    var isOnline = await probeLocalWebService(probeTarget.probeTargetOrigin);
+    if (probeId !== webServiceProbeSequence || win.isDestroyed()) {
+      return;
+    }
+
+    if (isOnline) {
+      await publishWebServiceStatus(
+        win,
+        "online",
+        "Web 服务在线，Reader / Agent / Learning 入口可尝试打开。",
+        probeTarget.displayTarget
+      );
+      console.log("[desktop] Web-service status: online");
+      return;
+    }
+
+    await publishWebServiceStatus(
+      win,
+      "offline",
+      "Web 服务不可用，请先启动 Web 开发服务。",
+      probeTarget.displayTarget
+    );
+    console.log("[desktop] Web-service status: offline");
+  } catch (_error) {
+    console.warn("[desktop] Web-service diagnosis failed. Static home remains available.");
+    await publishWebServiceStatus(
+      win,
+      "error",
+      "检测失败，Desktop 仍可显示本地首页。",
+      probeTarget.displayTarget
+    );
+    console.log("[desktop] Web-service status: error");
+  }
+}
+
+// -------------------------------------------------
+// 4. Navigation guard helpers
 // -------------------------------------------------
 var currentAllowedOrigin = null;
 
@@ -269,18 +831,48 @@ function handleInternalDesktopNavigation(win, url) {
     return false;
   }
 
+  var isRootPath = parsed.pathname === "/" || parsed.pathname === "";
+  var hasNoSearchOrHash = parsed.search === "" && parsed.hash === "";
+
+  if (!isRootPath || !hasNoSearchOrHash) {
+    console.warn("[desktop] Blocked malformed internal action URL");
+    return true;
+  }
+
+  if (parsed.hostname === DESKTOP_HOME_ACTION) {
+    return openDesktopHome(win);
+  }
+
+  if (parsed.hostname === DESKTOP_BACK_ACTION) {
+    return openDesktopBack(win);
+  }
+
+  if (parsed.hostname === DESKTOP_REFRESH_ACTION) {
+    return refreshDesktopPreview(win);
+  }
+
   if (
-    parsed.hostname === "open-reader-preview" &&
-    (parsed.pathname === "/" || parsed.pathname === "")
+    parsed.hostname === "open-reader-preview"
   ) {
     return openReaderPreview(win);
   }
 
   if (
-    parsed.hostname === "open-agent-preview" &&
-    (parsed.pathname === "/" || parsed.pathname === "")
+    parsed.hostname === "open-agent-preview"
   ) {
     return openAgentPreview(win);
+  }
+
+  if (
+    parsed.hostname === "open-learning-preview"
+  ) {
+    return openLearningPreview(win);
+  }
+
+  if (
+    parsed.hostname === DESKTOP_DIAGNOSTICS_ACTION
+  ) {
+    return openDiagnosticsPreview(win);
   }
 
   console.warn("[desktop] Blocked unknown internal action: " + parsed.hostname);
@@ -288,7 +880,7 @@ function handleInternalDesktopNavigation(win, url) {
 }
 
 // -------------------------------------------------
-// 4. Create window
+// 5. Create window
 // -------------------------------------------------
 function createWindow() {
   var win = new BrowserWindow({
@@ -307,9 +899,46 @@ function createWindow() {
   // Set allowed origin before loading
   var launchConfig = resolveDesktopLaunchConfigFromEnv();
   currentAllowedOrigin = launchConfig.allowedUrl ? launchConfig.allowedUrl.origin : null;
+  staticHomeViewKind = "home";
+  lastBlockedExternalNavigation = false;
+  lastWebServiceStatusKind = "checking";
 
   // Load the entry
   loadDesktopEntry(win, launchConfig);
+
+  // Keep the navigation shell present on web preview pages where framework re-render can remove injected nodes.
+  var navigationShellSyncTimer = setInterval(function () {
+    if (!win || win.isDestroyed()) {
+      clearInterval(navigationShellSyncTimer);
+      return;
+    }
+
+    refreshDesktopPageStatus(win);
+  }, NAVIGATION_SHELL_SYNC_INTERVAL_MS);
+
+  win.on("closed", function () {
+    clearInterval(navigationShellSyncTimer);
+  });
+
+  win.webContents.on("did-finish-load", function () {
+    lastBlockedExternalNavigation = false;
+    refreshDesktopPageStatus(win);
+
+    // Only static home renders the diagnosis card.
+    if (currentAllowedOrigin) {
+      return;
+    }
+
+    void runWebServiceDiagnosisForStaticHome(win);
+    void publishDbProbeStatus(win);
+
+    if (shouldFocusDiagnosticsOnNextStaticLoad) {
+      shouldFocusDiagnosticsOnNextStaticLoad = false;
+      void focusDiagnosticsPanel(win);
+    }
+
+    refreshDesktopPageStatus(win);
+  });
 
   // Navigation guard: prevent navigation to non-allowed URLs
   win.webContents.on("will-navigate", function (event, url) {
@@ -330,6 +959,8 @@ function createWindow() {
         "[desktop] Navigation blocked (not in allowed origin): " + logDetail
       );
       event.preventDefault();
+      lastBlockedExternalNavigation = true;
+      refreshDesktopPageStatus(win);
     }
   });
 
@@ -343,6 +974,8 @@ function createWindow() {
   win.webContents.on("did-fail-load", function (event, errorCode, errorDescription, validatedURL, isMainFrame) {
     // Only intervene for the main frame; sub-frame failures are ignored.
     if (!isMainFrame) return;
+    // Ignore cancellation during route transitions (for example Next.js client-side navigation).
+    if (errorCode === -3) return;
     // Avoid infinite loop - only one fallback attempt.
     if (webLoadAttempted) return;
 
@@ -359,6 +992,9 @@ function createWindow() {
     if (currentAllowedOrigin) {
       webLoadAttempted = true;
       console.log("[desktop] Falling back to static index.html");
+      staticHomeViewKind = "home";
+      lastWebServiceStatusKind = "offline";
+      lastBlockedExternalNavigation = false;
       currentAllowedOrigin = null;
       win.loadFile(path.join(__dirname, "index.html"));
     }
@@ -368,10 +1004,24 @@ function createWindow() {
 }
 
 // -------------------------------------------------
-// 5. Preview DB probe (lazy + non-blocking)
+// 6. Preview DB probe (lazy + non-blocking)
 // -------------------------------------------------
 async function probePreviewDatabase() {
   var disconnectPrismaClient = null;
+
+  if (
+    typeof process.env.DATABASE_URL !== "string" ||
+    process.env.DATABASE_URL.trim().length === 0
+  ) {
+    setDbProbeSummary(
+      "unconfigured",
+      "未启用 DB 探活，本轮不新增数据库访问。"
+    );
+    console.log("[desktop] Preview DB probe skipped (DATABASE_URL is not configured)");
+    return;
+  }
+
+  setDbProbeSummary("checking", DEFAULT_DB_PROBE_MESSAGE);
 
   try {
     var dbModule = await import("@learning-agent-platform/db");
@@ -381,7 +1031,8 @@ async function probePreviewDatabase() {
         : null;
 
     if (!dbModule || typeof dbModule.getPrismaClient !== "function") {
-      console.warn("[desktop] 棰勮鏁版嵁搴撲笉鍙敤锛岀户缁湰鍦板洖閫€");
+      console.warn("[desktop] Preview DB is unavailable; continuing with local fallback");
+      setDbProbeSummary("unavailable", "只读 DB 探活不可用，保持本地预览模式。");
       return;
     }
 
@@ -391,16 +1042,19 @@ async function probePreviewDatabase() {
       !prisma.readingProgress ||
       typeof prisma.readingProgress.findFirst !== "function"
     ) {
-      console.warn("[desktop] 棰勮鏁版嵁搴撲笉鍙敤锛岀户缁湰鍦板洖閫€");
+      console.warn("[desktop] Preview DB is unavailable; continuing with local fallback");
+      setDbProbeSummary("unavailable", "只读 DB 探活不可用，保持本地预览模式。");
       return;
     }
 
     await prisma.readingProgress.findFirst({
       select: { id: true },
     });
-    console.log("[desktop] 棰勮鏁版嵁搴撳彲鐢?);
+    console.log("[desktop] Preview DB probe reachable");
+    setDbProbeSummary("available", "只读 DB 探活可用（未执行写入操作）。");
   } catch (_error) {
-    console.warn("[desktop] 棰勮鏁版嵁搴撲笉鍙敤锛岀户缁湰鍦板洖閫€");
+    console.warn("[desktop] Preview DB is unavailable; continuing with local fallback");
+    setDbProbeSummary("unavailable", "只读 DB 探活不可用，保持本地预览模式。");
   } finally {
     if (disconnectPrismaClient) {
       try {
@@ -413,7 +1067,7 @@ async function probePreviewDatabase() {
 }
 
 // -------------------------------------------------
-// 6. App lifecycle
+// 7. App lifecycle
 // -------------------------------------------------
 app.whenReady().then(function () {
   // Fire-and-forget preview DB probe.

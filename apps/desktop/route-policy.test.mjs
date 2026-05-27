@@ -53,6 +53,28 @@ test("allows /books and /learning routes", () => {
   assert.equal(getAllowedWebRouteFromValue("/learning").route, "/learning");
 });
 
+test("builds fixed /learning target without query parameters", () => {
+  const allowedUrl = mustAllowedUrl("http://localhost:3000");
+  const entry = buildWebEntryUrl(allowedUrl, "/learning", {});
+  assert.equal(entry.error, null);
+  assert.equal(entry.targetError, null);
+  assert.equal(entry.url, "http://localhost:3000/learning");
+});
+
+test("rejects dangerous query and external protocol route values for /learning", () => {
+  const withDangerousQuery = getAllowedWebRouteFromValue("/learning?next=http://evil.example");
+  assert.equal(withDangerousQuery.route, "/books");
+  assert.equal(withDangerousQuery.error, "safety_rule");
+
+  const javascriptProtocol = getAllowedWebRouteFromValue("javascript:alert(1)");
+  assert.equal(javascriptProtocol.route, "/books");
+  assert.equal(javascriptProtocol.error, "safety_rule");
+
+  const externalHttpRoute = getAllowedWebRouteFromValue("http://evil.example/learning");
+  assert.equal(externalHttpRoute.route, "/books");
+  assert.equal(externalHttpRoute.error, "safety_rule");
+});
+
 test("allows /agent route for fixed preview-mode construction only", () => {
   assert.equal(getAllowedWebRouteFromValue("/agent").route, "/agent");
   assert.equal(getAllowedWebRouteFromValue("/agent").error, null);
