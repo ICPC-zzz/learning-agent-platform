@@ -15,11 +15,20 @@ import type {
 import { LearningAbilityProfileSaveControls } from "./components/LearningAbilityProfileSaveControls";
 import { LearningDailyRecommendationSaveControls } from "./components/LearningDailyRecommendationSaveControls";
 import { LearningDailyRecommendationListWithAttemptStatus } from "./components/LearningDailyRecommendationListWithAttemptStatus";
+import { LearningDailyTaskPanel } from "./components/LearningDailyTaskPanel";
+import { LearningDailyTaskStatsPanel } from "./components/LearningDailyTaskStatsPanel";
+import { LearningDailyTaskHistoryPanel } from "./components/LearningDailyTaskHistoryPanel";
+import { LearningDailyTaskWeeklyReportPanel } from "./components/LearningDailyTaskWeeklyReportPanel";
+import { LearningDailyTaskWeeklyReportExportPanel } from "./components/LearningDailyTaskWeeklyReportExportPanel";
 import { ManualLearningCycleStatusPanel } from "./components/ManualLearningCycleStatusPanel";
 import { LearningProblemAttemptSaveControls } from "./components/LearningProblemAttemptSaveControls";
 import { LearningProblemAttemptSignalSummary } from "./components/LearningProblemAttemptSignalSummary";
+import { LearningRecentReadingProgressPanel } from "./components/LearningRecentReadingProgressPanel";
+import { createLearningDailyTaskViewModel } from "./learning-daily-task-mapper";
+import { LearningNextStepSuggestionPanel } from "./components/LearningNextStepSuggestionPanel";
 import { LearningReadingProgressSignalSummary } from "./components/LearningReadingProgressSignalSummary";
 import { LearningRecentProblemAttemptHistoryPanel } from "./components/LearningRecentProblemAttemptHistoryPanel";
+import { createLearningNextStepSuggestionViewModel } from "./learning-next-step-suggestion-mapper";
 import type { LearningDailyRecommendationAbilityProfileSource } from "./learning-daily-recommendation-save-types";
 import { createManualLearningCycleStatusViewModel } from "./manual-learning-cycle-status";
 import { applyProblemAttemptSignalsToAbilityPreview } from "./problem-attempt-ability-preview";
@@ -34,6 +43,9 @@ import {
   createLearningReadingProgressSignalPreviewForFallbackReason,
   loadLearningReadingProgressSignalPreview,
 } from "./reading-progress-signal-loader";
+import {
+  loadLearningRecentReadingProgress,
+} from "./recent-reading-progress-loader";
 import {
   loadLearningRecommendationProblemAttemptStatusPreview,
 } from "./recommendation-problem-attempt-status-loader";
@@ -69,6 +81,14 @@ export default async function LearningPage() {
     });
   const recommendationProblemAttemptStatusPreview =
     await getRecommendationProblemAttemptStatusPreview(dashboardData);
+  const recentReadingProgress = await getRecentReadingProgress(dashboardData);
+  const nextStepSuggestion = createLearningNextStepSuggestionViewModel({
+    recentReadingProgress,
+  });
+  const dailyTask = createLearningDailyTaskViewModel({
+    recentReadingProgress,
+    nextStepSuggestion,
+  });
   const recentProblemAttemptHistory =
     await getRecentProblemAttemptHistory(dashboardData);
   const manualLearningCycleStatus =
@@ -144,6 +164,13 @@ export default async function LearningPage() {
         <LearningReadingProgressSignalSummary
           preview={readingProgressSignalPreview}
         />
+        <LearningRecentReadingProgressPanel progress={recentReadingProgress} />
+        <LearningNextStepSuggestionPanel suggestion={nextStepSuggestion} />
+        <LearningDailyTaskPanel dailyTask={dailyTask} />
+        <LearningDailyTaskStatsPanel dailyTask={dailyTask} />
+        <LearningDailyTaskHistoryPanel />
+        <LearningDailyTaskWeeklyReportPanel />
+        <LearningDailyTaskWeeklyReportExportPanel />
         <LearningProblemAttemptSignalSummary
           preview={problemAttemptSignalPreview}
         />
@@ -230,6 +257,16 @@ async function getRecentProblemAttemptHistory(
   dashboardData: LearningDashboardPageData,
 ) {
   return loadLearningRecentProblemAttemptHistory({
+    dashboardSource: dashboardData.source,
+    fallbackReason:
+      dashboardData.source === "mock_fallback"
+        ? dashboardData.fallbackReason
+        : undefined,
+  });
+}
+
+async function getRecentReadingProgress(dashboardData: LearningDashboardPageData) {
+  return loadLearningRecentReadingProgress({
     dashboardSource: dashboardData.source,
     fallbackReason:
       dashboardData.source === "mock_fallback"
