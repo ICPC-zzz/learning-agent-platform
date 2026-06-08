@@ -144,6 +144,13 @@ export {
   PrismaUserRepository,
   normalizeProgressRatio,
 } from "./repositories/index.js";
+export {
+  createReadingProgressPrismaRepositoryAdapter,
+} from "./reading-progress-prisma-adapter.js";
+export {
+  createBlockedReadingProgressDbIntegrationGuardPreview,
+  evaluateReadingProgressDbIntegrationGuard,
+} from "./reading-progress-db-integration-guard.js";
 export type {
   LlmCallPersistenceInput,
   LlmChatCompletionResultLike,
@@ -187,6 +194,28 @@ export type {
   ReadOnlyToolSandboxPersistenceBlockedReason,
   ReadOnlyToolSandboxPersistenceInput,
 } from "./agent-tool-sandbox-audit-persistence.js";
+export type {
+  ReadingProgressPrismaAdapterCapabilities,
+  ReadingProgressPrismaAdapterOptions,
+  ReadingProgressPrismaAdapterSafetyStatus,
+  ReadingProgressPrismaAuditPreview,
+  ReadingProgressPrismaBlocker,
+  ReadingProgressPrismaDelegateLike,
+  ReadingProgressPrismaFindResult,
+  ReadingProgressPrismaIdempotencyPreview,
+  ReadingProgressPrismaIdentity,
+  ReadingProgressPrismaLikeClient,
+  ReadingProgressPrismaRecordView,
+  ReadingProgressPrismaRepositoryAdapter,
+  ReadingProgressPrismaUpsertInput,
+  ReadingProgressPrismaUpsertResult,
+} from "./reading-progress-prisma-adapter.js";
+export type {
+  ReadingProgressDbIntegrationGuardBlocker,
+  ReadingProgressDbIntegrationGuardInput,
+  ReadingProgressDbIntegrationGuardPreview,
+  ReadingProgressDbIntegrationGuardStatus,
+} from "./reading-progress-db-integration-guard.js";
 export type {
   PersistSparkDiagnosticPreviewOptions,
   PersistSparkDiagnosticPreviewResult,

@@ -13,13 +13,17 @@
 - `ARCHITECTURE_BOUNDARIES.md`
 - `DOC_WORKFLOW.md`
 
+**Reader sync 任务额外必读：**
+- `docs/modules/reader-sync-current-state.md` — Reader sync 模块级总结，替代历史 A310–A332 轮次文档
+
 ## 默认不读取
 
 - Codex 每轮只读本轮任务相关源码。
-- Codex 默认不读所有历史 Axxx 文档。
+- Codex 默认不读所有历史 Axxx 文档（A310–A332 已归档至 `docs/_archive_pending_review/rounds/A310-A332/`）。
 - Codex 默认不读 `docs/status/PROJECT_COMPLETION_SUMMARY.md`。
 - Codex 默认不读 `docs/reference-analysis`。
 - 只有任务明确要求审计、阶段总结、文档压缩、全局规划或参考分析时，才读取上述大文件。
+- **Reader sync 任务优先读 `docs/modules/reader-sync-current-state.md`，不再默认读取任何 A310–A332 原始轮次文档。** 只有定位具体历史问题时才查阅 archive。
 
 ## 上下文不足时
 

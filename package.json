@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "npm -w @learning-agent-platform/web run dev",
     "typecheck": "bash scripts/vm-typecheck.sh",
-    "lint": "bash scripts/vm-lint.sh"
+    "lint": "bash scripts/vm-lint.sh",
+    "desktop:test:gui": "node --test apps/desktop/desktop-gui-regression.test.mjs",
+    "desktop:test:gui:ci": "node apps/desktop/run-desktop-gui-ci.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

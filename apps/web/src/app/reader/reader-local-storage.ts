@@ -33,7 +33,24 @@ export interface ReaderLocalTimerRecord {
   updatedAt: string;
 }
 
+export interface ReaderLocalStatusSummaryV1 {
+  schemaVersion: 1;
+  source: "reader";
+  previewOnly: true;
+  bookId: string | null;
+  chapterId: string | null;
+  bookTitle?: string | null;
+  chapterTitle?: string | null;
+  progressRatio?: number | null;
+  progressPercent?: number | null;
+  noteCount?: number;
+  bookmarkCount?: number;
+  readingSeconds?: number;
+  updatedAt: string;
+}
+
 const KEY_PREFIX = "lap.reader";
+const READER_LOCAL_STATUS_V1_KEY = `${KEY_PREFIX}.localStatus.v1`;
 const READER_SYNC_SWITCH_KEY = `${KEY_PREFIX}.syncSwitch`;
 const STORAGE_UPDATE_EVENT = "lap-reader-local-storage-updated";
 
@@ -80,6 +97,10 @@ export function buildReaderTimerStorageKey(
 ): string {
   const scope = getReaderLocalScope(bookId, chapterId);
   return `${KEY_PREFIX}.timer.${scope.bookSegment}.${scope.chapterSegment}`;
+}
+
+export function getReaderLocalStatusStorageKey(): string {
+  return READER_LOCAL_STATUS_V1_KEY;
 }
 
 export function getReaderSyncSwitchStorageKey(): string {
@@ -175,6 +196,10 @@ function isBoolean(value: unknown): value is boolean {
   return typeof value === "boolean";
 }
 
+function isNullableNonEmptyString(value: unknown): value is string | null {
+  return value === null || (typeof value === "string" && value.length > 0);
+}
+
 function isReaderLocalBookmarkRecord(value: unknown): value is ReaderLocalBookmarkRecord {
   if (value === null || typeof value !== "object") {
     return false;
@@ -224,6 +249,45 @@ function isReaderLocalTimerRecord(value: unknown): value is ReaderLocalTimerReco
     typeof record.isRunning === "boolean" &&
     (record.lastStartedAt === null || isIsoDate(record.lastStartedAt)) &&
     isIsoDate(record.updatedAt)
+  );
+}
+
+function isReaderLocalStatusSummaryV1(value: unknown): value is ReaderLocalStatusSummaryV1 {
+  if (value === null || typeof value !== "object") {
+    return false;
+  }
+
+  const summary = value as Record<string, unknown>;
+  const hasValidProgressRatio =
+    summary.progressRatio === undefined ||
+    summary.progressRatio === null ||
+    isNonNegativeNumber(summary.progressRatio);
+  const hasValidProgressPercent =
+    summary.progressPercent === undefined ||
+    summary.progressPercent === null ||
+    isNonNegativeNumber(summary.progressPercent);
+  const hasValidNoteCount =
+    summary.noteCount === undefined || isNonNegativeNumber(summary.noteCount);
+  const hasValidBookmarkCount =
+    summary.bookmarkCount === undefined || isNonNegativeNumber(summary.bookmarkCount);
+  const hasValidReadingSeconds =
+    summary.readingSeconds === undefined || isNonNegativeNumber(summary.readingSeconds);
+
+  return (
+    summary.schemaVersion === 1 &&
+    summary.source === "reader" &&
+    summary.previewOnly === true &&
+    isNullableNonEmptyString(summary.bookId) &&
+    isNullableNonEmptyString(summary.chapterId) &&
+    (summary.bookTitle === undefined || isNullableNonEmptyString(summary.bookTitle)) &&
+    (summary.chapterTitle === undefined ||
+      isNullableNonEmptyString(summary.chapterTitle)) &&
+    hasValidProgressRatio &&
+    hasValidProgressPercent &&
+    hasValidNoteCount &&
+    hasValidBookmarkCount &&
+    hasValidReadingSeconds &&
+    isIsoDate(summary.updatedAt)
   );
 }
 
@@ -300,6 +364,16 @@ export function removeReaderLocalTimer(
 ): boolean {
   const key = buildReaderTimerStorageKey(bookId, chapterId);
   return removeStorageKey(key);
+}
+
+export function readReaderLocalStatusSummary(): ReaderLocalStatusSummaryV1 | null {
+  return readJson(READER_LOCAL_STATUS_V1_KEY, isReaderLocalStatusSummaryV1);
+}
+
+export function writeReaderLocalStatusSummary(
+  value: ReaderLocalStatusSummaryV1,
+): boolean {
+  return writeJson(READER_LOCAL_STATUS_V1_KEY, value);
 }
 
 export function readReaderSyncSwitch(): boolean {

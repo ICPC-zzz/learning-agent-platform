@@ -4,6 +4,12 @@ const {
   resolveDesktopWebTarget,
   getAllowedWebUrlFromValue,
 } = require("./route-policy");
+const {
+  buildLocalLearningStatusPanelScript,
+} = require("./local-learning-status-panel");
+const {
+  buildReaderSyncHealthPanelScript,
+} = require("./local-reader-sync-health-panel");
 
 const PREVIEW_DEFAULT_WEB_URL = "http://localhost:3000";
 const READER_PREVIEW_ROUTE = "/reader";
@@ -31,6 +37,9 @@ const DB_PROBE_STATUS_LABELS = Object.freeze({
   unconfigured: "未配置",
 });
 const DEFAULT_DB_PROBE_MESSAGE = "正在执行只读探活检查...";
+const READER_LOCAL_STORAGE_KEY_PREFIX = "lap.reader.";
+const READER_SCROLL_STORAGE_KEY_PREFIX = "learning-agent-platform:reader-scroll:";
+const LEARNING_LOCAL_STORAGE_KEY_PREFIX = "lap.learning.dailyTasks.";
 
 var shouldFocusDiagnosticsOnNextStaticLoad = false;
 var staticHomeViewKind = "home";
@@ -274,8 +283,49 @@ async function publishDesktopPageStatus(win, statusLabel) {
   }
 }
 
+async function publishLocalLearningStatusPanel(win) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var script = buildLocalLearningStatusPanelScript({
+    readerLocalStorageKeyPrefix: READER_LOCAL_STORAGE_KEY_PREFIX,
+    readerScrollStorageKeyPrefix: READER_SCROLL_STORAGE_KEY_PREFIX,
+    learningLocalStorageKeyPrefix: LEARNING_LOCAL_STORAGE_KEY_PREFIX,
+  });
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to publish local learning status panel");
+  }
+}
+
+async function publishReaderSyncHealthPanel(win) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  var script = buildReaderSyncHealthPanelScript();
+
+  try {
+    await win.webContents.executeJavaScript(script, true);
+  } catch (_error) {
+    console.warn("[desktop] Failed to publish reader sync health panel");
+  }
+}
+
 function refreshDesktopPageStatus(win) {
-  void publishDesktopPageStatus(win, resolveDesktopPageStatusLabel(win));
+  void publishDesktopPageStatus(win, resolveDesktopPageStatusLabel(win)).then(
+    function () {
+      return publishLocalLearningStatusPanel(win).then(function () {
+        if (!currentAllowedOrigin) {
+          return publishReaderSyncHealthPanel(win);
+        }
+        return null;
+      });
+    }
+  );
 }
 
 // -------------------------------------------------
@@ -931,6 +981,7 @@ function createWindow() {
 
     void runWebServiceDiagnosisForStaticHome(win);
     void publishDbProbeStatus(win);
+    void publishReaderSyncHealthPanel(win);
 
     if (shouldFocusDiagnosticsOnNextStaticLoad) {
       shouldFocusDiagnosticsOnNextStaticLoad = false;

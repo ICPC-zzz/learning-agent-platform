@@ -1,4 +1,11 @@
 import styles from "./page.module.css";
+import {
+  agentAllowedCapabilities,
+  agentForbiddenCapabilities,
+  agentNextSafeSteps,
+  agentNotConnectedCapabilities,
+  agentSafetyBoundarySummaryText,
+} from "./agent-safety-boundary-summary";
 
 const safetyBoundaryStatuses = [
   {
@@ -195,6 +202,164 @@ export function AgentSafetyBoundaryPanel({
             <li key={note}>{note}</li>
           ))}
         </ul>
+      </article>
+
+      <article className={styles.planPreviewCard} aria-label="总体安全边界声明">
+        <div className={styles.planHeader}>
+          <div>
+            <h3 className={styles.planTitle}>总体安全边界声明</h3>
+            <p className={styles.planSummary}>
+              运行模式：{agentSafetyBoundarySummaryText.overallStatus}
+            </p>
+          </div>
+          <span className={`${styles.riskBadge} ${styles.disabled}`}>
+            preview-only
+          </span>
+        </div>
+        <p className={styles.disabledReason}>
+          {agentSafetyBoundarySummaryText.overview}
+        </p>
+        <ul className={styles.safetyNotes}>
+          {agentSafetyBoundarySummaryText.safetyDisclaimers.map((text) => (
+            <li key={text}>{text}</li>
+          ))}
+        </ul>
+      </article>
+
+      <article className={styles.planPreviewCard} aria-label="当前允许能力">
+        <div className={styles.planHeader}>
+          <div>
+            <h3 className={styles.planTitle}>当前允许能力</h3>
+            <p className={styles.planSummary}>
+              以下为当前页面允许的操作，均为只读、预览或显式保存操作。
+            </p>
+          </div>
+          <span className={`${styles.riskBadge} ${styles.boundaryReady}`}>
+            仅预览
+          </span>
+        </div>
+        <ol className={styles.stepList}>
+          {agentAllowedCapabilities.map((item) => (
+            <li className={styles.stepItem} key={item.label}>
+              <p className={styles.stepTitle}>{item.label}</p>
+              <p className={styles.stepDescription}>{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </article>
+
+      <article className={styles.planPreviewCard} aria-label="当前禁止能力">
+        <div className={styles.planHeader}>
+          <div>
+            <h3 className={styles.planTitle}>当前禁止能力</h3>
+            <p className={styles.planSummary}>
+              以下操作在当前页面明确禁止，不会执行。
+            </p>
+          </div>
+          <span className={`${styles.riskBadge} ${styles.riskCritical}`}>
+            已禁止
+          </span>
+        </div>
+        <ol className={styles.stepList}>
+          {agentForbiddenCapabilities.map((item) => (
+            <li className={styles.stepItem} key={item.label}>
+              <div className={styles.stepTopLine}>
+                <div>
+                  <p className={styles.stepTitle}>{item.label}</p>
+                  <p className={styles.stepKind}>风险：{item.risk}</p>
+                </div>
+                <span
+                  className={`${styles.stepRisk} ${
+                    item.risk === "critical"
+                      ? styles.riskCritical
+                      : item.risk === "high"
+                        ? styles.riskHigh
+                        : styles.riskMedium
+                  }`}
+                >
+                  {item.risk === "critical"
+                    ? "严重"
+                    : item.risk === "high"
+                      ? "高"
+                      : "中"}
+                </span>
+              </div>
+              <p className={styles.stepDescription}>{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </article>
+
+      <article className={styles.planPreviewCard} aria-label="未接入真实能力清单">
+        <div className={styles.planHeader}>
+          <div>
+            <h3 className={styles.planTitle}>未接入真实能力清单</h3>
+            <p className={styles.planSummary}>
+              以下能力在 ai-core 中已有类型/接口定义，但真实实现均未接入。
+            </p>
+          </div>
+          <span className={`${styles.riskBadge} ${styles.notStarted}`}>
+            未接入
+          </span>
+        </div>
+        <ol className={styles.stepList}>
+          {agentNotConnectedCapabilities.map((item) => (
+            <li className={styles.stepItem} key={item.label}>
+              <div className={styles.stepTopLine}>
+                <div>
+                  <p className={styles.stepTitle}>{item.label}</p>
+                  <p className={styles.stepKind}>状态：{item.currentStatus}</p>
+                </div>
+              </div>
+              <p className={styles.stepDescription}>{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+      </article>
+
+      <article className={styles.planPreviewCard} aria-label="下一步安全前置条件">
+        <div className={styles.planHeader}>
+          <div>
+            <h3 className={styles.planTitle}>下一步安全前置条件</h3>
+            <p className={styles.planSummary}>
+              在开放任何真实 Agent 能力之前，必须逐项完成以下安全前置条件。
+            </p>
+          </div>
+          <span className={`${styles.riskBadge} ${styles.riskHigh}`}>
+            前置条件
+          </span>
+        </div>
+        <ol className={styles.stepList}>
+          {agentNextSafeSteps.map((item) => (
+            <li className={styles.stepItem} key={item.label}>
+              <div className={styles.stepTopLine}>
+                <div>
+                  <p className={styles.stepTitle}>{item.label}</p>
+                </div>
+                <span
+                  className={`${styles.stepRisk} ${
+                    item.priority === "critical"
+                      ? styles.riskCritical
+                      : item.priority === "high"
+                        ? styles.riskHigh
+                        : styles.riskMedium
+                  }`}
+                >
+                  {item.priority === "critical"
+                    ? "严重"
+                    : item.priority === "high"
+                      ? "高"
+                      : "中"}
+                </span>
+              </div>
+              <p className={styles.stepDescription}>{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+        <p className={styles.disabledReason}>
+          注意：以上前置条件不代表承诺上线顺序。在完成这些前置条件之前，不可开放真实
+          LLM 调用、工具执行、Agent loop 或自动后台任务。
+        </p>
       </article>
     </section>
   );

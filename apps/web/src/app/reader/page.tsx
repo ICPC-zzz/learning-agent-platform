@@ -24,6 +24,10 @@ import { ReaderReadingStateSourceNotice } from "./ReaderReadingStateSourceNotice
 import { ReaderScrollProgressIndicator } from "./ReaderScrollProgressIndicator";
 import { ReaderVisibleBlockIndicator } from "./ReaderVisibleBlockIndicator";
 import { ReaderSyncPreviewPanel } from "./ReaderSyncPreviewPanel";
+import { ReaderLocalLearningStatusCard } from "./ReaderLocalLearningStatusCard";
+import { previewReaderSyncRealServerAction } from "./reader-sync-real-server-action.server";
+import { resolveReaderSyncDevTriggerConfig } from "./reader-sync-dev-trigger-config";
+import type { ReaderSyncDevTriggerProgressPayload } from "./ReaderSyncDevTriggerPreview";
 import {
   readReaderSearchQuery,
   resolveReaderChapterSelection,
@@ -44,6 +48,14 @@ function DemoModeNotice() {
       </p>
     </section>
   );
+}
+
+function clampProgressRatio(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+
+  return Math.min(Math.max(value, 0), 1);
 }
 
 interface ReaderPageProps {
@@ -126,6 +138,16 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
   const bookSourceLabel = readerData.book.sourceType ?? "未知";
   const lastCurrentChunk =
     currentChapterChunks[currentChapterChunks.length - 1];
+  const readerDevSyncPreviewConfig = resolveReaderSyncDevTriggerConfig();
+  const readerDevSyncProgressPreview: ReaderSyncDevTriggerProgressPayload = {
+    bookId: readerData.book.id,
+    chapterId: currentChapter.id,
+    progressRatio: clampProgressRatio(savedProgress.progressPercent / 100),
+    source:
+      savedProgress.loadStatus === "loaded"
+        ? "server-preview"
+        : "server-preview-fallback",
+  };
 
   return (
     <main className="readerPage">
@@ -183,9 +205,28 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
         />
         <ReaderContent chapter={currentChapter} />
         <aside className="readerRightRail" aria-label="阅读器上下文">
+          <ReaderLocalLearningStatusCard
+            bookId={readerData.book.id}
+            chapterId={currentChapter.id}
+            bookTitle={readerData.book.title}
+            chapterTitle={currentChapter.title}
+          />
           <ReaderSyncPreviewPanel
             bookId={readerData.book.id}
             chapterId={currentChapter.id}
+            devSyncProgressPreview={readerDevSyncProgressPreview}
+            showDevSyncTrigger={readerDevSyncPreviewConfig.showDevSyncTrigger}
+            devSyncEnabled={readerDevSyncPreviewConfig.devSyncEnabled}
+            allowDevOnlySyncPreview={
+              readerDevSyncPreviewConfig.allowDevOnlySyncPreview
+            }
+            onTriggerDevSync={
+              readerDevSyncPreviewConfig.showDevSyncTrigger &&
+              readerDevSyncPreviewConfig.devSyncEnabled &&
+              readerDevSyncPreviewConfig.allowDevOnlySyncPreview
+                ? previewReaderSyncRealServerAction
+                : undefined
+            }
           />
           <ReadingProgressSaveForm
             bookId={readerData.book.id}

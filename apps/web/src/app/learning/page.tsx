@@ -24,6 +24,8 @@ import { ManualLearningCycleStatusPanel } from "./components/ManualLearningCycle
 import { LearningProblemAttemptSaveControls } from "./components/LearningProblemAttemptSaveControls";
 import { LearningProblemAttemptSignalSummary } from "./components/LearningProblemAttemptSignalSummary";
 import { LearningRecentReadingProgressPanel } from "./components/LearningRecentReadingProgressPanel";
+import { LearningReaderLocalStatusPanel } from "./components/LearningReaderLocalStatusPanel";
+import { LearningNextActionCard } from "./components/LearningNextActionCard";
 import { createLearningDailyTaskViewModel } from "./learning-daily-task-mapper";
 import { LearningNextStepSuggestionPanel } from "./components/LearningNextStepSuggestionPanel";
 import { LearningReadingProgressSignalSummary } from "./components/LearningReadingProgressSignalSummary";
@@ -164,6 +166,8 @@ export default async function LearningPage() {
         <LearningReadingProgressSignalSummary
           preview={readingProgressSignalPreview}
         />
+        <LearningReaderLocalStatusPanel />
+        <LearningNextActionCard />
         <LearningRecentReadingProgressPanel progress={recentReadingProgress} />
         <LearningNextStepSuggestionPanel suggestion={nextStepSuggestion} />
         <LearningDailyTaskPanel dailyTask={dailyTask} />

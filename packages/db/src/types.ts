@@ -329,19 +329,107 @@ export interface MarkChapterCompletedInput {
   lastChunkId?: string | null;
 }
 
+/**
+ * Data-access interface for the ReadingProgress domain.
+ *
+ * Scope: pure DB read/write. No authorization, audit logging,
+ * idempotency keys, conflict detection, or server-action logic.
+ *
+ * Architecture constraint (A276 / A277):
+ * - Future real Reader sync must call this repository through a server
+ *   action or service layer that enforces authentication, resource
+ *   authorization, payload validation, idempotency, and conflict resolution.
+ * - The Reader-side localStorage preview modules (reader-sync-*.ts)
+ *   must not call this repository directly; they remain preview-only
+ *   until a real sync path is authorized and implemented.
+ *
+ * Sync-contract alignment:
+ * The four methods below cover every CRUD need described in the
+ * reader-sync-contract-design.md minimum payload. Design-stage gaps
+ * (explicit idempotency-key column, audit-log table / methods, monotonic
+ * progressRatio conflict detection, lastReadAt field) are tracked in
+ * docs/reader-sync-repository-alignment-audit.md and are not yet
+ * implemented.
+ */
 export interface ReadingProgressRepository {
+  /**
+   * Upsert a single ReadingProgress row keyed on userId_bookId_chapterId.
+   *
+   * @param input - userId, bookId, chapterId (all required, trimmed,
+   *   non-empty strings); progressRatio (required, clamped to [0, 1]);
+   *   lastChunkId (optional, nullable).
+   * @returns The upserted ReadingProgressRecord.
+   *
+   * Sync-contract mapping: corresponds to the "upsert with composite
+   * unique key" requirement in the Reader sync contract draft.
+   *
+   * Current coverage: basic last-write-wins upsert with input
+   * normalization. completedAt is auto-set when progressRatio >= 1.
+   *
+   * Not covered (design-stage): idempotency-key deduplication,
+   * monotonic-progress conflict detection, audit-log emission.
+   */
   upsertReadingProgress(
     input: UpsertReadingProgressInput,
   ): Promise<ReadingProgressRecord>;
 
+  /**
+   * Look up a single ReadingProgress row by its composite natural key.
+   *
+   * @param input - userId, bookId, chapterId (all required,
+   *   trimmed, non-empty strings).
+   * @returns The matching ReadingProgressRecord, or null if
+   *   no row exists for that key.
+   *
+   * Sync-contract mapping: equivalent to the
+   * getReadingProgressByUserAndChapter query in the Reader sync
+   * contract draft (functional equivalence, different name; kept as-is
+   * for consistency with the project's other repository methods).
+   *
+   * Not covered (design-stage): authorization checks, read-before-write
+   * for conflict detection, idempotency-key lookup.
+   */
   getReadingProgress(
     input: GetReadingProgressInput,
   ): Promise<ReadingProgressRecord | null>;
 
+  /**
+   * List ReadingProgress rows for a user, optionally filtered by book.
+   *
+   * @param input - userId (required, trimmed, non-empty string);
+   *   bookId (optional filter, trimmed, non-empty when supplied);
+   *   limit (optional, defaults to 50, capped at 200).
+   * @returns An array of ReadingProgressRecord sorted by
+   *   updatedAt DESC, id ASC.
+   *
+   * Sync-contract mapping: provides the "list by user" query
+   * described in the sync contract draft.
+   *
+   * Not covered (design-stage): pagination cursors, authorization
+   * scoping beyond the caller-supplied userId.
+   */
   listReadingProgress(
     input: ListReadingProgressInput,
   ): Promise<ReadingProgressRecord[]>;
 
+  /**
+   * Mark a chapter as completed (progressRatio = 1) for the given
+   * user/book/chapter combination.
+   *
+   * Delegates to upsertReadingProgress internally; no
+   * separate write path.
+   *
+   * @param input - userId, bookId, chapterId (all required,
+   *   trimmed, non-empty strings); lastChunkId (optional, nullable).
+   * @returns The upserted ReadingProgressRecord with
+   *   progressRatio === 1 and completedAt set.
+   *
+   * Sync-contract mapping: satisfies the "mark chapter complete"
+   * operation in the Reader sync contract draft.
+   *
+   * Not covered (design-stage): completion-date backfill
+   * validation, audit-log emission on completion events.
+   */
   markChapterCompleted(
     input: MarkChapterCompletedInput,
   ): Promise<ReadingProgressRecord>;
