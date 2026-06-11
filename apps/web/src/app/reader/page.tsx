@@ -1,31 +1,22 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 
-import { AskAiPlaceholder } from "../../components/reader/AskAiPlaceholder";
-import { ChunkList } from "../../components/reader/ChunkList";
+import { DemoModeNotice } from "./DemoModeNotice";
 import { ReaderDataSourceNotice } from "../../components/reader/ReaderDataSourceNotice";
-import { ReaderContent } from "../../components/reader/ReaderContent";
 import { getReaderPageData } from "../../lib/reader-data";
 import {
   loadLatestReaderProgressChapterId,
   loadReaderProgressView,
 } from "../../lib/reader-progress";
-import { ReaderChapterNavigation } from "./components/ReaderChapterNavigation";
-import { ReaderChapterSelectionNotice } from "./components/ReaderChapterSelectionNotice";
-import { ReadingProgressSaveForm } from "./components/ReadingProgressSaveForm";
-import { ReaderScrollPositionTracker } from "./ReaderScrollPositionTracker";
-import { ReaderReadingTimer } from "./ReaderReadingTimer";
-import { ReaderChapterCompletionToggle } from "./ReaderChapterCompletionToggle";
-import { ReaderFontSizeControl } from "./ReaderFontSizeControl";
-import { ReaderRecentChaptersPanel } from "./ReaderRecentChaptersPanel";
-import { ReaderReadingStatsPanel } from "./ReaderReadingStatsPanel";
-import { ReaderBookmarksPanel } from "./ReaderBookmarksPanel";
-import { ReaderNoteDraftPanel } from "./ReaderNoteDraftPanel";
+import { deserializeDevSession } from "../../lib/web-auth-dev-session";
 import { ReaderReadingStateSourceNotice } from "./ReaderReadingStateSourceNotice";
-import { ReaderScrollProgressIndicator } from "./ReaderScrollProgressIndicator";
-import { ReaderVisibleBlockIndicator } from "./ReaderVisibleBlockIndicator";
-import { ReaderSyncPreviewPanel } from "./ReaderSyncPreviewPanel";
-import { ReaderLocalLearningStatusCard } from "./ReaderLocalLearningStatusCard";
-import { previewReaderSyncRealServerAction } from "./reader-sync-real-server-action.server";
+import { ReaderEmptyState } from "./ReaderEmptyState";
+import { ReaderPageContent } from "./ReaderPageContent";
+import { getReaderProgressDbStatusForUi } from "./reader-progress-db-guard";
+import { getFavoritesDbStatusForUi } from "../user/favorites-db-guard";
+import { getReaderBookmarksDbStatusForUi } from "../user/reader-bookmarks-db-guard";
+import { getReaderNotesDbStatusForUi } from "../user/reader-notes-db-guard";
+import { getReadingSessionDbStatusForUi } from "../user/reading-session-db-guard";
 import { resolveReaderSyncDevTriggerConfig } from "./reader-sync-dev-trigger-config";
 import type { ReaderSyncDevTriggerProgressPayload } from "./ReaderSyncDevTriggerPreview";
 import {
@@ -34,27 +25,8 @@ import {
   type ReaderRawSearchParams,
 } from "./reader-query";
 
-function DemoModeNotice() {
-  return (
-    <section
-      aria-label="演示模式提醒"
-      className="demoModeNotice"
-    >
-      <span className="demoModeBadge">演示模式</span>
-      <p>
-        当前阅读器使用演示/预览数据。阅读进度仍以章节级预览为主；
-        本章已读、滚动位置、阅读计时和当前可见内容块提示均为当前浏览器本地预览能力，
-        数据库同步能力仅限开发预览，不代表真实学习闭环。AI 问答、RAG 与真实模型 provider 均未启用。
-      </p>
-    </section>
-  );
-}
-
 function clampProgressRatio(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-
+  if (!Number.isFinite(value)) return 0;
   return Math.min(Math.max(value, 0), 1);
 }
 
@@ -79,7 +51,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
       ? await loadLatestReaderProgressChapterId({
           source: readerData.source,
           bookId: readerData.book.id,
-          chapterIds: readerData.chapters.map((chapter) => chapter.id),
+          chapterIds: readerData.chapters.map((c) => c.id),
         })
       : null;
   const chapterSelection = resolveReaderChapterSelection({
@@ -88,10 +60,7 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
     requestedChapterId: readerQuery.chapterId,
   });
 
-  if (
-    chapterSelection === null ||
-    chapterSelection.status === "invalid_chapter_fallback"
-  ) {
+  if (chapterSelection === null || chapterSelection.status === "invalid_chapter_fallback") {
     return (
       <main className="readerPage">
         <DemoModeNotice />
@@ -101,201 +70,108 @@ export default async function ReaderPage({ searchParams }: ReaderPageProps) {
             <h1>{readerData.book.title}</h1>
             <p className="status">未找到请求的可读章节。</p>
           </div>
-          <Link className="secondaryLink" href="/books">
-            返回书库
-          </Link>
+          <Link className="secondaryLink" href="/books">返回书库</Link>
         </header>
-        <ReaderDataSourceNotice
-          fallbackReason={readerData.fallbackReason}
-          source={readerData.source}
-        />
+        <ReaderDataSourceNotice fallbackReason={readerData.fallbackReason} source={readerData.source} />
         <ReaderReadingStateSourceNotice source={readerData.source} />
-        <section
-          aria-label="阅读器章节选择"
-          className="readerDataSourceNotice readerDataSourceNoticeFallback"
-        >
+        <section aria-label="阅读器章节选择" className="readerDataSourceNotice readerDataSourceNoticeFallback">
           <span className="readerDataSourceBadge">章节不可用</span>
-          <p>
-            请求的 chapterId{" "}
-            <code>{readerQuery.chapterId ?? "未提供"}</code>{" "}
-            未匹配到当前书籍章节。当前页面不会自动生成章节或调用 AI，请返回书籍详情页重新选择章节。
-          </p>
+          <p>请求的 chapterId <code>{readerQuery.chapterId ?? "未提供"}</code> 未匹配到当前书籍章节。</p>
         </section>
       </main>
     );
   }
 
   const currentChapter = chapterSelection.currentChapter;
-  const currentChapterChunks = readerData.chunks.filter(
-    (chunk) => chunk.chapterId === currentChapter.id,
-  );
-  const currentChapterIndex = chapterSelection.currentChapterIndex;
   const savedProgress = await loadReaderProgressView({
     source: readerData.source,
     bookId: readerData.book.id,
     chapterId: currentChapter.id,
   });
   const bookSourceLabel = readerData.book.sourceType ?? "未知";
-  const lastCurrentChunk =
-    currentChapterChunks[currentChapterChunks.length - 1];
   const readerDevSyncPreviewConfig = resolveReaderSyncDevTriggerConfig();
-  const readerDevSyncProgressPreview: ReaderSyncDevTriggerProgressPayload = {
-    bookId: readerData.book.id,
-    chapterId: currentChapter.id,
-    progressRatio: clampProgressRatio(savedProgress.progressPercent / 100),
-    source:
-      savedProgress.loadStatus === "loaded"
-        ? "server-preview"
-        : "server-preview-fallback",
-  };
+  const progressRatio = clampProgressRatio(savedProgress.progressPercent / 100);
+
+  // --- A379: Reader Progress DB save control ---
+  let dbStatus;
+  try {
+    const ck = await cookies();
+    dbStatus = getReaderProgressDbStatusForUi(ck.get("lap-web-dev-session")?.value);
+  } catch {
+    dbStatus = getReaderProgressDbStatusForUi(undefined);
+  }
+
+  // --- A385: Favorites DB status ---
+  let favDbStatus;
+  let devSessionOwnerId: string | null = null;
+  try {
+    const ck = await cookies();
+    const raw = ck.get("lap-web-dev-session")?.value;
+    favDbStatus = getFavoritesDbStatusForUi(raw);
+    const s = deserializeDevSession(raw);
+    devSessionOwnerId = s?.userIdPreview ?? null;
+  } catch {
+    favDbStatus = getFavoritesDbStatusForUi(undefined);
+    devSessionOwnerId = null;
+  }
+
+  // --- A391: Reader Bookmarks DB status ---
+  let bookmarkDbStatus;
+  try {
+    const ck = await cookies();
+    bookmarkDbStatus = getReaderBookmarksDbStatusForUi(ck.get("lap-web-dev-session")?.value);
+  } catch {
+    bookmarkDbStatus = getReaderBookmarksDbStatusForUi(undefined);
+  }
+
+  // --- A391: Reader Notes DB status ---
+  let noteDbStatus;
+  try {
+    const ck = await cookies();
+    noteDbStatus = getReaderNotesDbStatusForUi(ck.get("lap-web-dev-session")?.value);
+  } catch {
+    noteDbStatus = getReaderNotesDbStatusForUi(undefined);
+  }
+
+  // --- A392: Reading Session DB status ---
+  let readingSessionDbStatus;
+  try {
+    const ck = await cookies();
+    readingSessionDbStatus = getReadingSessionDbStatusForUi(ck.get("lap-web-dev-session")?.value);
+  } catch {
+    readingSessionDbStatus = getReadingSessionDbStatusForUi(undefined);
+  }
 
   return (
-    <main className="readerPage">
-      <DemoModeNotice />
-      <ReaderScrollPositionTracker
-        bookId={readerData.book.id}
-        chapterId={currentChapter.id}
-        dbSyncEnabled={false}
-      />
-      <ReaderReadingTimer
-        bookId={readerData.book.id}
-        chapterId={currentChapter.id}
-      />
-      <ReaderChapterCompletionToggle
-        bookId={readerData.book.id}
-        chapterId={currentChapter.id}
-      />
-      <ReaderFontSizeControl />
-      <ReaderScrollProgressIndicator />
-      <ReaderVisibleBlockIndicator />
-      <header className="readerHeader">
-        <div>
-          <p className="eyebrow">阅读器预览</p>
-          <h1>{readerData.book.title}</h1>
-          <p className="status">
-            {readerData.book.author ?? bookSourceLabel} · 来源：{bookSourceLabel}
-          </p>
-        </div>
-        <Link
-          className="secondaryLink"
-          href={`/books/${encodeURIComponent(readerData.book.id)}`}
-        >
-          返回章节列表
-        </Link>
-      </header>
-
-      <ReaderDataSourceNotice
-        fallbackReason={readerData.fallbackReason}
-        source={readerData.source}
-      />
-      <ReaderReadingStateSourceNotice source={readerData.source} />
-      <ReaderChapterSelectionNotice
-        chapterTitle={currentChapter.title}
-        currentChapterIndex={currentChapterIndex}
-        requestedChapterId={chapterSelection.requestedChapterId}
-        status={chapterSelection.status}
-        totalChapters={readerData.chapters.length}
-      />
-
-      <div className="readerLayout">
-        <ReaderChapterNavigation
-          bookId={readerData.book.id}
-          chapters={readerData.chapters}
-          currentChapterId={currentChapter.id}
-        />
-        <ReaderContent chapter={currentChapter} />
-        <aside className="readerRightRail" aria-label="阅读器上下文">
-          <ReaderLocalLearningStatusCard
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            bookTitle={readerData.book.title}
-            chapterTitle={currentChapter.title}
-          />
-          <ReaderSyncPreviewPanel
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            devSyncProgressPreview={readerDevSyncProgressPreview}
-            showDevSyncTrigger={readerDevSyncPreviewConfig.showDevSyncTrigger}
-            devSyncEnabled={readerDevSyncPreviewConfig.devSyncEnabled}
-            allowDevOnlySyncPreview={
-              readerDevSyncPreviewConfig.allowDevOnlySyncPreview
-            }
-            onTriggerDevSync={
-              readerDevSyncPreviewConfig.showDevSyncTrigger &&
-              readerDevSyncPreviewConfig.devSyncEnabled &&
-              readerDevSyncPreviewConfig.allowDevOnlySyncPreview
-                ? previewReaderSyncRealServerAction
-                : undefined
-            }
-          />
-          <ReadingProgressSaveForm
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            currentChapterIndex={currentChapterIndex}
-            fallbackReason={readerData.fallbackReason}
-            lastChunkId={lastCurrentChunk?.id ?? null}
-            progressRatio={1}
-            savedProgress={savedProgress}
-            source={readerData.source}
-            totalChapters={readerData.chapters.length}
-          />
-          <AskAiPlaceholder
-            bookTitle={readerData.book.title}
-            chapterTitle={currentChapter.title}
-            chunkCount={currentChapterChunks.length}
-          />
-          <ReaderRecentChaptersPanel
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            bookTitle={readerData.book.title}
-            chapterTitle={currentChapter.title}
-          />
-          <ReaderReadingStatsPanel
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            bookTitle={readerData.book.title}
-            chapterTitle={currentChapter.title}
-          />
-          <ReaderBookmarksPanel
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-            bookTitle={readerData.book.title}
-            chapterTitle={currentChapter.title}
-          />
-          <ReaderNoteDraftPanel
-            bookId={readerData.book.id}
-            chapterId={currentChapter.id}
-          />
-        </aside>
-      </div>
-
-      <ChunkList chunks={currentChapterChunks} />
-    </main>
-  );
-}
-
-function ReaderEmptyState({ message }: { message: string }) {
-  return (
-    <main className="readerPage">
-      <DemoModeNotice />
-      <header className="readerHeader">
-        <div>
-          <p className="eyebrow">阅读器预览</p>
-          <h1>阅读器需要书籍参数</h1>
-          <p className="status">请从书库选择一本书，再从章节列表进入阅读器。</p>
-        </div>
-        <Link className="secondaryLink" href="/books">
-          返回书库
-        </Link>
-      </header>
-      <ReaderReadingStateSourceNotice source="local_fallback" />
-      <section
-        aria-label="阅读器错误提示"
-        className="readerDataSourceNotice readerDataSourceNoticeFallback"
-      >
-        <span className="readerDataSourceBadge">不可阅读</span>
-        <p>{message}</p>
-      </section>
-    </main>
+    <ReaderPageContent
+      bookId={readerData.book.id}
+      currentChapter={currentChapter}
+      currentChapterIndex={chapterSelection.currentChapterIndex}
+      chapters={readerData.chapters}
+      bookTitle={readerData.book.title}
+      bookAuthor={readerData.book.author ?? bookSourceLabel}
+      bookSourceLabel={bookSourceLabel}
+      chunks={readerData.chunks}
+      savedProgress={savedProgress}
+      readerDevSyncProgressPreview={{
+        bookId: readerData.book.id,
+        chapterId: currentChapter.id,
+        progressRatio,
+        source: savedProgress.loadStatus === "loaded" ? "server-preview" : "server-preview-fallback",
+      } satisfies ReaderSyncDevTriggerProgressPayload}
+      readerDevSyncPreviewConfig={readerDevSyncPreviewConfig}
+      dbStatus={dbStatus}
+      favDbStatus={favDbStatus}
+      bookmarkDbStatus={bookmarkDbStatus}
+      noteDbStatus={noteDbStatus}
+      readingSessionDbStatus={readingSessionDbStatus}
+      devSessionOwnerId={devSessionOwnerId}
+      totalChapters={readerData.chapters.length}
+      fallbackReason={readerData.fallbackReason}
+      source={readerData.source}
+      chapterSelectionStatus={chapterSelection.status}
+      requestedChapterId={chapterSelection.requestedChapterId}
+      progressRatio={progressRatio}
+    />
   );
 }

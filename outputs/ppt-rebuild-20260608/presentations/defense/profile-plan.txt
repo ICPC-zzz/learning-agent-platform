@@ -1,0 +1,7 @@
+task mode: create
+primary deck-profile: engineering-platform
+secondary profile gates: classroom defense, five-minute delivery
+required proof objects: AI collaboration workflow, safety boundary, product screenshots, issue-response table
+source/asset requirements: local project screenshots only
+brand constraints: no invented logos or production claims
+QA gates: 12 slides, editable member fields, body text >= 32 px, no overflow, no debug or authoring notes

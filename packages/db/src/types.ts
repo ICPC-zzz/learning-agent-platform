@@ -517,3 +517,484 @@ export interface DatabaseEnvStatus {
   provider: DatabaseProvider;
   isConfigured: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// BookFavorite (dev-only DB favorites — A385)
+// ---------------------------------------------------------------------------
+
+export interface BookFavoriteRecord {
+  id: string;
+  userId: string;
+  bookId: string;
+  bookTitle: string;
+  sourceType: string;
+  firstChapterId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddFavoriteBookInput {
+  userId: string;
+  bookId: string;
+  bookTitle: string;
+  sourceType: string;
+  firstChapterId?: string | null;
+}
+
+export interface RemoveFavoriteBookInput {
+  userId: string;
+  bookId: string;
+}
+
+export interface ListFavoritesByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface IsFavoriteBookInput {
+  userId: string;
+  bookId: string;
+}
+
+export interface FavoriteRepository {
+  addFavoriteBook(input: AddFavoriteBookInput): Promise<BookFavoriteRecord>;
+
+  removeFavoriteBook(input: RemoveFavoriteBookInput): Promise<boolean>;
+
+  listFavoritesByOwner(
+    input: ListFavoritesByOwnerInput,
+  ): Promise<BookFavoriteRecord[]>;
+
+  isFavoriteBook(input: IsFavoriteBookInput): Promise<boolean>;
+}
+
+// ---------------------------------------------------------------------------
+// ProblemFavorite (dev-only DB problem favorites — A387)
+// ---------------------------------------------------------------------------
+
+export interface ProblemFavoriteRecord {
+  id: string;
+  userId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddProblemFavoriteInput {
+  userId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  tags?: string[];
+}
+
+export interface RemoveProblemFavoriteInput {
+  userId: string;
+  problemId: string;
+}
+
+export interface ListProblemFavoritesByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface IsProblemFavoriteInput {
+  userId: string;
+  problemId: string;
+}
+
+export interface ProblemFavoriteRepository {
+  addFavoriteProblem(input: AddProblemFavoriteInput): Promise<ProblemFavoriteRecord>;
+  removeFavoriteProblem(input: RemoveProblemFavoriteInput): Promise<boolean>;
+  listFavoritesByOwner(input: ListProblemFavoritesByOwnerInput): Promise<ProblemFavoriteRecord[]>;
+  isFavoriteProblem(input: IsProblemFavoriteInput): Promise<boolean>;
+}
+
+// ---------------------------------------------------------------------------
+// ProblemPracticeActivity (dev-only DB practice records — A387)
+// ---------------------------------------------------------------------------
+
+export type ProblemPracticeStatus = "not-started" | "practiced" | "completed" | "needs-review";
+
+export interface ProblemPracticeActivityRecord {
+  id: string;
+  userId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  status: ProblemPracticeStatus;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface RecordProblemPracticeInput {
+  userId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  status: ProblemPracticeStatus;
+  tags?: string[];
+}
+
+export interface ListProblemPracticeByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface ProblemPracticeRepository {
+  recordPractice(input: RecordProblemPracticeInput): Promise<ProblemPracticeActivityRecord>;
+  listPracticeByOwner(input: ListProblemPracticeByOwnerInput): Promise<ProblemPracticeActivityRecord[]>;
+  getProblemPracticeStatus(input: GetProblemPracticeStatusInput): Promise<ProblemPracticeActivityRecord | null>;
+  removeProblemPractice(input: RemoveProblemPracticeInput): Promise<boolean>;
+}
+
+export interface GetProblemPracticeStatusInput {
+  userId: string;
+  problemId: string;
+}
+
+export interface RemoveProblemPracticeInput {
+  userId: string;
+  problemId: string;
+}
+
+// ---------------------------------------------------------------------------
+// LearningActivity (dev-only DB activity timeline — A392)
+// ---------------------------------------------------------------------------
+
+export type LearningActivityType =
+  | "read-book"
+  | "practice-problem"
+  | "favorite-book"
+  | "favorite-problem"
+  | "add-note"
+  | "add-bookmark"
+  | "import-book"
+  | "daily_challenge_completed";
+
+export type LearningActivityTargetType =
+  | "book"
+  | "chapter"
+  | "problem"
+  | "note"
+  | "bookmark";
+
+export const VALID_ACTIVITY_TYPES: ReadonlySet<string> = new Set([
+  "read-book",
+  "practice-problem",
+  "favorite-book",
+  "favorite-problem",
+  "add-note",
+  "add-bookmark",
+  "import-book",
+  "daily_challenge_completed",
+]);
+
+export const VALID_TARGET_TYPES: ReadonlySet<string> = new Set([
+  "book",
+  "chapter",
+  "problem",
+  "note",
+  "bookmark",
+]);
+
+export interface LearningActivityRecord {
+  id: string;
+  userId: string;
+  activityType: LearningActivityType;
+  title: string;
+  targetType: LearningActivityTargetType;
+  targetId: string;
+  bookId: string | null;
+  chapterId: string | null;
+  problemId: string | null;
+  sourceType: string;
+  occurredAt: Date;
+  durationSeconds: number | null;
+  metadataPreview: string | null;
+  createdAt: Date;
+}
+
+export interface RecordLearningActivityInput {
+  userId: string;
+  activityType: LearningActivityType;
+  title: string;
+  targetType: LearningActivityTargetType;
+  targetId: string;
+  bookId?: string | null;
+  chapterId?: string | null;
+  problemId?: string | null;
+  sourceType: string;
+  occurredAt: Date;
+  durationSeconds?: number | null;
+  metadataPreview?: string | null;
+}
+
+export interface ListLearningActivitiesByOwnerInput {
+  userId: string;
+  limit?: number;
+  activityType?: LearningActivityType;
+}
+
+export interface LearningActivityRepository {
+  recordLearningActivity(input: RecordLearningActivityInput): Promise<LearningActivityRecord>;
+  listLearningActivitiesByOwner(input: ListLearningActivitiesByOwnerInput): Promise<LearningActivityRecord[]>;
+}
+
+// ---------------------------------------------------------------------------
+// ReadingSession (dev-only DB reading sessions — A392)
+// ---------------------------------------------------------------------------
+
+export interface ReadingSessionRecord {
+  id: string;
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  startedAt: Date;
+  endedAt: Date | null;
+  durationSeconds: number;
+  progressRatio: number;
+  sourceType: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface StartReadingSessionInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  startedAt: Date;
+  durationSeconds: number;
+  progressRatio: number;
+  sourceType: string;
+}
+
+export interface EndReadingSessionInput {
+  userId: string;
+  sessionId: string;
+  endedAt: Date;
+  durationSeconds: number;
+}
+
+export interface ListReadingSessionsByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface ReadingSessionSummary {
+  totalSessions: number;
+  totalDurationSeconds: number;
+  totalDurationMinutes: number;
+}
+
+export interface ReadingSessionRepository {
+  startReadingSession(input: StartReadingSessionInput): Promise<ReadingSessionRecord>;
+  endReadingSession(input: EndReadingSessionInput): Promise<ReadingSessionRecord>;
+  listReadingSessionsByOwner(input: ListReadingSessionsByOwnerInput): Promise<ReadingSessionRecord[]>;
+  summarizeReadingSessionsByOwner(userId: string): Promise<ReadingSessionSummary>;
+}
+
+export interface ReaderBookmarkRecord {
+  id: string;
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  progressRatio: number;
+  sourceType: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddReaderBookmarkInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  progressRatio: number;
+  sourceType: string;
+}
+
+export interface RemoveReaderBookmarkInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+}
+
+export interface ListReaderBookmarksByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface IsReaderBookmarkedInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+}
+
+export interface ReaderBookmarkRepository {
+  addReaderBookmark(input: AddReaderBookmarkInput): Promise<ReaderBookmarkRecord>;
+  removeReaderBookmark(input: RemoveReaderBookmarkInput): Promise<boolean>;
+  listReaderBookmarksByOwner(input: ListReaderBookmarksByOwnerInput): Promise<ReaderBookmarkRecord[]>;
+  isReaderBookmarked(input: IsReaderBookmarkedInput): Promise<boolean>;
+}
+
+// ---------------------------------------------------------------------------
+// ReaderNote (dev-only DB reader notes — A390)
+// ---------------------------------------------------------------------------
+
+export interface ReaderNoteRecord {
+  id: string;
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  progressRatio: number;
+  noteText: string;
+  excerptPreview: string | null;
+  sourceType: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddReaderNoteInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  progressRatio: number;
+  noteText: string;
+  excerptPreview?: string | null;
+  sourceType: string;
+}
+
+export interface UpdateReaderNoteInput {
+  userId: string;
+  noteId: string;
+  noteText: string;
+  excerptPreview?: string | null;
+  progressRatio?: number;
+}
+
+export interface RemoveReaderNoteInput {
+  userId: string;
+  noteId: string;
+}
+
+export interface ListReaderNotesByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface ListReaderNotesByBookChapterInput {
+  userId: string;
+  bookId: string;
+  chapterId: string;
+  limit?: number;
+}
+
+export interface ReaderNoteRepository {
+  addReaderNote(input: AddReaderNoteInput): Promise<ReaderNoteRecord>;
+  updateReaderNote(input: UpdateReaderNoteInput): Promise<ReaderNoteRecord>;
+  removeReaderNote(input: RemoveReaderNoteInput): Promise<boolean>;
+  listReaderNotesByOwner(input: ListReaderNotesByOwnerInput): Promise<ReaderNoteRecord[]>;
+  listReaderNotesByBookChapter(input: ListReaderNotesByBookChapterInput): Promise<ReaderNoteRecord[]>;
+}
+
+// ---------------------------------------------------------------------------
+// ProblemWrongBook (dev-only DB wrong book — A395)
+// ---------------------------------------------------------------------------
+
+export type ProblemWrongBookReviewStatus =
+  | "needs-review"
+  | "reviewed"
+  | "mastered";
+
+export const VALID_WRONG_BOOK_REVIEW_STATUSES: ReadonlySet<string> = new Set([
+  "needs-review",
+  "reviewed",
+  "mastered",
+]);
+
+export interface ProblemWrongBookRecord {
+  id: string;
+  ownerId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  tagsJson: string;
+  wrongCount: number;
+  lastWrongAt: Date;
+  reviewStatus: ProblemWrongBookReviewStatus;
+  notePreview: string | null;
+  sourceType: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddProblemWrongBookInput {
+  ownerId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  tags?: string[];
+  sourceType?: string;
+}
+
+export interface RecordProblemWrongInput {
+  ownerId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  tags?: string[];
+  sourceType?: string;
+}
+
+export interface RemoveProblemWrongBookInput {
+  ownerId: string;
+  problemId: string;
+}
+
+export interface UpdateProblemWrongBookReviewStatusInput {
+  ownerId: string;
+  problemId: string;
+  reviewStatus: ProblemWrongBookReviewStatus;
+}
+
+export interface UpdateProblemWrongBookNoteInput {
+  ownerId: string;
+  problemId: string;
+  notePreview: string | null;
+}
+
+export interface ListProblemWrongBookByOwnerInput {
+  ownerId: string;
+  limit?: number;
+}
+
+export interface IsProblemInWrongBookInput {
+  ownerId: string;
+  problemId: string;
+}
+
+export interface ProblemWrongBookRepository {
+  addProblemToWrongBook(input: AddProblemWrongBookInput): Promise<ProblemWrongBookRecord>;
+  recordProblemWrong(input: RecordProblemWrongInput): Promise<ProblemWrongBookRecord>;
+  removeProblemFromWrongBook(input: RemoveProblemWrongBookInput): Promise<boolean>;
+  updateProblemWrongBookReviewStatus(input: UpdateProblemWrongBookReviewStatusInput): Promise<ProblemWrongBookRecord>;
+  updateProblemWrongBookNote(input: UpdateProblemWrongBookNoteInput): Promise<ProblemWrongBookRecord>;
+  listProblemWrongBookByOwner(input: ListProblemWrongBookByOwnerInput): Promise<ProblemWrongBookRecord[]>;
+  isProblemInWrongBook(input: IsProblemInWrongBookInput): Promise<boolean>;
+}

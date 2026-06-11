@@ -7,9 +7,13 @@ import { BookLibraryItem } from "./BookLibraryItem";
 
 interface BookLibraryListProps {
   books: BookLibraryItemView[];
+  /** Whether DB favorites guard is enabled for this session. */
+  dbFavoritesEnabled?: boolean;
+  /** Dev session owner ID. */
+  devSessionOwnerId?: string | null;
 }
 
-export function BookLibraryList({ books }: BookLibraryListProps) {
+export function BookLibraryList({ books, dbFavoritesEnabled = false, devSessionOwnerId = null }: BookLibraryListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const availableLanguages = useMemo(() => getAvailableLanguages(books), [books]);
@@ -101,7 +105,7 @@ export function BookLibraryList({ books }: BookLibraryListProps) {
       <div className="chunkList" style={{ marginTop: "18px" }}>
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book) => (
-            <BookLibraryItem book={book} key={book.id} />
+            <BookLibraryItem book={book} key={book.id} dbFavoritesEnabled={dbFavoritesEnabled} devSessionOwnerId={devSessionOwnerId} />
           ))
         ) : (
           <div className="learningEmptyState" aria-live="polite">

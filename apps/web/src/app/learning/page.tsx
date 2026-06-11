@@ -1,314 +1,212 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
 
-import { AbilityBreakdown } from "../../components/learning/AbilityBreakdown";
-import { AbilityScoreCard } from "../../components/learning/AbilityScoreCard";
-import { LearningDashboardEmptyState } from "../../components/learning/LearningDashboardEmptyState";
-import { LearningDataSourceNotice } from "../../components/learning/LearningDataSourceNotice";
-import { LearningEventSummary } from "../../components/learning/LearningEventSummary";
-import { LearningQaFeedbackSignalSummary } from "../../components/learning/LearningQaFeedbackSignalSummary";
-import { getLearningDashboardPageData } from "../../lib/learning-dashboard";
-import type {
-  LearningDashboardDataSource,
-  LearningDashboardPageData,
-  LearningDashboardPartialReason,
-} from "../../lib/learning-types";
-import { LearningAbilityProfileSaveControls } from "./components/LearningAbilityProfileSaveControls";
-import { LearningDailyRecommendationSaveControls } from "./components/LearningDailyRecommendationSaveControls";
-import { LearningDailyRecommendationListWithAttemptStatus } from "./components/LearningDailyRecommendationListWithAttemptStatus";
-import { LearningDailyTaskPanel } from "./components/LearningDailyTaskPanel";
-import { LearningDailyTaskStatsPanel } from "./components/LearningDailyTaskStatsPanel";
-import { LearningDailyTaskHistoryPanel } from "./components/LearningDailyTaskHistoryPanel";
-import { LearningDailyTaskWeeklyReportPanel } from "./components/LearningDailyTaskWeeklyReportPanel";
-import { LearningDailyTaskWeeklyReportExportPanel } from "./components/LearningDailyTaskWeeklyReportExportPanel";
-import { ManualLearningCycleStatusPanel } from "./components/ManualLearningCycleStatusPanel";
-import { LearningProblemAttemptSaveControls } from "./components/LearningProblemAttemptSaveControls";
-import { LearningProblemAttemptSignalSummary } from "./components/LearningProblemAttemptSignalSummary";
-import { LearningRecentReadingProgressPanel } from "./components/LearningRecentReadingProgressPanel";
-import { LearningReaderLocalStatusPanel } from "./components/LearningReaderLocalStatusPanel";
-import { LearningNextActionCard } from "./components/LearningNextActionCard";
-import { createLearningDailyTaskViewModel } from "./learning-daily-task-mapper";
-import { LearningNextStepSuggestionPanel } from "./components/LearningNextStepSuggestionPanel";
-import { LearningReadingProgressSignalSummary } from "./components/LearningReadingProgressSignalSummary";
-import { LearningRecentProblemAttemptHistoryPanel } from "./components/LearningRecentProblemAttemptHistoryPanel";
-import { createLearningNextStepSuggestionViewModel } from "./learning-next-step-suggestion-mapper";
-import type { LearningDailyRecommendationAbilityProfileSource } from "./learning-daily-recommendation-save-types";
-import { createManualLearningCycleStatusViewModel } from "./manual-learning-cycle-status";
-import { applyProblemAttemptSignalsToAbilityPreview } from "./problem-attempt-ability-preview";
-import {
-  loadLearningRecentProblemAttemptHistory,
-} from "./problem-attempt-history-loader";
-import {
-  createLearningProblemAttemptSignalPreviewForFallbackReason,
-  loadLearningProblemAttemptSignalPreview,
-} from "./problem-attempt-signal-loader";
-import {
-  createLearningReadingProgressSignalPreviewForFallbackReason,
-  loadLearningReadingProgressSignalPreview,
-} from "./reading-progress-signal-loader";
-import {
-  loadLearningRecentReadingProgress,
-} from "./recent-reading-progress-loader";
-import {
-  loadLearningRecommendationProblemAttemptStatusPreview,
-} from "./recommendation-problem-attempt-status-loader";
+/**
+ * /learning — Learning Center page (A397).
+ *
+ * Unified entry point for all learning-related sub-pages:
+ * report, review recommendations, today plan, activity timeline,
+ * wrong book, recent reading, recent practice, AI history.
+ *
+ * @previewOnly — dev-only / 规则型学习反馈 / 未调用 LLM
+ */
 
-export const dynamic = "force-dynamic";
-
-const currentLimitations = [
-  "当前没有登录或真实用户身份，页面只读取演示用户或模拟回退数据",
-  "能力画像保存是开发环境演示快照，必须手动触发，未形成自动画像闭环",
-  "每日推荐保存是开发环境演示快照，必须手动触发，不代表真实个性化推荐系统已上线",
-  "ProblemAttempt 历史只作为预览信号显示；需要手动重新计算并保存后才会影响演示快照",
+const ENTRY_CARDS = [
+  {
+    title: "每日挑战",
+    description: "每天一道规则推荐题，基于错题本、收藏、练习记录选择。确定性规则，不调用 LLM。",
+    href: "/daily-challenge",
+    label: "A399 每日挑战",
+    accent: "#3b82f6",
+  },
+  {
+    title: "学习报告",
+    description: "聚合阅读、题目、错题、笔记数据，生成学习摘要。",
+    href: "/user/report",
+    label: "A396 学习报告",
+    accent: "#166534",
+  },
+  {
+    title: "复习推荐",
+    description: "基于错题本、阅读进度、笔记/书签生成确定性复习建议（7 级优先级）。",
+    href: "/user/review",
+    label: "A396 复习推荐",
+    accent: "#1e40af",
+  },
+  {
+    title: "今日计划",
+    description: "基于本地学习数据生成 3–5 个建议任务，估计用时和原因。",
+    href: "/user/today",
+    label: "A396 今日计划",
+    accent: "#9a3412",
+  },
+  {
+    title: "学习活动",
+    description: "查看学习活动时间线：阅读、练习、收藏、导入等记录。",
+    href: "/user/activity",
+    label: "A392 学习活动",
+    accent: "#4f46e5",
+  },
+  {
+    title: "错题本",
+    description: "记录和复习做错的题目，本地错题本（localStorage fallback）。",
+    href: "/user/wrong-book",
+    label: "A395 错题本",
+    accent: "#dc2626",
+  },
+  {
+    title: "最近阅读",
+    description: "查看最近的阅读进度和章节记录。",
+    href: "/user/recent-reading",
+    label: "最近阅读",
+    accent: "#0d9488",
+  },
+  {
+    title: "最近刷题",
+    description: "查看最近练习的题目记录。",
+    href: "/user/recent-practice",
+    label: "最近刷题",
+    accent: "#7c3aed",
+  },
+  {
+    title: "AI 问答历史",
+    description: "查看 QA 问答历史的安全摘要（不保存 raw prompt/response）。",
+    href: "/user/ai-history",
+    label: "AI 问答历史",
+    accent: "#0891b2",
+  },
 ];
 
-export default async function LearningPage() {
-  const initialDashboardData = await getLearningDashboardPageData();
-  const readingProgressSignalPreview =
-    await getReadingProgressSignalPreview(initialDashboardData);
-  const initialProblemAttemptSignalPreview =
-    await getProblemAttemptSignalPreview(initialDashboardData);
-  const {
-    dashboardData,
-    problemAttemptSignalPreview,
-  } = applyProblemAttemptSignalsToAbilityPreview({
-    dashboardData: initialDashboardData,
-    readingProgressSignalPreview,
-    problemAttemptSignalPreview: initialProblemAttemptSignalPreview,
-  });
-  const dailyRecommendationAbilityProfileSource =
-    getDailyRecommendationAbilityProfileSource({
-      source: dashboardData.source,
-      partialReasons: dashboardData.partialReasons,
-      hasAbilityProfile: dashboardData.abilityProfile !== null,
-    });
-  const recommendationProblemAttemptStatusPreview =
-    await getRecommendationProblemAttemptStatusPreview(dashboardData);
-  const recentReadingProgress = await getRecentReadingProgress(dashboardData);
-  const nextStepSuggestion = createLearningNextStepSuggestionViewModel({
-    recentReadingProgress,
-  });
-  const dailyTask = createLearningDailyTaskViewModel({
-    recentReadingProgress,
-    nextStepSuggestion,
-  });
-  const recentProblemAttemptHistory =
-    await getRecentProblemAttemptHistory(dashboardData);
-  const manualLearningCycleStatus =
-    createManualLearningCycleStatusViewModel({
-      dashboardData,
-      readingProgressSignalPreview,
-      problemAttemptSignalPreview,
-    });
+export default async function LearningCenterPage() {
+  let hasSession = false;
+
+  try {
+    const cookieStore = await cookies();
+    const raw = cookieStore.get("lap-web-dev-session")?.value;
+    const payload = deserializeDevSession(raw);
+    const summary = getSafeSessionSummary(payload);
+    hasSession = summary.hasSession;
+  } catch {
+    // Silently ignore — no session
+  }
 
   return (
     <main className="learningPage">
       <header className="learningHero">
         <div>
-          <p className="eyebrow">学习预览 / 演示数据边界</p>
-          <h1>学习仪表盘预览</h1>
+          <p className="eyebrow">A397 Learning Center</p>
+          <h1>学习中心（开发预览）</h1>
           <p className="status">
-            在数据库可用时仅读取演示用户的开发数据，并结合内存态
-            learning-engine 预览；当数据库不可用时，回退到确定性的模拟数据。
-            本页不会调用真实 AI、不会自动生成学习闭环。
+            规则型学习反馈 · 未调用 LLM · local fallback · 未接生产账号
           </p>
         </div>
-        <Link className="secondaryLink" href="/">
-          返回首页
-        </Link>
+        <div className="homeActions">
+          <Link className="secondaryLink" href="/">
+            Home
+          </Link>
+          <Link className="secondaryLink" href="/user">
+            User Center
+          </Link>
+          <Link className="secondaryLink" href="/books">
+            Books
+          </Link>
+          <Link className="secondaryLink" href="/reader">
+            Reader
+          </Link>
+        </div>
       </header>
 
-      <LearningDataSourceNotice
-        source={dashboardData.source}
-        fallbackReason={dashboardData.fallbackReason}
-        partialReasons={dashboardData.partialReasons}
-      />
+      {/* Intro */}
+      <section className="learningPanel" aria-labelledby="learning-intro-title">
+        <div className="panelHeader">
+          <h2 id="learning-intro-title">学习反馈入口</h2>
+          <p className="panelNote">
+            聚合已有学习数据，通过确定性规则生成报告、推荐和计划。所有计算在浏览器本地完成，不调用 LLM。
+          </p>
+        </div>
+        <div style={{ marginTop: "14px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "6px" }}>
+          <p style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.7" }}>
+            <strong>当前状态：</strong>
+            规则型学习反馈 · 开发预览 · localStorage fallback · 未调用 LLM · 未接生产账号。
+            数据来自浏览器 localStorage 本地存储，不保存到数据库（DB guard 默认关闭）。
+            所有推荐为确定性规则计算，不依赖 AI 模型。
+            每日挑战基于 6 级优先级规则，同一天同样数据返回同一道题。
+          </p>
+        </div>
+      </section>
 
-      <LearningDashboardEmptyState messages={dashboardData.emptyStateMessages} />
+      {/* Entry cards */}
+      <section className="learningPanel" aria-labelledby="learning-cards-title">
+        <div className="panelHeader">
+          <h2 id="learning-cards-title">学习功能入口</h2>
+          <p className="panelNote">点击进入各个学习功能模块。</p>
+        </div>
+        <div
+          style={{
+            marginTop: "14px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+            gap: "12px",
+          }}
+        >
+          {ENTRY_CARDS.map(function (card) {
+            return (
+              <div
+                key={card.href}
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  padding: "14px",
+                  backgroundColor: "#ffffff",
+                }}
+              >
+                <p style={{ fontSize: "11px", color: "#94a3b8", marginBottom: "4px" }}>
+                  {card.label}
+                </p>
+                <h3 style={{ fontSize: "15px", color: "#1e293b", marginBottom: "6px" }}>
+                  {card.title}
+                </h3>
+                <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "10px", lineHeight: "1.6" }}>
+                  {card.description}
+                </p>
+                <Link
+                  href={card.href}
+                  style={{
+                    display: "inline-block",
+                    padding: "4px 12px",
+                    fontSize: "12px",
+                    fontWeight: "500",
+                    color: "#ffffff",
+                    backgroundColor: card.accent,
+                    borderRadius: "4px",
+                    textDecoration: "none",
+                  }}
+                >
+                  进入 →
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
-      <LearningAbilityProfileSaveControls
-        source={dashboardData.source}
-        fallbackReason={dashboardData.fallbackReason}
-        inputEventCount={dashboardData.recentEventsSummary.totalEvents}
-        qaFeedbackSignalCount={dashboardData.qaFeedbackSignalPreview.validSignalCount}
-        readingProgressSignalCount={readingProgressSignalPreview.mappedSignalCount}
-        readingProgressStatus={readingProgressSignalPreview.status}
-        problemAttemptSignalCount={problemAttemptSignalPreview.mappedSignalCount}
-        problemAttemptStatus={problemAttemptSignalPreview.status}
-      />
-
-      <LearningDailyRecommendationSaveControls
-        source={dashboardData.source}
-        fallbackReason={dashboardData.fallbackReason}
-        hasAbilityProfile={dashboardData.abilityProfile !== null}
-        initialAbilityProfileSource={dailyRecommendationAbilityProfileSource}
-        candidateProblemCount={dashboardData.candidateProblems.length}
-        qaFeedbackSignalCount={dashboardData.qaFeedbackSignalPreview.validSignalCount}
-        problemAttemptHistoryStatus={problemAttemptSignalPreview.status}
-        recentProblemAttemptCount={problemAttemptSignalPreview.recentAttemptCount}
-        solvedProblemCount={problemAttemptSignalPreview.solvedCount}
-      />
-
-      <ManualLearningCycleStatusPanel status={manualLearningCycleStatus} />
-
-      <div className="dashboardGrid">
-        <AbilityScoreCard
-          profile={dashboardData.abilityProfile}
-          source={dashboardData.source}
-        />
-        <AbilityBreakdown dimensions={dashboardData.dimensionScores} />
-        <LearningEventSummary
-          summary={dashboardData.recentEventsSummary}
-          warnings={dashboardData.scoringWarnings}
-        />
-        <LearningQaFeedbackSignalSummary
-          preview={dashboardData.qaFeedbackSignalPreview}
-        />
-        <LearningReadingProgressSignalSummary
-          preview={readingProgressSignalPreview}
-        />
-        <LearningReaderLocalStatusPanel />
-        <LearningNextActionCard />
-        <LearningRecentReadingProgressPanel progress={recentReadingProgress} />
-        <LearningNextStepSuggestionPanel suggestion={nextStepSuggestion} />
-        <LearningDailyTaskPanel dailyTask={dailyTask} />
-        <LearningDailyTaskStatsPanel dailyTask={dailyTask} />
-        <LearningDailyTaskHistoryPanel />
-        <LearningDailyTaskWeeklyReportPanel />
-        <LearningDailyTaskWeeklyReportExportPanel />
-        <LearningProblemAttemptSignalSummary
-          preview={problemAttemptSignalPreview}
-        />
-        <LearningRecentProblemAttemptHistoryPanel
-          history={recentProblemAttemptHistory}
-        />
-        <LearningDailyRecommendationListWithAttemptStatus
-          recommendedProblems={dashboardData.recommendedProblems}
-          recommendationSource={dashboardData.recommendationSource}
-          recommendationSourceDetail={dashboardData.recommendationSourceDetail}
-          candidateProblemCount={dashboardData.candidateProblems.length}
-          targetDifficulty={dashboardData.targetDifficulty}
-          weakDimensions={dashboardData.weakDimensions}
-          warnings={dashboardData.recommendationWarnings}
-          problemAttemptStatusPreview={recommendationProblemAttemptStatusPreview}
-        />
-        <LearningProblemAttemptSaveControls
-          recommendedProblems={dashboardData.recommendedProblems}
-          recommendationSource={dashboardData.recommendationSource}
-          fallbackReason={dashboardData.fallbackReason}
-        />
-      </div>
-
-      <section className="learningPanel limitationPanel" aria-labelledby="limits-title">
-        <h2 id="limits-title">当前限制</h2>
-        <ul>
-          {currentLimitations.map((limitation) => (
-            <li key={limitation}>{limitation}</li>
-          ))}
+      {/* Footer */}
+      <section className="learningPanel" aria-labelledby="learning-footer-title" style={{ marginTop: "20px" }}>
+        <div className="panelHeader">
+          <h2 id="learning-footer-title" style={{ fontSize: "14px", color: "#94a3b8" }}>
+            数据来源说明
+          </h2>
+        </div>
+        <ul style={{ fontSize: "12px", color: "#94a3b8", lineHeight: "1.8", paddingLeft: "16px" }}>
+          <li>规则型学习反馈 — 基于确定性规则，非 AI</li>
+          <li>不调用 LLM — 不使用任何语言模型</li>
+          <li>localStorage fallback — 数据存储在浏览器本地</li>
+          <li>未接生产账号 — 未连接真实用户系统</li>
+          <li>DB guard 默认关闭 — 不保存学习数据到数据库</li>
+          <li>不读取 raw prompt/response — 仅聚合安全摘要</li>
         </ul>
       </section>
     </main>
-  );
-}
-
-async function getProblemAttemptSignalPreview(
-  dashboardData: LearningDashboardPageData,
-) {
-  if (dashboardData.source === "mock_fallback") {
-    return createLearningProblemAttemptSignalPreviewForFallbackReason(
-      dashboardData.fallbackReason,
-    );
-  }
-
-  return loadLearningProblemAttemptSignalPreview({
-    previewAppliedToAbility: false,
-  });
-}
-
-async function getReadingProgressSignalPreview(
-  dashboardData: LearningDashboardPageData,
-) {
-  if (dashboardData.source === "mock_fallback") {
-    return createLearningReadingProgressSignalPreviewForFallbackReason(
-      dashboardData.fallbackReason,
-    );
-  }
-
-  return loadLearningReadingProgressSignalPreview({
-    previewAppliedToAbility: isReadingProgressAppliedToAbilityPreview(
-      dashboardData.partialReasons,
-    ),
-  });
-}
-
-async function getRecommendationProblemAttemptStatusPreview(
-  dashboardData: LearningDashboardPageData,
-) {
-  if (dashboardData.source === "mock_fallback") {
-    return loadLearningRecommendationProblemAttemptStatusPreview({
-      recommendedProblems: dashboardData.recommendedProblems,
-      dashboardSource: dashboardData.source,
-      fallbackReason: dashboardData.fallbackReason,
-    });
-  }
-
-  return loadLearningRecommendationProblemAttemptStatusPreview({
-    recommendedProblems: dashboardData.recommendedProblems,
-    dashboardSource: dashboardData.source,
-  });
-}
-
-async function getRecentProblemAttemptHistory(
-  dashboardData: LearningDashboardPageData,
-) {
-  return loadLearningRecentProblemAttemptHistory({
-    dashboardSource: dashboardData.source,
-    fallbackReason:
-      dashboardData.source === "mock_fallback"
-        ? dashboardData.fallbackReason
-        : undefined,
-  });
-}
-
-async function getRecentReadingProgress(dashboardData: LearningDashboardPageData) {
-  return loadLearningRecentReadingProgress({
-    dashboardSource: dashboardData.source,
-    fallbackReason:
-      dashboardData.source === "mock_fallback"
-        ? dashboardData.fallbackReason
-        : undefined,
-  });
-}
-
-function getDailyRecommendationAbilityProfileSource({
-  source,
-  partialReasons,
-  hasAbilityProfile,
-}: {
-  source: LearningDashboardDataSource;
-  partialReasons?: readonly LearningDashboardPartialReason[];
-  hasAbilityProfile: boolean;
-}): LearningDailyRecommendationAbilityProfileSource {
-  if (source === "mock_fallback") {
-    return "mock_fallback";
-  }
-
-  if (!hasAbilityProfile) {
-    return "unavailable";
-  }
-
-  if (partialReasons?.includes("no_stored_ability_profile") === true) {
-    return "engine_preview";
-  }
-
-  return "database_saved";
-}
-
-function isReadingProgressAppliedToAbilityPreview(
-  partialReasons?: readonly LearningDashboardPartialReason[],
-): boolean {
-  return (
-    partialReasons?.includes(
-      "ability_profile_calculated_from_reading_progress",
-    ) ?? false
   );
 }

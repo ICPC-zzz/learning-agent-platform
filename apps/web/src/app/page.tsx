@@ -22,6 +22,12 @@ export default function Home() {
           <Link className="primaryLink" href="/reader">
             打开阅读器
           </Link>
+          <Link className="primaryLink" href="/problems">
+            打开题目中心
+          </Link>
+          <Link className="primaryLink" href="/user">
+            打开用户中心
+          </Link>
           <Link className="secondaryLink" href="/learning">
             打开学习面板
           </Link>

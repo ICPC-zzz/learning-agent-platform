@@ -1,0 +1,10 @@
+slide size: 1280 x 720, 16:9
+background: warm white #F5F7FA with navy header
+typeface: Microsoft YaHei
+title: 48 px bold
+body: 32 px minimum
+palette: navy #16324F, blue #2E6F95, cyan #48A9A6, amber #D68A2F
+containers: square or lightly rounded white panels, thin cool-gray borders
+diagrams: left-to-right reading order, attached arrows, short labels
+footer: page number and MVP / PREVIEW ONLY status
+banned motifs: authoring notes, filler instructions, tiny card grids, decorative gradients, unverified logos

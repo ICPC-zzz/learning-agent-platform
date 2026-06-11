@@ -24,6 +24,7 @@ const demoUserEmail = "demo@example.com";
 
 interface LoadBookDetailInput {
   bookId?: string;
+  ownerId?: string;
 }
 
 interface ChapterChunkStats {
@@ -33,6 +34,7 @@ interface ChapterChunkStats {
 
 export async function loadBookDetail({
   bookId,
+  ownerId,
 }: LoadBookDetailInput): Promise<BookDetailLoadResult> {
   const normalizedBookId = normalizeOptionalText(bookId);
 
@@ -83,6 +85,7 @@ export async function loadBookDetail({
       readerData,
       readingProgressRepository: new PrismaReadingProgressRepository(prisma),
       userRepository: new PrismaUserRepository(prisma),
+      ownerId,
     });
     const book = mapBookDetail(readerData, readingProgress);
 
@@ -229,14 +232,33 @@ async function loadBookReadingProgress({
   readerData,
   readingProgressRepository,
   userRepository,
+  ownerId,
 }: {
   readerData: BookReaderData;
   readingProgressRepository: ReadingProgressRepository;
   userRepository: UserRepository;
+  ownerId?: string;
 }): Promise<BookDetailReadingProgressView> {
   const defaultContinueReaderHref = createDefaultContinueReaderHref(readerData);
+  const isDevSession = ownerId !== undefined && ownerId.length > 0;
 
   try {
+    // When ownerId is provided (dev session), query directly by that userId
+    if (isDevSession) {
+      const progressRecords = await readingProgressRepository.listReadingProgress({
+        userId: ownerId,
+        bookId: readerData.book.id,
+        limit: Math.max(readerData.chapters.length, 1),
+      });
+
+      return mapReadingProgressSummary({
+        defaultContinueReaderHref,
+        progressRecords,
+        readerData,
+        isDevSession: true,
+      });
+    }
+
     const demoUser = await userRepository.getUserByEmail(demoUserEmail);
 
     if (demoUser === null) {
@@ -279,10 +301,12 @@ function mapReadingProgressSummary({
   defaultContinueReaderHref,
   progressRecords,
   readerData,
+  isDevSession = false,
 }: {
   defaultContinueReaderHref: string;
   progressRecords: ReadingProgressRecord[];
   readerData: BookReaderData;
+  isDevSession?: boolean;
 }): BookDetailReadingProgressView {
   const totalChapterCount = readerData.chapters.length;
   const chapterById = new Map(
@@ -314,8 +338,9 @@ function mapReadingProgressSummary({
   if (latestProgress === undefined || latestChapter === undefined) {
     return {
       status: "progress_saved",
-      message:
-        "存在演示阅读进度记录，但最新章节无法匹配到此书的当前章节。",
+      message: isDevSession
+        ? "存在 dev session 阅读进度记录，但最新章节无法匹配到此书的当前章节。"
+        : "存在演示阅读进度记录，但最新章节无法匹配到此书的当前章节。",
       hasSavedProgress: true,
       currentChapterProgressLabel:
         latestProgress === undefined

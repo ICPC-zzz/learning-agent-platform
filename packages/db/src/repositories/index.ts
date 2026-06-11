@@ -4,8 +4,32 @@ export { PrismaAgentRuntimeRepository } from "./agent-runtime-repository.js";
 export { PrismaBookRepository } from "./book-repository.js";
 export { PrismaChapterQaFeedbackRepository } from "./chapter-qa-feedback-repository.js";
 export { PrismaChapterQaHistoryRepository } from "./chapter-qa-history-repository.js";
+export { PrismaFavoriteRepository } from "./favorite-repository.js";
 export { PrismaLearningRepository } from "./learning-repository.js";
 export { PrismaProblemAttemptRepository } from "./problem-attempt-repository.js";
+export { PrismaProblemFavoriteRepository } from "./problem-favorite-repository.js";
+export { PrismaProblemPracticeRepository } from "./problem-practice-repository.js";
+export { PrismaProblemWrongBookRepository } from "./problem-wrong-book-repository.js";
+export {
+  createDailyChallengeProgressRepository,
+  getDailyChallengeProgressRepository,
+  isDailyChallengeDbGuardActive,
+  createRealDailyChallengeProgressRepository,
+} from "./daily-challenge-progress-repository.js";
+export type {
+  DailyChallengeProgressRepository,
+  DailyChallengeProgressRecord,
+  DailyChallengeProgressUpsertInput,
+  DailyChallengeProgressUpsertResult,
+  DailyChallengeProgressFindResult,
+  DailyChallengeProgressClearResult,
+  DailyChallengeProgressSafetyMetadata,
+  DailyChallengeProgressStatus,
+} from "./daily-challenge-progress-repository.js";
+export { PrismaReaderBookmarkRepository } from "./reader-bookmark-repository.js";
+export { PrismaReaderNoteRepository } from "./reader-note-repository.js";
+export { PrismaLearningActivityRepository } from "./learning-activity-repository.js";
+export { PrismaReadingSessionRepository } from "./reading-session-repository.js";
 export { PrismaReadingProgressRepository } from "./reading-progress-repository.js";
 export { PrismaUserRepository } from "./user-repository.js";
 export {
@@ -115,6 +139,9 @@ export type {
 } from "./reading-progress-mappers.js";
 export type {
   AbilityProfileRecord,
+  AddFavoriteBookInput,
+  AddProblemFavoriteInput,
+  BookFavoriteRecord,
   BookRepository,
   ChapterQaFeedbackRating,
   ChapterQaFeedbackRecord,
@@ -136,25 +163,41 @@ export type {
   CreateProblemInput,
   CreateUserInput,
   DailyRecommendationRecord,
+  FavoriteRepository,
   FindUserInput,
   ClearChapterQaFeedbackInput,
   GetDailyRecommendationsInput,
   GetChapterQaFeedbackInput,
   GetChapterQaHistoryRecordByIdInput,
+  GetProblemPracticeStatusInput,
   GetReadingProgressInput,
+  IsFavoriteBookInput,
+  IsProblemFavoriteInput,
   LearningRepository,
   ListBooksInput,
   ListChapterQaHistoryRecordsInput,
+  ListFavoritesByOwnerInput,
+  ListProblemFavoritesByOwnerInput,
+  ListProblemPracticeByOwnerInput,
   ListProblemsInput,
   ListReadingProgressInput,
   MarkChapterCompletedInput,
   BookListItem,
   BookReaderData,
   ProblemDifficulty,
+  ProblemFavoriteRecord,
+  ProblemFavoriteRepository,
+  ProblemPracticeActivityRecord,
+  ProblemPracticeRepository,
+  ProblemPracticeStatus,
   ProblemRecord,
   ReadingProgressRecord,
   ReadingProgressRepository,
   RecommendationStatus,
+  RecordProblemPracticeInput,
+  RemoveFavoriteBookInput,
+  RemoveProblemFavoriteInput,
+  RemoveProblemPracticeInput,
   UpsertAbilityProfileInput,
   UpsertChapterQaFeedbackInput,
   UpdateUserInput,

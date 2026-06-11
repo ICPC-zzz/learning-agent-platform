@@ -1,0 +1,16 @@
+thesis: AI can accelerate a programming-learning product when human review and preview-only safety boundaries remain explicit.
+audience: classroom defense panel
+arc: problem -> concept -> AI workflow -> safeguards -> product evidence -> reflection
+
+01 A coherent MVP connects reading, import preview, desktop preview and future AI planning.
+02 Five concrete roles cover planning, implementation support, testing, media and defense materials.
+03 Fragmented resources make it hard for beginners to turn reading into action.
+04 The innovation is the connection between learning content, code navigation and controlled previews.
+05 Different AI tools serve different development tasks; none is presented as production capability.
+06 The project uses a human-reviewed iterative AI development loop.
+07 AI accelerates implementation and documentation while humans own validation and boundaries.
+08 Explicit constraints address context, scope, security, layout and network problems.
+09 Reader improves the navigation of code-heavy learning materials.
+10 Import preview organizes raw text without writing to the database.
+11 Desktop presents local-only learning status without a real backend connection.
+12 The MVP proves the workflow and defines a realistic next-stage roadmap.

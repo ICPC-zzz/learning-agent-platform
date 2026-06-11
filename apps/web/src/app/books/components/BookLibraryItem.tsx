@@ -2,12 +2,17 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import type { BookLibraryItemView } from "../book-library-types";
+import { FavoriteBookButton } from "../../../components/books/FavoriteBookButton";
 
 interface BookLibraryItemProps {
   book: BookLibraryItemView;
+  /** Whether DB favorites guard is enabled for this session. */
+  dbFavoritesEnabled?: boolean;
+  /** Dev session owner ID. */
+  devSessionOwnerId?: string | null;
 }
 
-export function BookLibraryItem({ book }: BookLibraryItemProps) {
+export function BookLibraryItem({ book, dbFavoritesEnabled = false, devSessionOwnerId = null }: BookLibraryItemProps) {
   return (
     <article className="chunkItem">
       <div className="panelHeaderRow">
@@ -20,6 +25,13 @@ export function BookLibraryItem({ book }: BookLibraryItemProps) {
           </p>
         </div>
         <div className="homeActions">
+          <FavoriteBookButton
+            bookId={book.id}
+            title={book.title}
+            sourceType={book.sourceType ?? undefined}
+            dbFavoritesEnabled={dbFavoritesEnabled}
+            devSessionOwnerId={devSessionOwnerId}
+          />
           <Link className="primaryLink" href={book.detailHref}>
             查看章节
           </Link>

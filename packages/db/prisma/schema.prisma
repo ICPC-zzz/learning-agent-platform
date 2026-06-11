@@ -801,3 +801,174 @@ model AutonomySetting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/// Dev-only book favorites for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Owner isolation is enforced via @@unique([userId, bookId]).
+model BookFavorite {
+  id             String   @id @default(cuid())
+  userId         String
+  bookId         String
+  bookTitle      String
+  sourceType     String
+  firstChapterId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@index([userId, createdAt])
+  @@index([bookId])
+}
+
+/// Dev-only problem favorites for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Uses a composite key on (userId, problemId) for idempotent upsert.
+model ProblemFavorite {
+  id            String   @id @default(cuid())
+  userId        String
+  problemId     String
+  problemTitle  String
+  difficulty    String
+  tags          String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, problemId])
+  @@index([userId, createdAt])
+  @@index([problemId])
+  @@index([difficulty])
+}
+
+/// Dev-only problem practice activity for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Stores practice status transitions with timestamps.
+model ProblemPracticeActivity {
+  id           String   @id @default(cuid())
+  userId       String
+  problemId    String
+  problemTitle String
+  difficulty   String
+  status       String   @default("practiced")
+  tags         String[] @default([])
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+
+  @@index([userId, updatedAt])
+  @@index([problemId])
+  @@index([status])
+}
+
+/// Dev-only reader bookmarks for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// A bookmark is unique per (userId, bookId, chapterId).
+model ReaderBookmark {
+  id            String   @id @default(cuid())
+  userId        String
+  bookId        String
+  chapterId     String
+  bookTitle     String
+  chapterTitle  String
+  progressRatio Float    @default(0)
+  sourceType    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, bookId, chapterId])
+  @@index([userId, createdAt])
+  @@index([bookId])
+  @@index([chapterId])
+}
+
+/// Dev-only reader notes for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Multiple notes per chapter are allowed (no @@unique constraint on chapter).
+model ReaderNote {
+  id             String   @id @default(cuid())
+  userId         String
+  bookId         String
+  chapterId      String
+  bookTitle      String
+  chapterTitle   String
+  progressRatio  Float    @default(0)
+  noteText       String
+  excerptPreview String?
+  sourceType     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+  @@index([bookId])
+  @@index([chapterId])
+}
+
+/// Dev-only unified learning activity timeline for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Records user actions: read-book, practice-problem, favorite-book,
+/// favorite-problem, add-note, add-bookmark, import-book.
+model LearningActivity {
+  id               String   @id @default(cuid())
+  userId           String
+  activityType     String
+  title            String
+  targetType       String
+  targetId         String
+  bookId           String?
+  chapterId        String?
+  problemId        String?
+  sourceType       String
+  occurredAt       DateTime
+  durationSeconds  Int?
+  metadataPreview  String?
+  createdAt        DateTime @default(now())
+
+  @@index([userId, occurredAt(sort: Desc)])
+  @@index([activityType])
+  @@index([targetType])
+}
+
+/// Dev-only reading session timer for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Tracks timed reading sessions with start/end and duration.
+model ReadingSession {
+  id             String    @id @default(cuid())
+  userId         String
+  bookId         String
+  chapterId      String
+  bookTitle      String
+  chapterTitle   String
+  startedAt      DateTime
+  endedAt        DateTime?
+  durationSeconds Int
+  progressRatio  Float     @default(0)
+  sourceType     String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([bookId])
+  @@index([chapterId])
+}
+
+/// Dev-only problem wrong book for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+/// Uses composite unique key on (ownerId, problemId) for idempotent upsert.
+model ProblemWrongBook {
+  id           String   @id @default(cuid())
+  ownerId      String
+  problemId    String
+  problemTitle String
+  difficulty   String
+  tagsJson     String   @default("[]")
+  wrongCount   Int      @default(1)
+  lastWrongAt  DateTime @default(now())
+  reviewStatus String   @default("needs-review")
+  notePreview  String?
+  sourceType   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([ownerId, problemId])
+  @@index([ownerId, lastWrongAt(sort: Desc)])
+  @@index([problemId])
+  @@index([reviewStatus])
+}

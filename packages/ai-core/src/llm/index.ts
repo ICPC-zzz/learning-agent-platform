@@ -80,3 +80,36 @@ export {
   MockChapterQaProvider,
   mockChapterQaProvider,
 } from "./mock-chapter-qa-provider";
+
+// --- New provider contract (A393) ---
+export { LlmChatRole, LlmProviderMode } from "./llm-provider-contract";
+export type {
+  LlmChatMessage,
+  LlmChatRequest,
+  LlmChatResult,
+  LlmProvider,
+  LlmSafeError,
+  LlmSafeErrorKind,
+  LlmProviderMode as LlmProviderModeValue,
+} from "./llm-provider-contract";
+export {
+  createBlockedResult,
+  createMockSuccessResult,
+  createSafeError,
+  createSafeResult,
+} from "./llm-safe-result";
+export type { CreateSafeErrorInput, CreateSafeResultInput } from "./llm-safe-result";
+export { MockLlmProvider, mockLlmProvider } from "./mock-llm-provider";
+export {
+  ExternalChatCompletionsProvider,
+  LAP_LLM_DEV_API_KEY_KEY,
+  LAP_LLM_DEV_ENDPOINT_KEY,
+  LAP_LLM_DEV_MODEL_KEY,
+  LAP_LLM_DEV_TIMEOUT_MS_KEY,
+  loadExternalProviderConfig,
+} from "./external-chat-completions-provider";
+export type {
+  ExternalProviderConfig,
+  ExternalProviderEnv,
+  ExternalProviderFetch,
+} from "./external-chat-completions-provider";

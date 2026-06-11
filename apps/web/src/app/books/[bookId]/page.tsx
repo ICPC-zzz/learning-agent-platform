@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -7,6 +8,9 @@ import type {
   BookDetailReadingProgressView,
   BookDetailView,
 } from "../book-detail-types";
+import { deserializeDevSession } from "../../../lib/web-auth-dev-session";
+import { FavoriteBookButton } from "../../../components/books/FavoriteBookButton";
+import { getFavoritesDbStatusForUi } from "../../user/favorites-db-guard";
 
 interface BookDetailPageProps {
   params?: Promise<{
@@ -35,8 +39,36 @@ const progressStatusLabels: Record<
 };
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
+  // Read dev session cookie for ownerId — A379: enable DB progress queries
+  let ownerId: string | undefined;
+  try {
+    const cookieStore = await cookies();
+    const raw = cookieStore.get("lap-web-dev-session")?.value;
+    const session = deserializeDevSession(raw);
+    if (session !== null && session.userIdPreview.length > 0) {
+      ownerId = session.userIdPreview;
+    }
+  } catch {
+    ownerId = undefined;
+  }
+
+  // A385: Favorites DB status
+  let favDbStatus;
+  let devSessionOwnerId: string | null = null;
+  try {
+    const cookieStore = await cookies();
+    const devSessionCookie = cookieStore.get("lap-web-dev-session")?.value;
+    favDbStatus = getFavoritesDbStatusForUi(devSessionCookie);
+    const session = deserializeDevSession(devSessionCookie);
+    devSessionOwnerId = session?.userIdPreview ?? null;
+  } catch {
+    favDbStatus = getFavoritesDbStatusForUi(undefined);
+    devSessionOwnerId = null;
+  }
+
   const result = await loadBookDetail({
     bookId: await readBookIdRouteParam(params),
+    ownerId,
   });
 
   return (
@@ -57,9 +89,13 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           <Link className="secondaryLink" href="/books">
             返回书库
           </Link>
-          {result.book === null ? null : (
+          {result.book === null ? null : result.book.readingProgress.hasSavedProgress ? (
+            <Link className="primaryLink" href={result.book.readingProgress.continueReaderHref}>
+              继续阅读（dev session 进度）
+            </Link>
+          ) : (
             <Link className="primaryLink" href={result.book.readerHref}>
-              阅读第一章
+              从第一章开始阅读
             </Link>
           )}
         </div>
@@ -70,7 +106,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
       {result.book === null ? (
         <BookDetailEmptyState message={result.message} />
       ) : (
-        <BookDetailContent book={result.book} />
+        <BookDetailContent book={result.book} dbFavoritesEnabled={favDbStatus.enabled} devSessionOwnerId={devSessionOwnerId} />
       )}
     </main>
   );
@@ -126,7 +162,7 @@ function BookDetailEmptyState({ message }: { message: string }) {
   );
 }
 
-function BookDetailContent({ book }: { book: BookDetailView }) {
+function BookDetailContent({ book, dbFavoritesEnabled = false, devSessionOwnerId = null }: { book: BookDetailView; dbFavoritesEnabled?: boolean; devSessionOwnerId?: string | null }) {
   return (
     <>
       <section className="learningPanel" aria-labelledby="book-metadata-title">
@@ -138,9 +174,23 @@ function BookDetailContent({ book }: { book: BookDetailView }) {
               <p className="panelNote">{book.subtitle}</p>
             )}
           </div>
-          <Link className="primaryLink" href={book.readerHref}>
-            阅读第一章
-          </Link>
+          {book.readingProgress.hasSavedProgress ? (
+            <Link className="primaryLink" href={book.readingProgress.continueReaderHref}>
+              继续阅读（dev session 进度）
+            </Link>
+          ) : (
+            <Link className="primaryLink" href={book.readerHref}>
+              从第一章开始阅读
+            </Link>
+          )}
+          <FavoriteBookButton
+            bookId={book.id}
+            title={book.title}
+            sourceType={book.sourceType ?? undefined}
+            firstChapterId={book.chapters[0]?.id}
+            dbFavoritesEnabled={dbFavoritesEnabled}
+            devSessionOwnerId={devSessionOwnerId}
+          />
         </div>
 
         <dl className="scoreMeta" style={{ marginTop: "14px" }}>
@@ -239,7 +289,9 @@ function BookReadingProgressSummary({
       <div className="panelHeaderRow">
         <div>
           <p className="eyebrow">阅读进度预览</p>
-          <h2 id="book-progress-title">演示用户进度</h2>
+          <h2 id="book-progress-title">
+            {progress.hasSavedProgress ? "阅读进度（dev-only）" : "演示用户进度"}
+          </h2>
           <p className="panelNote">{progress.message}</p>
         </div>
         <Link className="primaryLink" href={progress.continueReaderHref}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { BookImportPreviewClient } from "./BookImportPreviewClient";
+import { BookApiPreviewClient } from "./BookApiPreviewClient";
 
 export default function ImportPage() {
   return (
@@ -30,6 +31,8 @@ export default function ImportPage() {
       </section>
 
       <BookImportPreviewClient />
+
+      <BookApiPreviewClient apiEnabled={false} />
     </main>
   );
 }
