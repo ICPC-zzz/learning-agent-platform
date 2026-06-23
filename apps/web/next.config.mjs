@@ -12,6 +12,14 @@ const nextConfig = {
       ".js": [".ts", ".tsx", ".js", ".jsx"],
       ".mjs": [".mts", ".mjs"],
     };
+    // Node built-in modules that should never be bundled for the browser
+    config.resolve.fallback = {
+      ...(config.resolve.fallback ?? {}),
+      fs: false,
+      path: false,
+      os: false,
+      crypto: false,
+    };
 
     return config;
   },

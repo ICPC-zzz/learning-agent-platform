@@ -3,9 +3,11 @@ node_modules/
 .next/
 dist/
 build/
+.data/
 coverage/
 .turbo/
 .vercel/
+.local/
 
 .env
 .env.*
@@ -17,4 +19,4 @@ npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 .DS_Store
-Thumbs.db
+Thu
