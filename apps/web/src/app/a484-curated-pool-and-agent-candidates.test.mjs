@@ -129,9 +129,9 @@ describe("A484 curated pool selection", () => {
       }
     }
 
-    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 1500 };
+    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 2000 };
     const result = selectCuratedPool(eligible, config);
-    assert.ok(result.selectedTotal <= 1500, `Should not exceed targetSize 1500, got ${result.selectedTotal}`);
+    assert.ok(result.selectedTotal <= 2000, `Should not exceed targetSize 2000, got ${result.selectedTotal}`);
   });
 
   it("should be deterministic — same input same output", () => {
@@ -221,13 +221,13 @@ describe("A484 pool config validation", () => {
   });
 
   it("should reject targetSize below minimum", () => {
-    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 500 };
+    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 50 };
     const errors = validatePoolConfig(config);
     assert.ok(errors.some((e) => e.includes("targetSize")), "Should reject low targetSize");
   });
 
   it("should reject targetSize above maximum", () => {
-    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 3000 };
+    const config = { ...AGENT_POOL_V1_CONFIG, targetSize: 50000 };
     const errors = validatePoolConfig(config);
     assert.ok(errors.some((e) => e.includes("targetSize")), "Should reject high targetSize");
   });

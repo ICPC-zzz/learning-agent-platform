@@ -21,4 +21,10 @@ yarn-debug.log*
 .DS_Store
 Thu
 .codex_tmp/
-E___code_lap-
+E___code_lap-*
+*.bak
+*.bak2
+*.broken
+test-results/
+*.pyc
+__pycache__/

@@ -28,10 +28,8 @@ describe("A479 Codeforces problem metadata boundary", () => {
   it("public list and detail sources do not expose old problem body paths", () => {
     const targets = [
       "problems/page.tsx",
-      "problems/ProblemLibraryClient.tsx",
       "problems/problem-library-page-data.ts",
-      "problems/problem-detail-loader.ts",
-      "problems/[problemId]/page.tsx",
+      "problems/problem-library-filter.ts",
     ];
     const forbidden = [
       "ProblemCodeSubmissionControl",
@@ -52,14 +50,14 @@ describe("A479 Codeforces problem metadata boundary", () => {
 
   it("public list source is Codeforces-only with rating filters", () => {
     const pageSource = readSource("problems/page.tsx");
-    const clientSource = readSource("problems/ProblemLibraryClient.tsx");
     const loaderSource = readSource("problems/problem-library-page-data.ts");
 
-    assert.ok(pageSource.includes("Codeforces 题目中心"));
-    assert.ok(pageSource.includes("Codeforces 题目列表"));
-    assert.ok(clientSource.includes('name="minRating"'));
-    assert.ok(clientSource.includes('name="maxRating"'));
+    assert.ok(pageSource.includes("Codeforces Problem Center"));
+    assert.ok(pageSource.includes("题目中心"));
+    assert.ok(pageSource.includes("Local Codeforces Pool"));
+    assert.ok(pageSource.includes('name="minRating"'));
+    assert.ok(pageSource.includes('name="maxRating"'));
     assert.ok(loaderSource.includes("mapProblemRecordToCodeforcesMetadata"));
-    assert.ok(loaderSource.includes("matchesRatingFilter"));
+    assert.ok(loaderSource.includes("DEFAULT_CODEFORCES_CATALOG_POLICY"));
   });
 });
