@@ -1833,4 +1833,136 @@ h1 {
 
   /* Border radii */
   --lap-radius-sm: 6px;
-  --la
+  --lap-radius-md: 8px;
+  --lap-radius-lg: 12px;
+
+  /* Text colors */
+  --lap-text-primary: #1c2430;
+  --lap-text-secondary: #445064;
+  --lap-text-muted: #586174;
+  --lap-text-subtle: #7a8495;
+  --lap-text-inverse: #ffffff;
+
+  /* Accent palette */
+  --lap-accent-primary: #1e293b;
+  --lap-accent-green: #166534;
+  --lap-accent-purple: #6b21a8;
+
+  /* Backgrounds */
+  --lap-bg-muted: #f1f5f9;
+  --lap-bg-card-alt: #f8fafc;
+
+  /* Borders */
+  --lap-border-light: 1px solid #e2e8f0;
+
+  /* Status colors */
+  --lap-status-success-bg: #f0fdf4;
+  --lap-status-success-text: #166534;
+  --lap-status-error-bg: #fef2f2;
+  --lap-status-error-text: #991b1b;
+  --lap-status-dev-bg: #fef9c3;
+  --lap-status-dev-text: #854d0e;
+
+  /* Typography */
+  --lap-font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+
+  /* Transitions */
+  --lap-transition-fast: 150ms ease;
+  --lap-transition-normal: 250ms ease;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Shared component classes
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Card — white surface with border for content blocks */
+.lap-card {
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: var(--lap-radius-md);
+}
+
+.lap-card--hover:hover {
+  border-color: #b8c4d4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Empty state — subdued block when no data to show */
+.lap-empty-state {
+  padding: var(--lap-space-4);
+  border: 1px solid #e3e8ef;
+  border-radius: var(--lap-radius-md);
+  background: #fbfcfe;
+  color: var(--lap-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Dev badge — small label for metadata */
+.lap-dev-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 9px;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #586174;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 760px) {
+  .lap-hide-mobile {
+    display: none !important;
+  }
+
+  .lap-show-mobile {
+    display: inline-flex !important;
+  }
+
+  .page {
+    padding: 40px 0;
+  }
+
+  h1 {
+    font-size: 2.125rem;
+  }
+
+  .placeholderGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .readerHeader,
+  .readerLayout,
+  .chunkList,
+  .learningHero,
+  .dashboardGrid,
+  .problemList {
+    grid-template-columns: 1fr;
+  }
+
+  .readerSidebar {
+    position: static;
+  }
+
+  .readerContent {
+    padding: 22px;
+  }
+
+  .aiContextList div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .learningHero {
+    align-items: flex-start;
+  }
+
+  .scoreValue {
+    font-size: 3.25rem;
+  }
+}
+
