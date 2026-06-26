@@ -435,11 +435,6 @@ export type {
   RecommendedProblemLike,
 } from "./repositories/index.js";
 
-export * from "./repositories/model-provider-repository.js";
-
 export const dbPackage = "db";
 
 export const dbPackageStatus: DbPackageStatus = "client-boundary";
-export * from "./repositories/codeforces-account-repository.js";
-export * from "./repositories/daily-content-repository.js";
-export * from "./repositories/email-otp-repository.js";

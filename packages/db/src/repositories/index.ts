@@ -1,7 +1,6 @@
 export { PrismaAgentTaskRepository } from "./agent-task-repository.js";
 export { PrismaAgentPermissionRepository } from "./agent-permission-repository.js";
 export { PrismaAgentRuntimeRepository } from "./agent-runtime-repository.js";
-export { PrismaArticleRepository } from "./article-repository.js";
 export { PrismaBookRepository } from "./book-repository.js";
 export { PrismaChapterQaFeedbackRepository } from "./chapter-qa-feedback-repository.js";
 export { PrismaChapterQaHistoryRepository } from "./chapter-qa-history-repository.js";
