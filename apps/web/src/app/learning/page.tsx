@@ -22,14 +22,14 @@ const ENTRY_CARDS = [
   },
   {
     title: "学习报告",
-    description: "聚合阅读、题目、错题、笔记数据，生成学习摘要。",
+    description: "聚合题目、错题、训练状态和 AI 问答摘要，生成学习摘要。",
     href: "/user/report",
     label: "A396 学习报告",
     accent: "#166534",
   },
   {
     title: "复习推荐",
-    description: "基于错题本、阅读进度、笔记/书签生成确定性复习建议（7 级优先级）。",
+    description: "基于错题本、薄弱标签和近期训练生成确定性复习建议（7 级优先级）。",
     href: "/user/review",
     label: "A396 复习推荐",
     accent: "#1e40af",
@@ -43,7 +43,7 @@ const ENTRY_CARDS = [
   },
   {
     title: "学习活动",
-    description: "查看学习活动时间线：阅读、练习、收藏、导入等记录。",
+    description: "查看学习活动时间线：练习、收藏、复习和 AI 分析等记录。",
     href: "/user/activity",
     label: "A392 学习活动",
     accent: "#4f46e5",
@@ -54,13 +54,6 @@ const ENTRY_CARDS = [
     href: "/user/wrong-book",
     label: "A395 错题本",
     accent: "#dc2626",
-  },
-  {
-    title: "最近阅读",
-    description: "查看最近的阅读进度和章节记录。",
-    href: "/user/recent-reading",
-    label: "最近阅读",
-    accent: "#0d9488",
   },
   {
     title: "最近刷题",
@@ -107,12 +100,6 @@ export default async function LearningCenterPage() {
           </Link>
           <Link className="secondaryLink" href="/user">
             User Center
-          </Link>
-          <Link className="secondaryLink" href="/books">
-            Books
-          </Link>
-          <Link className="secondaryLink" href="/reader">
-            Reader
           </Link>
         </div>
       </header>

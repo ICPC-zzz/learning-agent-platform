@@ -12,29 +12,42 @@ import {
   markChallengeNeedsReview,
   resetChallenge,
   getTodayDateString,
+  type DailyChallengeState,
 } from "../../lib/local-daily-challenge-store";
-import { selectDailyChallenge } from "./daily-challenge-rules";
+import {
+  selectDailyChallenge,
+  type DailyChallengeRecommendation,
+} from "./daily-challenge-rules";
 import {
   buildDailyChallengePageView,
+  type DailyChallengePageView,
 } from "./daily-challenge-view-model";
 import { SAMPLE_PROBLEMS } from "../problems/sample-programming-problems";
 import {
   loadWrongBook,
 } from "../../lib/local-problem-wrong-book-store";
+import type { WrongBookEntry } from "../../lib/local-problem-wrong-book-store";
 import {
   loadFavorites,
   loadRecentPractice,
 } from "../../lib/local-user-problem-store";
 import { loadLearningActivities } from "../../lib/local-learning-activity-store";
 
+interface DailyChallengeLocalData {
+  wrongBookEntries: WrongBookEntry[];
+  favoriteProblems: ReturnType<typeof loadFavorites>;
+  recentPractice: ReturnType<typeof loadRecentPractice>;
+  learningActivityCount: number;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 export default function DailyChallengeClient() {
-  const [pageView, setPageView] = useState(null);
+  const [pageView, setPageView] = useState<DailyChallengePageView | null>(null);
   const [loading, setLoading] = useState(true);
-  const [actionError, setActionError] = useState(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Load challenge data on mount (and on each render per date change detection)
   useEffect(() => {
@@ -68,7 +81,7 @@ export default function DailyChallengeClient() {
     setLoading(false);
   }, []);
 
-  function loadLocalData() {
+  function loadLocalData(): DailyChallengeLocalData {
     let wrongBookEntries: WrongBookEntry[] = [];
     let favoriteProblems: ReturnType<typeof loadFavorites> = [];
     let recentPractice: ReturnType<typeof loadRecentPractice> = [];
@@ -83,9 +96,9 @@ export default function DailyChallengeClient() {
   }
 
   function getOrCreateRecommendation(
-    localData,
-    dateString,
-  ) {
+    localData: DailyChallengeLocalData,
+    dateString: string,
+  ): DailyChallengeRecommendation | null {
     const rec = selectDailyChallenge({
       sampleProblems: SAMPLE_PROBLEMS,
       wrongBookEntries: localData.wrongBookEntries.map((e) => ({
@@ -125,7 +138,7 @@ export default function DailyChallengeClient() {
       return;
     }
 
-    let newState = null;
+    let newState: DailyChallengeState | null = null;
 
     try {
       switch (actionId) {

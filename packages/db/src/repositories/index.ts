@@ -1,6 +1,7 @@
 export { PrismaAgentTaskRepository } from "./agent-task-repository.js";
 export { PrismaAgentPermissionRepository } from "./agent-permission-repository.js";
 export { PrismaAgentRuntimeRepository } from "./agent-runtime-repository.js";
+export { PrismaArticleRepository } from "./article-repository.js";
 export { PrismaBookRepository } from "./book-repository.js";
 export { PrismaChapterQaFeedbackRepository } from "./chapter-qa-feedback-repository.js";
 export { PrismaChapterQaHistoryRepository } from "./chapter-qa-history-repository.js";
@@ -29,6 +30,7 @@ export type {
 export { PrismaReaderBookmarkRepository } from "./reader-bookmark-repository.js";
 export { PrismaReaderNoteRepository } from "./reader-note-repository.js";
 export { PrismaLearningActivityRepository } from "./learning-activity-repository.js";
+export { PrismaMemoryRepository } from "./memory-repository.js";
 export { PrismaReadingSessionRepository } from "./reading-session-repository.js";
 export { PrismaReadingProgressRepository } from "./reading-progress-repository.js";
 export { PrismaUserRepository } from "./user-repository.js";
@@ -139,8 +141,12 @@ export type {
 } from "./reading-progress-mappers.js";
 export type {
   AbilityProfileRecord,
+  AddFavoriteArticleInput,
   AddFavoriteBookInput,
   AddProblemFavoriteInput,
+  ArticleFavoriteRecord,
+  ArticleReadingRecord,
+  ArticleRepository,
   BookFavoriteRecord,
   BookRepository,
   ChapterQaFeedbackRating,
@@ -163,6 +169,8 @@ export type {
   CreateProblemInput,
   CreateUserInput,
   DailyRecommendationRecord,
+  DeleteBookInput,
+  DeleteBookResult,
   FavoriteRepository,
   FindUserInput,
   ClearChapterQaFeedbackInput,
@@ -171,12 +179,15 @@ export type {
   GetChapterQaHistoryRecordByIdInput,
   GetProblemPracticeStatusInput,
   GetReadingProgressInput,
+  IsFavoriteArticleInput,
   IsFavoriteBookInput,
   IsProblemFavoriteInput,
   LearningRepository,
   ListBooksInput,
   ListChapterQaHistoryRecordsInput,
+  ListArticleReadingsByOwnerInput,
   ListFavoritesByOwnerInput,
+  ListFavoriteArticlesByOwnerInput,
   ListProblemFavoritesByOwnerInput,
   ListProblemPracticeByOwnerInput,
   ListProblemsInput,
@@ -194,13 +205,17 @@ export type {
   ReadingProgressRecord,
   ReadingProgressRepository,
   RecommendationStatus,
+  RecordArticleReadingInput,
   RecordProblemPracticeInput,
   RemoveFavoriteBookInput,
+  RemoveFavoriteArticleInput,
   RemoveProblemFavoriteInput,
   RemoveProblemPracticeInput,
   UpsertAbilityProfileInput,
   UpsertChapterQaFeedbackInput,
   UpdateUserInput,
+  UpdateBookMetadataInput,
+  UpdateBookMetadataResult,
   UpsertReadingProgressInput,
   UserRecord,
   UserRepository,

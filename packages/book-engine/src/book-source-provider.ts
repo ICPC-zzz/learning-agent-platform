@@ -70,8 +70,10 @@ export interface BookSourceProvider {
 }
 
 export function createBlockedSafetyMetadata(
-  providerId, blockedReasons, fallbackSource
-) {
+  providerId: string,
+  blockedReasons: string[],
+  fallbackSource: BookSourceProviderSafetyMetadata["fallbackSource"] = "empty",
+): BookSourceProviderSafetyMetadata {
   if (fallbackSource === void 0) { fallbackSource = "empty"; }
   return {
     providerId: providerId,
@@ -87,7 +89,9 @@ export function createBlockedSafetyMetadata(
   };
 }
 
-export function createPassedSafetyMetadata(providerId) {
+export function createPassedSafetyMetadata(
+  providerId: string,
+): BookSourceProviderSafetyMetadata {
   return {
     providerId: providerId,
     productionReady: false,
@@ -103,8 +107,10 @@ export function createPassedSafetyMetadata(providerId) {
 }
 
 export function createErrorSafetyMetadata(
-  providerId, errorMessage, fallbackSource
-) {
+  providerId: string,
+  errorMessage: string,
+  fallbackSource: BookSourceProviderSafetyMetadata["fallbackSource"] = "empty",
+): BookSourceProviderSafetyMetadata {
   if (fallbackSource === void 0) { fallbackSource = "empty"; }
   return {
     providerId: providerId,
@@ -120,7 +126,11 @@ export function createErrorSafetyMetadata(
   };
 }
 
-export function createEmptySearchResult(providerId, query, safety) {
+export function createEmptySearchResult(
+  providerId: string,
+  query: string,
+  safety: BookSourceProviderSafetyMetadata,
+): BookSearchResult {
   return {
     books: [],
     totalResults: 0,
@@ -129,7 +139,9 @@ export function createEmptySearchResult(providerId, query, safety) {
   };
 }
 
-export function createEmptyDetailResult(safety) {
+export function createEmptyDetailResult(
+  safety: BookSourceProviderSafetyMetadata,
+): BookDetailResult {
   return {
     book: null,
     chapterPreviews: [],
@@ -137,7 +149,7 @@ export function createEmptyDetailResult(safety) {
   };
 }
 
-function truncateSafeErrorMessage(message) {
+function truncateSafeErrorMessage(message: string): string {
   /* Strip URL query strings (may contain tokens) and collapse whitespace */
   var sanitized = stripUrlQueryParams(message);
   var cleaned = sanitized.replace(/\s+/g, " ").trim();
@@ -145,7 +157,7 @@ function truncateSafeErrorMessage(message) {
   return cleaned.slice(0, 197) + "...";
 }
 
-function stripUrlQueryParams(text) {
+function stripUrlQueryParams(text: string): string {
   var out = "";
   var i = 0;
   while (i < text.length) {

@@ -6,7 +6,7 @@ import {
   getRecentReadings,
   loadRecentReadings,
   type RecentReadingEntry,
-} from "../../../../lib/local-user-library-store";
+} from "../../../lib/local-user-library-store";
 import type { RecentReadingPageView, RecentReadingPageItemView } from "./recent-reading-page-view-model";
 
 interface RecentReadingPageClientProps {

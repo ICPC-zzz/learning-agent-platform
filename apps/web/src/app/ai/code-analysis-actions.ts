@@ -149,12 +149,11 @@ export async function runCodeAnalysisAction(
 
       reportProgress: function(phase: string) { report(phase); },
 
-      // Problem profiling — profileProblem internally skips model when user provides rating
+      // Problem profiling returns a rule estimate first and only uses a short model pass for enrichment.
       profileProblem: async (pi) => {
-        // profileProblem does: user has rating → 0ms return, otherwise → 15s max model call
         return profileProblem(
           { problemStatement: pi.problemStatement, code: pi.code, userProvidedRating: pi.userProvidedRating, userProvidedTags: pi.userProvidedTags },
-          { baseUrl: model.provider.baseUrl, authMode: model.provider.authMode, secrets: model.provider.secrets, modelId: model.profile.modelId, timeoutMs: 15000, maxOutputTokens: 1024, temperature: model.profile.temperature, supportsJsonSchema: model.profile.supportsJsonSchema, modelDisplayName: model.info.modelDisplayName, providerName: model.info.providerName },
+          { baseUrl: model.provider.baseUrl, authMode: model.provider.authMode, secrets: model.provider.secrets, modelId: model.profile.modelId, timeoutMs: 6000, maxOutputTokens: 768, temperature: model.profile.temperature, supportsJsonSchema: model.profile.supportsJsonSchema, modelDisplayName: model.info.modelDisplayName, providerName: model.info.providerName },
         );
       },
 

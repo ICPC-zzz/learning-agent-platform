@@ -10,9 +10,9 @@ import {
 } from "../../../../lib/local-user-library-store";
 import {
   toggleFavoriteDbAction,
-} from "../../../favorites-db-server-action";
+} from "../../favorites-db-server-action";
 import type { FavoriteBooksPageView, FavoriteBooksPageItemView } from "./favorite-books-page-view-model";
-import type { FavoritesDbStatusForUi } from "../../../favorites-db-guard";
+import type { FavoritesDbStatusForUi } from "../../favorites-db-guard";
 
 interface FavoriteBooksPageClientProps {
   pageView: FavoriteBooksPageView;

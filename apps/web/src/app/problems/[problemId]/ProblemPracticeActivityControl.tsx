@@ -16,7 +16,7 @@ import {
   addLearningActivity,
   generateLearningActivityId,
   type LocalLearningActivity,
-} from "../../lib/local-learning-activity-store";
+} from "../../../lib/local-learning-activity-store";
 
 export interface ProblemPracticeActivityControlProps {
   problemId: string;

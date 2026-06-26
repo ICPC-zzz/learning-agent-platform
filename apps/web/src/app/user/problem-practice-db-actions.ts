@@ -43,7 +43,7 @@ export interface ProblemPracticeDbActionSuccess {
   callsRepository: boolean;
   problemId: string;
   ownerIdPreview: string;
-  status: PracticeStatusType;
+  status: PracticeStatusType | null;
   reasonCode: string;
   productionReady: false;
   updatedAt?: string;

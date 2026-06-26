@@ -142,6 +142,10 @@ export function listReaderAiHistoryEntries(
   return entries;
 }
 
+export function loadAiHistory(): ReaderAiHistoryEntry[] {
+  return listReaderAiHistoryEntries();
+}
+
 export function getReaderAiHistoryCount(params?: { bookId?: string; chapterId?: string }): number {
   var entries = readStore();
   if (params) {

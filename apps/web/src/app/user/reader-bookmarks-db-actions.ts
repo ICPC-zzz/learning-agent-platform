@@ -41,7 +41,7 @@ export interface ReaderBookmarksDbActionSuccess {
   devOnly: true;
   writesDatabase: boolean;
   callsRepository: true;
-  bookmarkId: string;
+  bookmarkId: string | null;
   bookId: string;
   chapterId: string;
   ownerIdPreview: string;

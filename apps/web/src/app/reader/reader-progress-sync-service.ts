@@ -1,14 +1,11 @@
-import type {
+﻿import type {
   ReaderProgressSyncDecisionNormalizedPayload,
   ReaderProgressSyncDecisionResult,
   ReaderProgressSyncDecisionStatus,
   ReaderProgressSyncOperationPreview,
 } from "./reader-progress-sync-decision";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { createNoopReaderSyncRepositoryPort } from "./reader-sync-repository-port.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncRepositoryAuditPreview, ReaderSyncRepositoryCapabilities, ReaderSyncRepositoryIdempotencyPreview, ReaderSyncRepositoryPort, ReaderSyncRepositoryPortMode, ReaderSyncRepositoryReadResult, ReaderSyncRepositoryWritePreview } from "./reader-sync-repository-port.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncPersistentAdapterCapabilities, ReaderSyncPersistentAuditPreview, ReaderSyncPersistentIdempotencyPreview, ReaderSyncPersistentReadResult, ReaderSyncPersistentRepositoryAdapter, ReaderSyncPersistentWriteResult } from "./reader-sync-persistent-repository-adapter.ts";
 
 export type ReaderProgressSyncServiceErrorCode =

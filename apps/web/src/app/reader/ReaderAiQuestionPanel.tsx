@@ -252,7 +252,7 @@ export function ReaderAiQuestionPanel(props: ReaderAiQuestionPanelProps) {
         <div className="aiAnswer" aria-live="polite">
           <div className="aiAnswerMeta">
             <span className="aiAnswerModeBadge">
-              {lastResult.providerMode === "external-dev-only"
+              {lastResult.providerMode === "external-dev-preview"
                 ? "external-dev（真实调用）"
                 : lastResult.providerMode === "mock"
                   ? "mock（模拟回答）"

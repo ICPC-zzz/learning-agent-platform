@@ -3,6 +3,17 @@
   "compilerOptions": {
     "jsx": "preserve",
     "incremental": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@prisma/client": [
+        "node_modules/.pnpm/@prisma+client@6.19.3_prism_1d040ab5215f59f0e27ddee7f0cf082e/node_modules/@prisma/client/default.d.ts"
+      ],
+      "@learning-agent-platform/ai-core": ["packages/ai-core/src/index.ts"],
+      "@learning-agent-platform/book-engine": ["packages/book-engine/src/index.ts"],
+      "@learning-agent-platform/db": ["packages/db/src/index.ts"],
+      "@learning-agent-platform/learning-engine": ["packages/learning-engine/src/index.ts"],
+      "@learning-agent-platform/shared": ["packages/shared/src/index.ts"]
+    },
     "plugins": [
       {
         "name": "next"
@@ -12,7 +23,8 @@
   "include": [
     "next-env.d.ts",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

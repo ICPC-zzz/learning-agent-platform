@@ -32,18 +32,25 @@ import type { ReaderSyncDevTriggerProgressPayload } from "./ReaderSyncDevTrigger
 import { getReaderProgressDbStatusForUi } from "./reader-progress-db-guard";
 import { previewReaderSyncRealServerAction } from "./reader-sync-real-server-action.server";
 import { resolveReaderSyncDevTriggerConfig } from "./reader-sync-dev-trigger-config";
-import type { ReaderPageData, ReaderChapterData, ReadingProgressView } from "../../lib/reader-data";
+import type {
+  ReaderChapterView,
+  ReaderChunkView,
+  ReaderDataSource,
+  ReaderFallbackReason,
+} from "../../lib/reader-types";
+import type { ReaderProgressView } from "../../lib/reader-progress";
+import type { ReaderChapterQueryStatus } from "./reader-query";
 
 interface ReaderPageContentProps {
   bookId: string;
-  currentChapter: ReaderChapterData;
+  currentChapter: ReaderChapterView;
   currentChapterIndex: number;
-  chapters: ReaderChapterData[];
+  chapters: ReaderChapterView[];
   bookTitle: string;
   bookAuthor: string;
   bookSourceLabel: string;
-  chunks: { chapterId: string; id: string }[];
-  savedProgress: ReadingProgressView;
+  chunks: ReaderChunkView[];
+  savedProgress: ReaderProgressView;
   readerDevSyncProgressPreview: ReaderSyncDevTriggerProgressPayload;
   readerDevSyncPreviewConfig: ReturnType<typeof resolveReaderSyncDevTriggerConfig>;
   dbStatus: ReturnType<typeof getReaderProgressDbStatusForUi>;
@@ -56,9 +63,9 @@ interface ReaderPageContentProps {
   readingSessionDbStatus: { enabled: boolean; notice: string };
   devSessionOwnerId: string | null;
   totalChapters: number;
-  fallbackReason?: string;
-  source: string;
-  chapterSelectionStatus: string;
+  fallbackReason?: ReaderFallbackReason;
+  source: ReaderDataSource;
+  chapterSelectionStatus: ReaderChapterQueryStatus;
   requestedChapterId?: string;
   progressRatio: number;
 }

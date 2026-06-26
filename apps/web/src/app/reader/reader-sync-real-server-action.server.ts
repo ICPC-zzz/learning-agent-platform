@@ -1,13 +1,9 @@
 ﻿"use server";
 
-// @ts-expect-error TS5097: direct .ts import is intentional in this repo.
 import { createPreviewReaderSyncRealServerActionResponse, type ReaderSyncRealServerActionExecutionResult, type ReaderSyncRealServerActionResponse, executeReaderSyncRealServerActionForTest } from "./reader-sync-real-server-action.ts";
-// @ts-expect-error TS5097: direct .ts import is intentional in this repo.
 import { createBlockedReaderSyncAuthSessionAdapter, createMockReaderSyncAuthSessionAdapterForTest } from "./reader-sync-auth-session-adapter.ts";
-// @ts-expect-error TS5097: direct .ts import is intentional in this repo.
 import { createReaderSyncPersistentRepositoryAdapter } from "./reader-sync-persistent-repository-adapter.ts";
 
-// @ts-expect-error TS5097: direct .ts import is intentional in this repo.
 import { evaluateReadingProgressDbIntegrationGuard } from "../../../../../packages/db/src/reading-progress-db-integration-guard.ts";
 import { execFileSync } from "node:child_process";
 

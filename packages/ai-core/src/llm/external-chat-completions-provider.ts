@@ -2,13 +2,14 @@
  * External Chat Completions Provider - dev-only OpenAI-compatible adapter.
  * @module external-chat-completions-provider @previewOnly
  */
-import type { LlmChatRequest, LlmProvider } from "./llm-provider-contract.ts";
+import type { LlmChatRequest, LlmChatResult, LlmProvider, LlmSafeErrorKind } from "./llm-provider-contract.ts";
 import { LlmProviderMode } from "./llm-provider-contract.ts";
 import { createSafeError, createSafeResult } from "./llm-safe-result.ts";
 
 export interface ExternalProviderEnv {
   endpoint?: string;
   apiKey?: string;
+  apiPassword?: string;
   model?: string;
   timeoutMs?: number | string;
 }
@@ -65,7 +66,7 @@ export class ExternalChatCompletionsProvider implements LlmProvider {
     this._fetch = customFetch ?? globalThis.fetch;
   }
 
-  async generate(request: LlmChatRequest): Promise<ReturnType<LlmProvider["generate"]>> {
+  async generate(request: LlmChatRequest): Promise<LlmChatResult> {
     if (!this.config.configured) {
       return createSafeResult({
         answerSummary: "[external provider blocked] " + (this.config.blockedReason ?? "provider not configured"),
@@ -101,7 +102,7 @@ export class ExternalChatCompletionsProvider implements LlmProvider {
       } finally { clearTimeout(timeoutId); }
       if (!response.ok) {
         var sc = response.status;
-        var ek = sc === 401 || sc === 403 ? "provider_disabled" : sc === 429 ? "provider_error" : sc >= 500 ? "provider_error" : "network_error";
+        var ek: LlmSafeErrorKind = sc === 401 || sc === 403 ? "provider_disabled" : sc === 429 ? "provider_error" : sc >= 500 ? "provider_error" : "network_error";
         return createSafeResult({
           answerSummary: "[external provider error] HTTP " + sc,
           providerMode: "external-dev-only", realProviderCalled: true, networkAccessed: true,

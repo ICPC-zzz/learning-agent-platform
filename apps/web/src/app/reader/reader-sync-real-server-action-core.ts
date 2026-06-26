@@ -1,21 +1,12 @@
-// Node --test imports this file directly, so keep the explicit .ts suffix here.
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
+﻿// Node --test imports this file directly, so keep the explicit .ts suffix here.
 import type { ReaderProgressSyncDecisionPayload, ReaderProgressSyncDecisionNormalizedPayload, ReaderProgressSyncDecisionResult, ReaderProgressSyncDecisionServerContext } from "./reader-progress-sync-decision.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { buildReaderProgressSyncDecision } from "./reader-progress-sync-decision.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderProgressSyncServiceResult } from "./reader-progress-sync-service.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { buildReaderProgressSyncServiceResult } from "./reader-progress-sync-service.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncIdempotencyKeyPreview } from "./reader-sync-idempotency-key.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { createBlockedReaderSyncIdempotencyPreview, createReaderSyncIdempotencyKeyPreview } from "./reader-sync-idempotency-key.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncPersistentAdapterCapabilities, ReaderSyncPersistentRepositoryAdapter } from "./reader-sync-persistent-repository-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncPermissionGateInput, ReaderSyncPermissionGatePreview } from "./reader-sync-permission-gate.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { validateReaderSyncPermissionGate } from "./reader-sync-permission-gate.ts";
 
 export type ReaderSyncRealServerActionCoreStatus =

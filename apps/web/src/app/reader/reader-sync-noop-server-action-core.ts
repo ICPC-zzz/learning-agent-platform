@@ -1,13 +1,8 @@
-// Node --test imports this file directly, so keep the explicit .ts suffix here.
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
+﻿// Node --test imports this file directly, so keep the explicit .ts suffix here.
 import type { ReaderProgressSyncDecisionResult } from "./reader-progress-sync-decision.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { buildReaderProgressSyncDecision } from "./reader-progress-sync-decision.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { buildReaderProgressSyncServiceResult } from "./reader-progress-sync-service.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { evaluateReaderSyncReadinessGate } from "./reader-sync-readiness-gate.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncReadinessGateResult } from "./reader-sync-readiness-gate.ts";
 
 export var ALLOWED_INPUT_KEYS = [

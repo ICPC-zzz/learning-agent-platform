@@ -121,7 +121,7 @@ export async function runCodeAnalysisWorkflow(
       startTime,
       modelCallCount,
       hadFormatRepair,
-      modelResult.model?.info ?? null,
+      null,
     );
   }
 

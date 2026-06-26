@@ -3,12 +3,12 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 
-import { SAMPLE_PROBLEMS } from "../app/problems/sample-programming-problems";
+import { SAMPLE_PROBLEMS } from "./sample-programming-problems";
 import {
   filterProblems,
   computeProblemLibraryStats,
   type ProblemFilterCriteria,
-} from "../app/problems/problem-library-filter";
+} from "./problem-library-filter";
 import {
   loadFavorites,
   isFavoriteProblem,
@@ -20,8 +20,8 @@ import {
   persistRecentPractice,
   type FavoriteProblemEntry,
   type RecentPracticeEntry,
-} from "../lib/local-user-problem-store";
-import type { SampleProgrammingProblem } from "../app/problems/sample-programming-problems";
+} from "../../lib/local-user-problem-store";
+import type { SampleProgrammingProblem } from "./sample-programming-problems";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -77,3 +77,68 @@ export interface MemoryStore {
     request: MemorySessionSummaryInput,
   ): Promise<MemoryItem>;
 }
+
+export type WorkingMemoryRole = "system" | "user" | "assistant" | "tool";
+
+export interface WorkingMemoryMessage {
+  id: string;
+  sessionId: string;
+  role: WorkingMemoryRole;
+  content: string;
+  attachments?: readonly string[];
+  createdAt: string;
+}
+
+export type CompactionTrigger = "auto" | "manual" | "budget_exceeded";
+
+export interface CompactionBoundary {
+  id: string;
+  sessionId: string;
+  trigger: CompactionTrigger;
+  sourceMessageIds: readonly string[];
+  sourceMessageRange: readonly [number, number];
+  preTokenEstimate: number;
+  postTokenEstimate: number;
+  preservedTailMessageIds: readonly string[];
+  summaryId?: string;
+  createdAt: string;
+}
+
+export interface MemoryContextBundle {
+  workingMemoryText: string;
+  sessionSummaryText: string;
+  retrievedMemoryText: string;
+  promptText: string;
+}
+
+export type MemoryExtractionKind =
+  | "preference"
+  | "goal"
+  | "learning"
+  | "project"
+  | "reference";
+
+export interface MemoryExtractionCandidate {
+  kind: MemoryExtractionKind;
+  content: string;
+  confidence: number;
+  sourceMessageIds: readonly string[];
+  sourceExcerpt: string;
+}
+
+export type MemoryAuditEventType =
+  | "memory_added"
+  | "memory_updated"
+  | "memory_deleted"
+  | "memory_retrieved"
+  | "memory_compacted";
+
+export interface MemoryAuditEvent {
+  id: string;
+  sessionId?: string;
+  userId?: string;
+  eventType: MemoryAuditEventType;
+  message: string;
+  details?: MemoryMetadata;
+  createdAt: string;
+}

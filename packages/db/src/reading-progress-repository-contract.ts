@@ -564,7 +564,14 @@ function normalizeUpsertInput(
     });
   }
 
-  const normalizedUpdatedAt = normalizeUpdatedAt(input.updatedAt);
+  const updatedAtInput =
+    input.updatedAt === undefined ||
+    input.updatedAt === null ||
+    typeof input.updatedAt === "string" ||
+    input.updatedAt instanceof Date
+      ? input.updatedAt
+      : undefined;
+  const normalizedUpdatedAt = normalizeUpdatedAt(updatedAtInput);
   if (normalizedUpdatedAt.blocker !== null) {
     blockers.push(normalizedUpdatedAt.blocker);
   }

@@ -11,12 +11,20 @@ export interface BookLibraryItemView {
   author?: string;
   language?: string;
   sourceType?: string;
+  sourceLabel?: string;
   summary?: string;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  difficulty?: string;
+  coverUrl?: string;
+  firstPublishYear?: number;
   chapterCount?: number;
   chunkCount?: number;
   createdAtLabel?: string;
   updatedAtLabel?: string;
   detailHref: string;
+  readerHref?: string;
 }
 
 export interface BookLibraryLoadResult {

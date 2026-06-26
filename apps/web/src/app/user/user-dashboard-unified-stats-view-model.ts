@@ -20,7 +20,6 @@ import type { DashboardLearningStatsView } from "./user-dashboard-learning-stats
 
 /** Category used to group stats in the unified panel. */
 export type UnifiedStatGroup =
-  | "reading"
   | "problems"
   | "review"
   | "ai-assist"
@@ -106,7 +105,6 @@ export interface UnifiedStatsInput {
 // ---------------------------------------------------------------------------
 
 const GROUP_LABELS: Record<UnifiedStatGroup, string> = {
-  "reading": "阅读",
   "problems": "题目",
   "review": "复习",
   "ai-assist": "AI 辅助",
@@ -187,7 +185,6 @@ function nextOrder(group: UnifiedStatGroup, base: number): number {
   _orderCounter++;
   // base * 100 ensures group ordering; counter ensures unique values
   const groupBase: Record<UnifiedStatGroup, number> = {
-    "reading": 100,
     "problems": 200,
     "review": 300,
     "ai-assist": 400,
@@ -244,75 +241,9 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
 
   const stats: UnifiedStatItem[] = [];
 
-  // ---- READING GROUP ----
-
-  // 1. Favorite books
-  const serverFavBooksCount = serverStats?.favoriteBooksCount ?? 0;
-  const serverFavBooksSrc = serverStats?.favoriteBooksSource ?? "none";
-  const localFavBooksCount = local.favoriteBookCount;
-  const favBooksSource = resolveSource(serverFavBooksSrc, localFavBooksCount > 0);
-  const favBooksValue = serverFavBooksSrc !== "none" ? serverFavBooksCount : localFavBooksCount;
-  stats.push(makeStat({
-    statId: "fav-books",
-    label: "收藏书籍",
-    value: favBooksValue,
-    description: favBooksValue > 0 ? `已收藏 ${favBooksValue} 本书` : "暂无收藏书籍",
-    source: favBooksSource,
-    href: "/user/favorites/books",
-    group: "reading",
-  }));
-
-  // 2. Recent reading
-  const serverRecentReadingCount = serverStats?.recentReadingCount ?? 0;
-  const serverRecentReadingSrc = serverStats?.recentReadingSource ?? "none";
-  const localRecentReadingCount = local.recentReadingCount;
-  const recentReadingSource = resolveSource(serverRecentReadingSrc, localRecentReadingCount > 0);
-  const recentReadingValue = serverRecentReadingSrc !== "none" ? serverRecentReadingCount : localRecentReadingCount;
-  stats.push(makeStat({
-    statId: "recent-reading",
-    label: "最近阅读",
-    value: recentReadingValue,
-    description: recentReadingValue > 0 ? `最近阅读 ${recentReadingValue} 个章节` : "暂无最近阅读记录",
-    source: recentReadingSource,
-    href: "/user/recent-reading",
-    group: "reading",
-  }));
-
-  // 3. Reader bookmarks
-  const serverBookmarksCount = serverStats?.readerBookmarksCount ?? 0;
-  const serverBookmarksSrc = serverStats?.readerBookmarksSource ?? "none";
-  const localBookmarkCount = local.bookmarkCount;
-  const bookmarksSource = resolveSource(serverBookmarksSrc, localBookmarkCount > 0);
-  const bookmarksValue = serverBookmarksSrc !== "none" ? serverBookmarksCount : localBookmarkCount;
-  stats.push(makeStat({
-    statId: "bookmarks",
-    label: "阅读书签",
-    value: bookmarksValue,
-    description: bookmarksValue > 0 ? `${bookmarksValue} 个阅读书签` : "暂无阅读书签",
-    source: bookmarksSource,
-    href: "/user/bookmarks",
-    group: "reading",
-  }));
-
-  // 4. Reader notes
-  const serverNotesCount = serverStats?.readerNotesCount ?? 0;
-  const serverNotesSrc = serverStats?.readerNotesSource ?? "none";
-  const localNoteCount = local.noteCount;
-  const notesSource = resolveSource(serverNotesSrc, localNoteCount > 0);
-  const notesValue = serverNotesSrc !== "none" ? serverNotesCount : localNoteCount;
-  stats.push(makeStat({
-    statId: "notes",
-    label: "阅读笔记",
-    value: notesValue,
-    description: notesValue > 0 ? `${notesValue} 条阅读笔记` : "暂无阅读笔记",
-    source: notesSource,
-    href: "/user/notes",
-    group: "reading",
-  }));
-
   // ---- PROBLEMS GROUP ----
 
-  // 5. Favorite problems
+  // 1. Favorite problems
   const serverFavProblemsCount = serverStats?.favoriteProblemsCount ?? 0;
   const serverFavProblemsSrc = serverStats?.favoriteProblemsSource ?? "none";
   const localFavProblemCount = local.favoriteProblemCount;
@@ -328,7 +259,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
     group: "problems",
   }));
 
-  // 6. Recent practice
+  // 2. Recent practice
   const serverRecentProblemsCount = serverStats?.recentProblemsCount ?? 0;
   const serverRecentProblemsSrc = serverStats?.recentProblemsSource ?? "none";
   const localRecentPracticeCount = local.recentPracticeCount;
@@ -344,7 +275,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
     group: "problems",
   }));
 
-  // 7. Wrong book
+  // 3. Wrong book
   const serverWrongBookCount = serverStats?.wrongBookTotalCount ?? 0;
   const serverWrongBookSrc = serverStats?.wrongBookSource ?? "none";
   const localWrongBookCount = local.wrongBookTotalCount;
@@ -365,7 +296,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
 
   // ---- REVIEW GROUP ----
 
-  // 8. Review recommendations
+  // 4. Review recommendations
   const localReviewRecCount = local.reviewRecommendationCount;
   stats.push(makeStat({
     statId: "review-recs",
@@ -379,7 +310,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
 
   // ---- AI ASSIST GROUP ----
 
-  // 9. AI history
+  // 5. AI history
   const localAiHistoryCount = local.aiHistoryCount;
   stats.push(makeStat({
     statId: "ai-history",
@@ -393,7 +324,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
 
   // ---- ACTIVITY & PLAN GROUP ----
 
-  // 10. Learning activities
+  // 6. Learning activities
   const serverActivityCount = serverLearningStats?.totalActivityCount ?? 0;
   const serverActivitySource = serverLearningStats?.dataSource ?? "none";
   const localActivityCount = local.learningActivityCount;
@@ -412,25 +343,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
     group: "activity-plan",
   }));
 
-  // 11. Reading duration
-  const serverReadingMinutes = serverLearningStats?.totalReadingMinutes ?? 0;
-  const localReadingMinutes = local.totalReadingMinutes;
-  const readingMinsSource = serverLearningStats?.anyDbActive ? "server-dev-db"
-    : localReadingMinutes > 0 ? "local-storage-fallback"
-    : "placeholder-not-connected";
-  const readingMinsValue = serverLearningStats?.anyDbActive ? serverReadingMinutes
-    : localReadingMinutes;
-  stats.push(makeStat({
-    statId: "reading-duration",
-    label: "阅读时长",
-    value: readingMinsValue + " 分钟",
-    description: readingMinsValue > 0 ? `累计阅读 ${readingMinsValue} 分钟` : "暂无阅读时长记录",
-    source: readingMinsSource,
-    href: "/user/activity",
-    group: "activity-plan",
-  }));
-
-  // 12. Today plan tasks
+  // 7. Today plan tasks
   const localTodayPlanCount = local.todayPlanTaskCount;
   stats.push(makeStat({
     statId: "today-plan",
@@ -442,7 +355,7 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
     group: "activity-plan",
   }));
 
-  // 13. A399 Daily Challenge
+  // 8. A399 Daily Challenge
   const dcActive = local.dailyChallengeActive;
   const dcTitle = local.dailyChallengeTitle;
   const dcStatus = local.dailyChallengeStatus;
@@ -463,9 +376,8 @@ export function buildUnifiedStatsView(input: UnifiedStatsInput): UnifiedStatsVie
   // Determine overall state
   const hasAnyData = stats.some(function (s) { return s.status === "available" && s.value !== "0"; });
   const serverStatsActive = serverStats?.anyDbActive || serverLearningStats?.anyDbActive || false;
-  const localStatsActive = (local.favoriteBookCount + local.recentReadingCount +
-    local.wrongBookTotalCount + local.noteCount + local.bookmarkCount +
-    local.learningActivityCount + local.totalReadingMinutes +
+  const localStatsActive = (local.wrongBookTotalCount +
+    local.learningActivityCount +
     local.aiHistoryCount + local.favoriteProblemCount + local.recentPracticeCount) > 0;
 
   let overallNotice: string;

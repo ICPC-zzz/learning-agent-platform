@@ -178,6 +178,8 @@ function mapProblemDifficulty(
     case "challenge":
     case "CHALLENGE":
       return "CHALLENGE";
+    default:
+      throw new Error(`Unsupported problem difficulty: ${String(difficulty)}`);
   }
 }
 
@@ -197,6 +199,8 @@ function mapRecommendationStatus(
       return "COMPLETED";
     case "DISMISSED":
       return "DISMISSED";
+    default:
+      throw new Error(`Unsupported recommendation status: ${String(status)}`);
   }
 }
 

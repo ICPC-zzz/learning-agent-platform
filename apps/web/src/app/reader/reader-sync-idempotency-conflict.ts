@@ -1,8 +1,6 @@
-// Preview-only idempotency replay classifier for Reader sync dev/test-only flows.
+﻿// Preview-only idempotency replay classifier for Reader sync dev/test-only flows.
 
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncIdempotencyKeyInput, ReaderSyncIdempotencyKeyPreview } from "./reader-sync-idempotency-key.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { createReaderSyncIdempotencyKeyPreview } from "./reader-sync-idempotency-key.ts";
 
 export type ReaderSyncIdempotencyConflictStatus =

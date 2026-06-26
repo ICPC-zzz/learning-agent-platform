@@ -25,6 +25,10 @@ a {
   color: inherit;
 }
 
+.lap-show-mobile {
+  display: none !important;
+}
+
 .page {
   width: min(960px, calc(100% - 32px));
   margin: 0 auto;
@@ -1816,47 +1820,17 @@ h1 {
   border-color: #7a3d28;
 }
 
-@media (max-width: 760px) {
-  .page {
-    padding: 40px 0;
-  }
+/* ──────────────────────────────────────────────────────────────────────
+   Design tokens — CSS custom properties used by UI components
+   ────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Spacing scale */
+  --lap-space-1: 4px;
+  --lap-space-2: 8px;
+  --lap-space-3: 14px;
+  --lap-space-4: 20px;
+  --lap-space-5: 28px;
 
-  h1 {
-    font-size: 2.125rem;
-  }
-
-  .placeholderGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .readerHeader,
-  .readerLayout,
-  .chunkList,
-  .learningHero,
-  .dashboardGrid,
-  .problemList {
-    grid-template-columns: 1fr;
-  }
-
-  .readerSidebar {
-    position: static;
-  }
-
-  .readerContent {
-    padding: 22px;
-  }
-
-  .aiContextList div {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-
-  .learningHero {
-    align-items: flex-start;
-  }
-
-  .scoreValue {
-    font-size: 3.25rem;
-  }
-}
-
+  /* Border radii */
+  --lap-radius-sm: 6px;
+  --la

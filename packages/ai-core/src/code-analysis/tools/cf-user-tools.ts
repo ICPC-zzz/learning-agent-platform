@@ -95,6 +95,7 @@ export interface CfReviewPlanOutput {
 export interface CfCandidatesInput {
   ratingMin?: number;
   ratingMax?: number;
+  targetRating?: number;
   tags?: string[];
   limit?: number;
 }
@@ -152,6 +153,7 @@ function candidatesSchema(): ToolInputSchema<CfCandidatesInput> {
       properties: {
         ratingMin: { type: "number" },
         ratingMax: { type: "number" },
+        targetRating: { type: "number" },
         tags: { type: "array", items: { type: "string" } },
         limit: { type: "number", minimum: 1, maximum: 10 },
       },
@@ -162,6 +164,7 @@ function candidatesSchema(): ToolInputSchema<CfCandidatesInput> {
       return {
         ratingMin: typeof obj.ratingMin === "number" ? obj.ratingMin : undefined,
         ratingMax: typeof obj.ratingMax === "number" ? obj.ratingMax : undefined,
+        targetRating: typeof obj.targetRating === "number" ? obj.targetRating : undefined,
         tags: Array.isArray(obj.tags) ? obj.tags.filter((t: unknown) => typeof t === "string") : undefined,
         limit: typeof obj.limit === "number" ? Math.min(Math.max(obj.limit, 1), 10) : 3,
       };
@@ -186,7 +189,12 @@ function makeSuccess<T>(toolCallId: string, data: T, summary: string, startedAt:
   };
 }
 
-function makeError(toolCallId: string, errorCode: string, message: string, startedAt: string): ToolExecutionResult {
+function makeError<TOutput>(
+  toolCallId: string,
+  errorCode: string,
+  message: string,
+  startedAt: string,
+): ToolExecutionResult<TOutput> {
   return {
     toolCallId,
     status: ToolExecutionStatus.Failed,

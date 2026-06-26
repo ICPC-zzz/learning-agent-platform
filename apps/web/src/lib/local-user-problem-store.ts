@@ -226,6 +226,10 @@ export function loadFavorites(): FavoriteProblemEntry[] {
   return parsed.filter(isValidFavoriteProblemEntry);
 }
 
+export function loadFavoriteProblems(): FavoriteProblemEntry[] {
+  return loadFavorites();
+}
+
 export function persistFavorites(
   favorites: readonly FavoriteProblemEntry[],
 ): boolean {

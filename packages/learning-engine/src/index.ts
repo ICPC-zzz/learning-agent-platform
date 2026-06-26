@@ -70,6 +70,24 @@ export type {
 } from "./recommendation/types.js";
 export { DEFAULT_RECOMMENDATION_CONFIG } from "./recommendation/config.js";
 export {
+  GenericProblemApiProvider,
+  createProblemApiProvider,
+} from "./problem-api-provider.js";
+export type {
+  ProblemApiDifficultyFilter,
+  ProblemApiFilters,
+  ProblemApiProvider,
+  ProblemApiProviderOptions,
+  ProblemApiProviderSafetyMetadata,
+  ProblemListParams,
+  ProblemListResult,
+  ProblemPaginationPreview,
+  ProblemPreviewItem,
+  ProblemSearchParams,
+  ProblemSearchResult,
+  SafeFetch,
+} from "./problem-api-provider.js";
+export {
   compareDifficulty,
   getDifficultyDistance,
   getDifficultyRank,

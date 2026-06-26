@@ -7,7 +7,7 @@ import {
   persistRecentPractice,
   type PracticeStatus,
   type RecentPracticeEntry,
-} from "../lib/local-user-problem-store";
+} from "../../lib/local-user-problem-store";
 
 interface ProblemPracticeStatusControlProps {
   problemId: string;

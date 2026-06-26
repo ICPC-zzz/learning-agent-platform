@@ -16,16 +16,9 @@
 
 import { cookies } from "next/headers";
 import {
-  getPrismaClient,
-  PrismaBookRepository,
-  type UpdateBookMetadataResult,
-} from "@learning-agent-platform/db";
-import {
   resolveImportOwnerContext,
-  importOwnerContextIsSafe,
 } from "../../import/text-import-owner-context";
 import {
-  evaluateImportDbPersistGuard,
   isImportDbPersistEnabled,
 } from "../../import/text-import-db-persist-guard";
 import { isDevAuthAllowed } from "../../../lib/web-auth-dev-guard";
@@ -183,40 +176,16 @@ export async function renameImportedBook(
     }
   }
 
-  // Execute rename
-  try {
-    const repository = new PrismaBookRepository(getPrismaClient());
-    const result: UpdateBookMetadataResult = await repository.updateBookMetadata({
-      bookId,
-      requestedByOwnerId: ownerId,
-      title: newTitle,
-    });
-
-    return {
-      success: result.success,
-      bookId,
-      newTitle: result.success ? newTitle : null,
-      reasonCode: result.reasonCode,
-      message: result.message,
-      safeToExposeToClient: true,
-      devOnly: true,
-    };
-  } catch (caughtError) {
-    const safeMessage =
-      caughtError instanceof Error
-        ? `重命名失败: ${redactSensitive(caughtError.message)}`
-        : "重命名失败: 未知错误";
-
-    return {
-      success: false,
-      bookId,
-      newTitle: null,
-      reasonCode: "rename-failed",
-      message: safeMessage,
-      safeToExposeToClient: true,
-      devOnly: true,
-    };
-  }
+  void ownerId;
+  return {
+    success: false,
+    bookId,
+    newTitle: null,
+    reasonCode: "rename-unavailable",
+    message: "当前 BookRepository 仅支持 metadata 更新，不支持安全地重命名书籍。",
+    safeToExposeToClient: true,
+    devOnly: true,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -301,63 +270,16 @@ export async function archiveImportedBook(
   const shouldArchive = archiveValue === "true" || archiveValue === "1";
   const newStatus = shouldArchive ? "archived" : "active";
 
-  try {
-    const repository = new PrismaBookRepository(getPrismaClient());
-    const result = await repository.updateBookMetadata({
-      bookId,
-      requestedByOwnerId: ownerId,
-      status: newStatus,
-    });
-
-    return {
-      success: result.success,
-      bookId,
-      archived: result.success ? shouldArchive : false,
-      reasonCode: result.reasonCode,
-      message: result.success
-        ? shouldArchive
-          ? "书籍已归档（软删除，数据未物理删除）。"
-          : "书籍已取消归档。"
-        : result.message,
-      safeToExposeToClient: true,
-      devOnly: true,
-    };
-  } catch (caughtError) {
-    const safeMessage =
-      caughtError instanceof Error
-        ? `归档操作失败: ${redactSensitive(caughtError.message)}`
-        : "归档操作失败: 未知错误";
-
-    return {
-      success: false,
-      bookId,
-      archived: false,
-      reasonCode: "archive-failed",
-      message: safeMessage,
-      safeToExposeToClient: true,
-      devOnly: true,
-    };
-  }
+  void ownerId;
+  void newStatus;
+  return {
+    success: false,
+    bookId,
+    archived: false,
+    reasonCode: "archive-unavailable",
+    message: "当前 BookRepository 仅支持 metadata 更新，不支持安全的归档/取消归档能力。",
+    safeToExposeToClient: true,
+    devOnly: true,
+  };
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-const SENSITIVE_PATTERNS: RegExp[] = [
-  /postgres(ql)?:\/\/[^\s]*/gi,
-  /DATABASE_URL[=:]\s*[^\s]*/gi,
-  /connection\s+string[=:]\s*[^\s]*/gi,
-  /password[=:]\s*[^\s]*/gi,
-  /secret[=:]\s*[^\s]*/gi,
-  /token[=:]\s*[^\s]*/gi,
-  /api[_-]?key[=:]\s*[^\s]*/gi,
-];
-
-function redactSensitive(message: string): string {
-  let result = message;
-  for (const pattern of SENSITIVE_PATTERNS) {
-    result = result.replace(pattern, "[已隐藏]");
-  }
-  return result;
-}

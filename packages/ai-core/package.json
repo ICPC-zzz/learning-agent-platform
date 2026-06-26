@@ -4,7 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./agent/*": "./src/agent/*.ts",
+    "./llm/*": "./src/llm/*.ts",
+    "./code-analysis/*": "./src/code-analysis/*.ts",
+    "./code-analysis/tools/*": "./src/code-analysis/tools/*.ts"
   },
   "types": "./src/index.ts",
   "scripts": {

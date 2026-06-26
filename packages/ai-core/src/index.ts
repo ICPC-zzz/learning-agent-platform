@@ -48,3 +48,7 @@ export type {
   LlmSafetyContext,
   LlmUsagePreview,
 } from "./llm-provider";
+export * from "./model-gateway";
+export { runCodeAnalysisWorkflow } from "./code-analysis/analysis-workflow";
+export { validateCodeAnalysisInput } from "./code-analysis/input-validation";
+export type { CodeAnalysisResult } from "./code-analysis/types";

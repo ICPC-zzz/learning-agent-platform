@@ -102,7 +102,7 @@ export function A492PersonalizedReportView({
 
       {/* Section 7: Candidate Problems */}
       {report.candidateProblems && report.candidateProblems.length > 0 && (
-        <SectionCard title="后续训练题推荐">
+        <SectionCard title="相似题目推荐">
           <CandidatesSection candidates={report.candidateProblems} />
         </SectionCard>
       )}
@@ -138,6 +138,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
     switch (source) {
       case "user_provided": return "用户填写";
       case "model_inferred": return "模型推断";
+      case "rule_estimated": return "规则估算";
       case "unknown": return "未知";
       default: return source;
     }
@@ -178,9 +179,9 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
           {tags.map((t, i) => (
             <span key={i} style={{
               ...tagChipStyle,
-              background: t.source === "user_provided" ? "#d1fae5" : "#eef2ff",
-              border: t.source === "user_provided" ? "1px solid #6ee7b7" : "1px solid #c7d2fe",
-              color: t.source === "user_provided" ? "#065f46" : "#4338ca",
+              background: t.source === "user_provided" ? "#d1fae5" : t.source === "rule_estimated" ? "#fef3c7" : "#eef2ff",
+              border: t.source === "user_provided" ? "1px solid #6ee7b7" : t.source === "rule_estimated" ? "1px solid #fde68a" : "1px solid #c7d2fe",
+              color: t.source === "user_provided" ? "#065f46" : t.source === "rule_estimated" ? "#92400e" : "#4338ca",
             }}>
               {t.tag}
               <span style={{ fontSize: "0.65rem", marginLeft: "4px", opacity: 0.7 }}>
@@ -426,9 +427,9 @@ function PersonalizationSection({ personalization }: { personalization: NonNulla
 function CandidatesSection({ candidates }: { candidates: NonNullable<A492PersonalizedReport["candidateProblems"]> }) {
   const typeLabel = (t: string) => {
     switch (t) {
-      case "prerequisite": return "前置训练";
-      case "same_tag_practice": return "同标签练习";
-      case "next_challenge": return "难度进阶";
+      case "prerequisite": return "热身相似题";
+      case "same_tag_practice": return "同档相似题";
+      case "next_challenge": return "进阶相似题";
       default: return t;
     }
   };
@@ -465,7 +466,7 @@ function CandidatesSection({ candidates }: { candidates: NonNullable<A492Persona
         </div>
       ))}
       <div style={{ fontSize: "0.72rem", color: "#9ca3af", marginTop: "4px" }}>
-        推荐题来自本地精选题池，已强制排除已完成题目。点击可跳转至 Codeforces 原题。
+        相似题来自本地 Codeforces 题库，按当前题标签和你的预估真实 Rating 分为热身、训练、挑战三档，已排除已完成题目。
       </div>
     </div>
   );
@@ -599,8 +600,8 @@ const sourceTagStyle = (source: string): React.CSSProperties => ({
   fontSize: "0.7rem",
   padding: "1px 6px",
   borderRadius: "4px",
-  background: source === "user_provided" ? "#d1fae5" : source === "model_inferred" ? "#eef2ff" : "#f3f4f6",
-  color: source === "user_provided" ? "#065f46" : source === "model_inferred" ? "#4338ca" : "#6b7280",
+  background: source === "user_provided" ? "#d1fae5" : source === "model_inferred" ? "#eef2ff" : source === "rule_estimated" ? "#fef3c7" : "#f3f4f6",
+  color: source === "user_provided" ? "#065f46" : source === "model_inferred" ? "#4338ca" : source === "rule_estimated" ? "#92400e" : "#6b7280",
 });
 
 const tagChipStyle: React.CSSProperties = {

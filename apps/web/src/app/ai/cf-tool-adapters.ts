@@ -40,7 +40,7 @@ export async function getCfSnapshotForTool(userId: string): Promise<CfSnapshotOu
       if (stats[i].accepted) solvedCount++; else unfinishedCount++;
     }
 
-    var tagMap = new Map();
+    var tagMap = new Map<string, { attempted: number; solved: number }>();
     for (var j = 0; j < stats.length; j++) {
       var s = stats[j];
       for (var k = 0; k < s.tags.length; k++) {
@@ -52,8 +52,8 @@ export async function getCfSnapshotForTool(userId: string): Promise<CfSnapshotOu
       }
     }
     var tagEntries = Array.from(tagMap.entries());
-    tagEntries.sort(function(a, b) { return b[1].attempted - a[1].attempted; });
-    var tagSummary = tagEntries.slice(0, 5).map(function(e) { return e[0] + "(" + e[1].solved + "/" + e[1].attempted + ")"; }).join(", ");
+    tagEntries.sort(function(a: [string, { attempted: number; solved: number }], b: [string, { attempted: number; solved: number }]) { return b[1].attempted - a[1].attempted; });
+    var tagSummary = tagEntries.slice(0, 5).map(function(e: [string, { attempted: number; solved: number }]) { return e[0] + "(" + e[1].solved + "/" + e[1].attempted + ")"; }).join(", ");
 
     var trend = accountStats.totalSubmissions > 100 ? "活跃" : accountStats.totalSubmissions > 20 ? "一般" : "不活跃";
 
@@ -77,11 +77,10 @@ export async function getCfSnapshotForTool(userId: string): Promise<CfSnapshotOu
 }
 
 // ==========================================================================
-// cf.user.estimated-rating.read — uses estimateUserRating from cf-rating-estimator.ts
+// cf.user.estimated-rating.read
 // ==========================================================================
 
 export async function getEstimatedRatingForTool(userId: string): Promise<CfEstimatedRatingOutput> {
-  // Check shared cache — avoids recomputing if /user page already computed recently
   var cached = getCachedComputation<CfEstimatedRatingOutput>(userId, "estimated-rating");
   if (cached) return cached;
 
@@ -94,7 +93,6 @@ export async function getEstimatedRatingForTool(userId: string): Promise<CfEstim
     var dbStats = await repo.getProblemStatsByAccount(account.id);
     var ratingHistory = await repo.getRatingHistory(account.id);
 
-    // Build CfProblemStat[] for the estimator (same format as /user page)
     var problemStats = dbStats.map(function(s) {
       return {
         problemKey: s.problemKey,
@@ -111,7 +109,6 @@ export async function getEstimatedRatingForTool(userId: string): Promise<CfEstim
       };
     });
 
-    // Build UserRatingInput
     var userRatingInput = {
       currentRating: account.currentRating,
       maxRating: account.maxRating,
@@ -128,7 +125,6 @@ export async function getEstimatedRatingForTool(userId: string): Promise<CfEstim
       lastOnlineAt: account.lastOnlineAt ? account.lastOnlineAt.toISOString() : null,
     };
 
-    // Use the same function as /user page
     var { estimateUserRating } = await import(
       "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-rating-estimator.ts"
     );
@@ -155,7 +151,7 @@ export async function getEstimatedRatingForTool(userId: string): Promise<CfEstim
 }
 
 // ==========================================================================
-// cf.user.weak-tags.read — uses computeWeakTags from cf-wrongbook-review.ts
+// cf.user.weak-tags.read
 // ==========================================================================
 
 export async function getWeakTagsForTool(userId: string): Promise<CfWeakTagsOutput> {
@@ -170,7 +166,6 @@ export async function getWeakTagsForTool(userId: string): Promise<CfWeakTagsOutp
 
     var dbStats = await repo.getProblemStatsByAccount(account.id);
 
-    // Build CfProblemStat[] (same as /user page)
     var problemStats = dbStats.map(function(s) {
       return {
         problemKey: s.problemKey,
@@ -187,14 +182,12 @@ export async function getWeakTagsForTool(userId: string): Promise<CfWeakTagsOutp
       };
     });
 
-    // Use computeWeakTags from /user page (Laplace smoothing, evidence levels)
     var { computeWeakTags } = await import(
       "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-wrongbook-review.ts"
     );
     var result = computeWeakTags(problemStats);
 
-    // Map to CfWeakTagEntry format with backward-compatible enrichment
-    var tagStatsMap = new Map();
+    var tagStatsMap = new Map<string, { attempted: number; solved: number; totalAttempts: number; ratings: number[] }>();
     for (var i = 0; i < problemStats.length; i++) {
       var s = problemStats[i];
       for (var j = 0; j < s.tags.length; j++) {
@@ -208,10 +201,10 @@ export async function getWeakTagsForTool(userId: string): Promise<CfWeakTagsOutp
       }
     }
 
-    var weakTags = result.map(function(wt) {
+    var weakTags = result.map(function(wt: { tag: string; waRate: number; evidenceLevel: string }) {
       var data = tagStatsMap.get(wt.tag) || { attempted: 0, solved: 0, totalAttempts: 0, ratings: [] };
       var avgRating = data.ratings.length > 0
-        ? Math.round(data.ratings.reduce(function(a, b) { return a + b; }, 0) / data.ratings.length)
+        ? Math.round(data.ratings.reduce(function(a: number, b: number) { return a + b; }, 0) / data.ratings.length)
         : 0;
       return {
         tag: wt.tag,
@@ -238,7 +231,7 @@ export async function getWeakTagsForTool(userId: string): Promise<CfWeakTagsOutp
 }
 
 // ==========================================================================
-// cf.user.review-plan.read — uses generateReviewPlan from cf-wrongbook-review.ts
+// cf.user.review-plan.read
 // ==========================================================================
 
 export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlanOutput> {
@@ -254,7 +247,6 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
     var dbStats = await repo.getProblemStatsByAccount(account.id);
     var ratingHistory = await repo.getRatingHistory(account.id);
 
-    // Build CfProblemStat[]
     var problemStats = dbStats.map(function(s) {
       return {
         problemKey: s.problemKey,
@@ -271,7 +263,6 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
       };
     });
 
-    // Estimate rating first (needed for zones)
     var { estimateUserRating } = await import(
       "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-rating-estimator.ts"
     );
@@ -286,7 +277,6 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
     };
     var estimate = estimateUserRating(userRatingInput);
 
-    // Get weak tags + zones + generate plan
     var { computeRatingZones, computeWeakTags, generateReviewPlan } = await import(
       "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-wrongbook-review.ts"
     );
@@ -299,7 +289,7 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
       where: { source: "codeforces" },
       select: { id: true, title: true, source: true, sourceUrl: true, metadata: true, tags: true },
     });
-    var localPool = [];
+    var localPool: Array<{ problemKey: string; problemId: string; name: string; rating: number | null; tags: string[]; originalUrl: string }> = [];
     for (var i = 0; i < problems.length; i++) {
       var p = problems[i];
       var m = (p.metadata || {}) as Record<string, unknown>;
@@ -310,7 +300,7 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
         problemId: p.id,
         name: p.title,
         rating: typeof m.rating === "number" ? m.rating : null,
-        tags: Array.isArray(p.tags) ? p.tags : [],
+        tags: Array.isArray(p.tags) ? p.tags as string[] : [],
         originalUrl: p.sourceUrl || ("https://codeforces.com/problemset/problem/" + pk),
       });
     }
@@ -324,12 +314,14 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
       localPool: localPool,
     });
 
+    // generateReviewPlan returns { recommendations, reviewAdvice, warnings }
+    // CfReviewPlanOutput expects focusTags (string[]), unfinishedCount, etc.
     var rpResult: CfReviewPlanOutput = {
-      focusTags: (plan.focusTags || []).map(function(t) { return t.tag; }),
+      focusTags: weakTags.map(function(t: { tag: string; waRate: number; evidenceLevel: string }) { return t.tag; }),
       unfinishedCount: problemStats.filter(function(s) { return !s.accepted; }).length,
       reviewNeededCount: problemStats.filter(function(s) { return s.accepted && s.attempts >= 3; }).length,
       recentSuggestions: (plan.recommendations || []).slice(0, 5).map(function(r) {
-        return String(r.name) + " (Rating " + String(r.rating || "?") + ") — " + String(r.priorityLevel);
+        return String(r.name) + " (Rating " + String(r.rating || "?") + ") - " + String(r.priorityLevel);
       }),
       associatedProblemKeys: (plan.recommendations || []).slice(0, 5).map(function(r) { return r.problemKey; }),
     };
@@ -341,7 +333,7 @@ export async function getReviewPlanForTool(userId: string): Promise<CfReviewPlan
 }
 
 // ==========================================================================
-// cf.problem.candidates.read — unchanged
+// cf.problem.candidates.read
 // ==========================================================================
 
 export async function getCandidatesForTool(userId: string, query: CfCandidatesInput): Promise<CfCandidatesOutput> {
@@ -350,35 +342,56 @@ export async function getCandidatesForTool(userId: string, query: CfCandidatesIn
     var repo = new PrismaCodeforcesAccountRepository(prisma);
     var account = await repo.getAccountByUserId(userId);
 
-    var solvedKeys = [];
+    var solvedKeys: string[] = [];
     if (account) {
       var stats = await repo.getProblemStatsByAccount(account.id);
       solvedKeys = stats.filter(function(s) { return s.accepted; }).map(function(s) { return s.problemKey; });
     }
 
-    var { getAllLocalCodeforcesProblems } = await import("../../lib/codeforces-curated-pool.ts");
     var { queryCodeforcesCandidatesForUser } = await import("../../lib/codeforces-agent-candidates-user.ts");
 
-    var records = await getAllLocalCodeforcesProblems();
-    if (!records || records.length === 0) return { candidates: [], totalAvailable: 0, excludedCount: solvedKeys.length };
+    // Load CF problems from DB instead of non-existent getAllLocalCodeforcesProblems
+    var problems = await prisma.problem.findMany({
+      where: { source: "codeforces" },
+      select: { id: true, title: true, sourceUrl: true, metadata: true, tags: true },
+    });
+    if (!problems || problems.length === 0) return { candidates: [], totalAvailable: 0, excludedCount: solvedKeys.length };
+
+    var records = problems.map(function(p) {
+      var m = (p.metadata || {}) as Record<string, unknown>;
+      var contestId = typeof m.contestId === "number" ? m.contestId : 0;
+      var index = typeof m.index === "string" ? m.index : "";
+      return {
+        id: p.id,
+        title: p.title,
+        source: "codeforces",
+        sourceUrl: p.sourceUrl,
+        metadata: p.metadata,
+        difficulty: "unknown",
+        tags: Array.isArray(p.tags) ? p.tags as string[] : [],
+      };
+    });
 
     var result = await queryCodeforcesCandidatesForUser(userId, records, {
       mode: "new_training",
-      tags: query.tags,
-      ratingMin: query.ratingMin,
-      ratingMax: query.ratingMax,
-      limit: query.limit || 3,
+      includeTags: query.tags,
+      minRating: query.ratingMin,
+      maxRating: query.ratingMax,
+      targetRating: query.targetRating,
+      limit: query.limit,
     }, repo);
 
     return {
       candidates: result.candidates.map(function(c) {
+        var contestId = c.contestId;
+        var index = c.index;
         return {
-          cfContestId: c.cfContestId,
-          cfIndex: c.cfIndex,
+          cfContestId: contestId,
+          cfIndex: index,
           name: c.name,
           rating: c.rating || null,
           tags: c.tags || [],
-          cfUrl: "https://codeforces.com/problemset/problem/" + c.cfContestId + "/" + c.cfIndex,
+          cfUrl: buildCodeforcesProblemUrl(contestId, index),
         };
       }),
       totalAvailable: result.totalCandidates,
@@ -387,8 +400,15 @@ export async function getCandidatesForTool(userId: string, query: CfCandidatesIn
   } catch (_) { return { candidates: [], totalAvailable: 0, excludedCount: 0 }; }
 }
 
+function buildCodeforcesProblemUrl(contestId: number, index: string): string {
+  if (!Number.isInteger(contestId) || contestId <= 0 || typeof index !== "string" || index.trim().length === 0) {
+    return "https://codeforces.com/problemset";
+  }
+  return "https://codeforces.com/problemset/problem/" + contestId + "/" + encodeURIComponent(index.trim());
+}
+
 // ==========================================================================
-// cf.user.refresh — unchanged
+// cf.user.refresh
 // ==========================================================================
 
 export async function refreshCfForTool(userId: string): Promise<CfRefreshOutput> {

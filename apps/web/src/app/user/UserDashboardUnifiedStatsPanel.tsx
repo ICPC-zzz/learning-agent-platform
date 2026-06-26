@@ -26,7 +26,6 @@ const SOURCE_COLORS: Record<string, { bg: string; text: string; label: string }>
 };
 
 const GROUP_ICONS: Record<UnifiedStatGroup, string> = {
-  "reading": "📖",
   "problems": "🧩",
   "review": "🔄",
   "ai-assist": "🤖",
@@ -48,7 +47,7 @@ export function UserDashboardUnifiedStatsPanel({
   const grouped = groupStatsByGroup(stats);
 
   // Build ordered group list
-  const groupOrder: UnifiedStatGroup[] = ["reading", "problems", "review", "ai-assist", "activity-plan"];
+  const groupOrder: UnifiedStatGroup[] = ["problems", "review", "ai-assist", "activity-plan"];
 
   return (
     <section className="learningPanel" aria-labelledby="unified-stats-title">

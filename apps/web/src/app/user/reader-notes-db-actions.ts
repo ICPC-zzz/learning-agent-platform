@@ -52,8 +52,8 @@ export interface ReaderNotesDbActionSuccess {
   writesDatabase: boolean;
   callsRepository: true;
   noteId: string;
-  bookId: string;
-  chapterId: string;
+  bookId: string | null;
+  chapterId: string | null;
   ownerIdPreview: string;
   reasonCode: string;
   productionReady: false;

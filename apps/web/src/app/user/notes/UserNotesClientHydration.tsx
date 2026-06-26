@@ -8,7 +8,7 @@ import {
   removeReaderNote,
   persistReaderNotes,
   type ReaderLocalNote,
-} from "../../lib/local-reader-annotation-store";
+} from "../../../lib/local-reader-annotation-store";
 
 // ---------------------------------------------------------------------------
 // Types

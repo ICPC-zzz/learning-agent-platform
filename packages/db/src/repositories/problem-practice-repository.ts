@@ -50,7 +50,7 @@ export class PrismaProblemPracticeRepository implements ProblemPracticeRepositor
     });
 
     if (existing !== null) {
-      return this.prisma.problemPracticeActivity.update({
+      const updated = await this.prisma.problemPracticeActivity.update({
         where: { id: existing.id },
         data: {
           problemTitle,
@@ -59,9 +59,10 @@ export class PrismaProblemPracticeRepository implements ProblemPracticeRepositor
           tags,
         },
       });
+      return mapProblemPracticeRecord(updated);
     }
 
-    return this.prisma.problemPracticeActivity.create({
+    const created = await this.prisma.problemPracticeActivity.create({
       data: {
         userId,
         problemId,
@@ -71,6 +72,7 @@ export class PrismaProblemPracticeRepository implements ProblemPracticeRepositor
         tags,
       },
     });
+    return mapProblemPracticeRecord(created);
   }
 
   async listPracticeByOwner(
@@ -79,11 +81,12 @@ export class PrismaProblemPracticeRepository implements ProblemPracticeRepositor
     const userId = normalizeRequiredText(input.userId, "userId required");
     const limit = normalizeListLimit(input.limit);
 
-    return this.prisma.problemPracticeActivity.findMany({
+    const records = await this.prisma.problemPracticeActivity.findMany({
       where: { userId },
       take: limit,
       orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     });
+    return records.map(mapProblemPracticeRecord);
   }
 
   async getProblemPracticeStatus(
@@ -92,9 +95,10 @@ export class PrismaProblemPracticeRepository implements ProblemPracticeRepositor
     const userId = normalizeRequiredText(input.userId, "userId required");
     const problemId = normalizeRequiredText(input.problemId, "problemId required");
 
-    return this.prisma.problemPracticeActivity.findFirst({
+    const record = await this.prisma.problemPracticeActivity.findFirst({
       where: { userId, problemId },
     });
+    return record === null ? null : mapProblemPracticeRecord(record);
   }
 
   async removeProblemPractice(
@@ -149,14 +153,14 @@ function normalizeRequiredText(value: string, errorMessage: string): string {
   return normalized;
 }
 
-function normalizeStatus(status: ProblemPracticeStatus): string {
+function normalizeStatus(status: ProblemPracticeStatus): ProblemPracticeStatus {
   const normalized = status.trim();
   if (!VALID_STATUSES.has(normalized)) {
     throw new Error(
       `Invalid practice status "${normalized}". Must be one of: ${Array.from(VALID_STATUSES).join(", ")}.`,
     );
   }
-  return normalized;
+  return normalized as ProblemPracticeStatus;
 }
 
 function normalizeTags(tags: string[] | undefined): string[] {
@@ -170,4 +174,21 @@ function normalizeTags(tags: string[] | undefined): string[] {
 function normalizeListLimit(limit: number | undefined): number {
   if (limit === undefined || !Number.isFinite(limit)) return 50;
   return Math.min(Math.max(Math.trunc(limit), 1), 200);
+}
+
+function mapProblemPracticeRecord(record: {
+  id: string;
+  userId: string;
+  problemId: string;
+  problemTitle: string;
+  difficulty: string;
+  status: string;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}): ProblemPracticeActivityRecord {
+  return {
+    ...record,
+    status: normalizeStatus(record.status as ProblemPracticeStatus),
+  };
 }

@@ -45,7 +45,7 @@ export interface PersonalizedCodeAnalysisInput {
 // Problem Profile (ProblemProfileAgent output)
 // ---------------------------------------------------------------------------
 
-export type ProfileSource = "user_provided" | "model_inferred" | "unknown";
+export type ProfileSource = "user_provided" | "model_inferred" | "rule_estimated" | "unknown";
 
 export interface ProblemRatingProfile {
   value: number | null;
@@ -83,6 +83,17 @@ export interface WeakTagSummary {
   averageAttempts: number;
   averageRating: number;
   evidenceLevel: "strong" | "moderate" | "weak";
+  reasonCodes: string[];
+}
+
+export interface CfWeakTagEntry {
+  tag: string;
+  attempted: number;
+  solved: number;
+  completionRate: number;
+  averageAttempts: number;
+  averageRating: number;
+  evidenceLevel: string;
   reasonCodes: string[];
 }
 

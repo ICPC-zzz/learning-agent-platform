@@ -1,15 +1,15 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { deserializeDevSession, getSafeSessionSummary } from "../../../lib/web-auth-dev-session";
-import { getDevAuthGuardStatus } from "../../../lib/web-auth-dev-guard";
-import { getFavoritesDbStatusForUi } from "../favorites-db-guard";
-import { loadDbFavorites } from "../favorites-db-loader";
-import type { DbFavoritesLoadResult } from "../favorites-db-view-model";
+import { deserializeDevSession, getSafeSessionSummary } from "../../../../lib/web-auth-dev-session";
+import { getDevAuthGuardStatus } from "../../../../lib/web-auth-dev-guard";
+import { getFavoritesDbStatusForUi } from "../../favorites-db-guard";
+import { loadDbFavorites } from "../../favorites-db-loader";
+import type { DbFavoritesLoadResult } from "../../favorites-db-view-model";
 import {
   buildFavoriteBooksPageView,
   type FavoriteBooksPageView,
 } from "./favorite-books-page-view-model";
-import { AuthStatusCard } from "../../../components/auth/AuthStatusCard";
+import { AuthStatusCard } from "../../../../components/auth/AuthStatusCard";
 import { FavoriteBooksPageClient } from "./favorite-books-page-client";
 
 export default async function FavoriteBooksPage() {

@@ -10,7 +10,7 @@
  */
 
 import type { LearningActivityRecord, ReadingSessionRecord } from "@learning-agent-platform/db";
-import type { LocalLearningActivity, LocalReadingSession } from "../../../lib/local-learning-activity-store";
+import type { LocalLearningActivity, LocalReadingSession } from "../../lib/local-learning-activity-store";
 
 // ---------------------------------------------------------------------------
 // Types

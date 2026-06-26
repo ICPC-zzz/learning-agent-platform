@@ -8,8 +8,8 @@
  * @previewOnly — dev-only; not production user system
  */
 
-import type { DbReadingProgressSummary } from "../../user-recent-reading-db-loader";
-import type { RecentReadingEntry } from "../../../../lib/local-user-library-store";
+import type { DbReadingProgressSummary } from "../user-recent-reading-db-loader";
+import type { RecentReadingEntry } from "../../../lib/local-user-library-store";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -23,7 +23,7 @@ import {
   updateWrongBookNote,
   type WrongBookEntry,
   type WrongBookReviewStatus,
-} from "../../lib/local-problem-wrong-book-store";
+} from "../../../lib/local-problem-wrong-book-store";
 
 export interface ProblemWrongBookControlProps {
   problemId: string;

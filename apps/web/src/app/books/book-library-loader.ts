@@ -54,10 +54,15 @@ function mapBookListItem(book: BookListItem): BookLibraryItemView {
     author: normalizeOptionalText(book.author),
     language: normalizeOptionalText(book.language),
     sourceType: book.sourceType,
+    sourceLabel: book.sourceType,
+    category: normalizeOptionalText(book.language) ?? "Imported",
+    tags: [],
+    difficulty: "Imported",
     createdAtLabel: formatDateLabel(book.createdAt),
     updatedAtLabel: formatDateLabel(book.updatedAt),
     summary: "开发数据源书籍入口：进入详情页后可只读查看章节列表并选择章节阅读。",
     detailHref: `/books/${encodeURIComponent(book.id)}`,
+    readerHref: `/books/${encodeURIComponent(book.id)}`,
   };
 }
 
@@ -76,6 +81,10 @@ function mapSampleBookListItem(): BookLibraryItemView {
     id: sampleBook.document.id,
     title: sampleBook.document.title,
     author: sampleBook.document.author ?? undefined,
+    sourceLabel: "Fallback",
+    category: "Demo",
+    tags: ["demo"],
+    difficulty: "Demo",
     sourceType: "演示数据 / fallback",
     summary:
       "演示 fallback 书籍：仅用于开发数据源暂无可读数据时预览最小阅读路径。",
@@ -83,6 +92,7 @@ function mapSampleBookListItem(): BookLibraryItemView {
     chunkCount: sampleBook.chunks.length,
     createdAtLabel: formatDateLabel(sampleBook.document.createdAt),
     detailHref: `/books/${encodeURIComponent(sampleBook.document.id)}`,
+    readerHref: `/books/${encodeURIComponent(sampleBook.document.id)}`,
   };
 }
 

@@ -23,7 +23,86 @@ var FORBIDDEN_LABELS = [
   "生产学习报告", "真实云端同步", "真实学习报告", "AI 生成报告", "LLM 生成",
 ];
 
-function computeLearningStatusTag(params) {
+type LearningStatusTag = keyof typeof LEARNING_STATUS_LABELS;
+
+interface LearningReportTimedEntry {
+  occurredAt: string;
+}
+
+interface LearningReportPracticeEntry {
+  updatedAt: string;
+}
+
+interface LearningReportWrongBookEntry {
+  lastWrongAt: string;
+  reviewStatus: string;
+}
+
+interface LearningReportReadingEntry {
+  bookTitle: string;
+  chapterTitle: string;
+}
+
+interface LearningReportInput {
+  activities: LearningReportTimedEntry[];
+  readingSessionSummary: {
+    todayDurationMinutes: number;
+    totalDurationMinutes: number;
+    totalSessions: number;
+  };
+  recentPractice: LearningReportPracticeEntry[];
+  wrongBookEntries: LearningReportWrongBookEntry[];
+  recentReading: LearningReportReadingEntry[];
+  favoriteProblems: unknown[];
+  bookmarks: unknown[];
+  notes: unknown[];
+  aiHistory: unknown[];
+}
+
+interface LearningReportView {
+  today: {
+    activityCount: number;
+    readingMinutes: number;
+    practiceCount: number;
+    wrongAddedCount: number;
+  };
+  last7Days: {
+    activityCount: number;
+    readingMinutes: number;
+    readingSessionCount: number;
+    practiceCount: number;
+    wrongAddedCount: number;
+  };
+  reading: {
+    recentReadingCount: number;
+    totalReadingMinutes: number;
+    totalReadingSessions: number;
+    latestChapterTitle: string | null;
+    latestBookTitle: string | null;
+  };
+  problems: {
+    recentPracticeCount: number;
+    favoriteProblemsCount: number;
+    wrongBookTotalCount: number;
+    wrongBookNeedsReviewCount: number;
+  };
+  annotations: {
+    bookmarkCount: number;
+    noteCount: number;
+    aiHistoryCount: number;
+  };
+  statusTag: LearningStatusTag;
+  statusLabel: string;
+  dataSourceNotice: string;
+  hasData: boolean;
+}
+
+function computeLearningStatusTag(params: {
+  readingMinutes: number;
+  recentPracticeCount: number;
+  wrongBookNeedsReviewCount: number;
+  totalEntries: number;
+}): LearningStatusTag {
   if (params.totalEntries === 0) return "no-data";
   if (params.readingMinutes >= 30) return "reading-active";
   if (params.wrongBookNeedsReviewCount > 0) return "wrong-book-needs-review";
@@ -32,7 +111,7 @@ function computeLearningStatusTag(params) {
   return "no-data";
 }
 
-export function buildLearningReportView(input) {
+export function buildLearningReportView(input: LearningReportInput): LearningReportView {
   var today = new Date();
   var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
   var sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -118,8 +197,8 @@ var SENSITIVE_PATTERNS = [
   /\bfullChapterContent\b/i, /\bsubmittedCode\b/i,
 ];
 
-export function learningReportViewIsSafe(view) {
-  var violations = [];
+export function learningReportViewIsSafe(view: LearningReportView): { safe: boolean; violations: string[] } {
+  var violations: string[] = [];
   var json = JSON.stringify(view);
 
   for (var i = 0; i < SENSITIVE_PATTERNS.length; i++) {

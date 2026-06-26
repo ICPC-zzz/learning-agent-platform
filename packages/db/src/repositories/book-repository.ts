@@ -7,8 +7,12 @@ import type {
   CreateBookChapterInput,
   CreateBookWithContentInput,
   CreateBookWithContentResult,
+  DeleteBookInput,
+  DeleteBookResult,
   CreateContentChunkInput,
   ListBooksInput,
+  UpdateBookMetadataInput,
+  UpdateBookMetadataResult,
 } from "../types.js";
 
 const defaultListBooksLimit = 20;
@@ -61,6 +65,7 @@ export class PrismaBookRepository implements BookRepository {
 
       return {
         bookId: book.id,
+        chapterIds: getCreatedChapterIds(chapterLookup),
         chapterCount: input.chapters.length,
         chunkCount,
       };
@@ -116,10 +121,58 @@ export class PrismaBookRepository implements BookRepository {
         sourceUrl: true,
         language: true,
         tags: true,
+        metadata: true,
         createdAt: true,
         updatedAt: true,
       },
     });
+  }
+
+  async deleteBook(input: DeleteBookInput): Promise<DeleteBookResult> {
+    const bookId = normalizeRequiredText(input.bookId, "Book id is required.");
+
+    return this.prisma.$transaction(async (transaction) => {
+      const [chunkCount, chapterCount] = await Promise.all([
+        transaction.contentChunk.count({ where: { bookId } }),
+        transaction.bookChapter.count({ where: { bookId } }),
+      ]);
+
+      await transaction.contentChunk.deleteMany({ where: { bookId } });
+      await transaction.bookChapter.deleteMany({ where: { bookId } });
+
+      const deleted = await transaction.book.deleteMany({
+        where: { id: bookId },
+      });
+
+      return {
+        deleted: deleted.count > 0,
+        bookId,
+        chapterCount,
+        chunkCount,
+      };
+    });
+  }
+
+  async updateBookMetadata(
+    input: UpdateBookMetadataInput,
+  ): Promise<UpdateBookMetadataResult> {
+    const bookId = normalizeRequiredText(input.bookId, "Book id is required.");
+    const updated = await this.prisma.book.update({
+      where: { id: bookId },
+      data: {
+        metadata: input.metadata,
+      },
+      select: {
+        id: true,
+        metadata: true,
+      },
+    });
+
+    return {
+      updated: true,
+      bookId: updated.id,
+      metadata: updated.metadata,
+    };
   }
 
   private async createChapters(
@@ -280,6 +333,12 @@ function resolveChunkChapterId(
   throw new Error(
     `Chunk at index ${inputIndex} must provide chapterId or chapterOrderIndex.`,
   );
+}
+
+function getCreatedChapterIds(chapterLookup: CreatedChapterLookup): string[] {
+  return Array.from(chapterLookup.byOrderIndex.entries())
+    .sort(([left], [right]) => left - right)
+    .map(([, chapterId]) => chapterId);
 }
 
 function createChunkMetadata(

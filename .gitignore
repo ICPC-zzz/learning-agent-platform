@@ -20,3 +20,5 @@ pnpm-debug.log*
 yarn-debug.log*
 .DS_Store
 Thu
+.codex_tmp/
+E___code_lap-*

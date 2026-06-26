@@ -6,6 +6,7 @@ import "./generated-prisma-shim.js";
 
 export type {
   AbilityProfileRecord,
+  AddFavoriteArticleInput,
   BookChapterRecord,
   BookFavoriteRecord,
   BookListItem,
@@ -13,17 +14,25 @@ export type {
   BookRecord,
   BookRepository,
   BookSourceType,
+  ArticleFavoriteRecord,
+  ArticleReadingRecord,
+  ArticleRepository,
   AddFavoriteBookInput,
   AddProblemFavoriteInput,
   GetProblemPracticeStatusInput,
+  IsFavoriteArticleInput,
   IsProblemFavoriteInput,
+  ListArticleReadingsByOwnerInput,
+  ListFavoriteArticlesByOwnerInput,
   ListProblemFavoritesByOwnerInput,
+  RemoveFavoriteArticleInput,
   RemoveProblemFavoriteInput,
   ProblemFavoriteRecord,
   ProblemFavoriteRepository,
   ProblemPracticeActivityRecord,
   ProblemPracticeRepository,
   ProblemPracticeStatus,
+  RecordArticleReadingInput,
   RecordProblemPracticeInput,
   ListProblemPracticeByOwnerInput,
   RemoveProblemPracticeInput,
@@ -99,6 +108,8 @@ export type {
   DatabaseEnvStatus,
   DatabaseProvider,
   DailyRecommendationRecord,
+  DeleteBookInput,
+  DeleteBookResult,
   DbPackageStatus,
   FavoriteRepository,
   FindUserInput,
@@ -114,6 +125,13 @@ export type {
   ListProblemsInput,
   ListReadingProgressInput,
   MarkChapterCompletedInput,
+  AddMemoryInput,
+  DeleteMemoryInput,
+  ListMemoriesByOwnerInput,
+  MemoryRecord,
+  MemoryRecordCategory,
+  MemoryRecordSource,
+  MemoryRepository,
   ProblemDifficulty,
   ProblemRecord,
   ReadingProgressRecord,
@@ -124,6 +142,8 @@ export type {
   UpsertAbilityProfileInput,
   UpsertChapterQaFeedbackInput,
   UpdateUserInput,
+  UpdateBookMetadataInput,
+  UpdateBookMetadataResult,
   UpsertReadingProgressInput,
   UserRecord,
   UserRepository,
@@ -206,11 +226,14 @@ export {
   PrismaAgentPermissionRepository,
   PrismaAgentRuntimeRepository,
   PrismaAgentTaskRepository,
+  PrismaArticleRepository,
   PrismaBookRepository,
   PrismaChapterQaFeedbackRepository,
   PrismaChapterQaHistoryRepository,
   PrismaFavoriteRepository,
   PrismaLearningRepository,
+  PrismaLearningActivityRepository,
+  PrismaMemoryRepository,
   PrismaProblemAttemptRepository,
   PrismaProblemFavoriteRepository,
   PrismaProblemPracticeRepository,
@@ -218,6 +241,7 @@ export {
   PrismaReaderBookmarkRepository,
   PrismaReaderNoteRepository,
   PrismaReadingProgressRepository,
+  PrismaReadingSessionRepository,
   PrismaUserRepository,
   createDailyChallengeProgressRepository,
   getDailyChallengeProgressRepository,
@@ -229,8 +253,6 @@ export {
   createReadingProgressPrismaRepositoryAdapter,
 } from "./reading-progress-prisma-adapter.js";
 export {
-  PrismaLearningActivityRepository,
-  PrismaReadingSessionRepository,
   createBlockedReadingProgressDbIntegrationGuardPreview,
   evaluateReadingProgressDbIntegrationGuard,
 } from "./reading-progress-db-integration-guard.js";
@@ -413,6 +435,11 @@ export type {
   RecommendedProblemLike,
 } from "./repositories/index.js";
 
+export * from "./repositories/model-provider-repository.js";
+
 export const dbPackage = "db";
 
 export const dbPackageStatus: DbPackageStatus = "client-boundary";
+export * from "./repositories/codeforces-account-repository.js";
+export * from "./repositories/daily-content-repository.js";
+export * from "./repositories/email-otp-repository.js";

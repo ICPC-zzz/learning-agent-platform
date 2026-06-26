@@ -7,8 +7,8 @@
  * @previewOnly — dev-only; not production user system
  */
 
-import type { FavoriteProblemEntry } from "../../../lib/local-user-problem-store";
-import type { DbProblemFavoriteView } from "../problem-favorites-db-loader";
+import type { FavoriteProblemEntry } from "../../../../lib/local-user-problem-store";
+import type { DbProblemFavoriteView } from "../../problem-favorites-db-loader";
 
 // ---------------------------------------------------------------------------
 // Types

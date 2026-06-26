@@ -116,7 +116,7 @@ export function buildReaderAiQaPanelViewModel(
     inputDisabled = true;
     submitDisabled = true;
     submitLabel = "已阻止";
-  } else if (result.providerMode === "external-dev-only") {
+  } else if (result.providerMode === "external-dev-preview") {
     modeLabel = "external-dev（真实调用）";
     modeCssClass = "external";
     modeDescription =

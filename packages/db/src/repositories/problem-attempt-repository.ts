@@ -358,6 +358,8 @@ function normalizeProblemAttemptDifficulty(
     case "challenge":
     case "CHALLENGE":
       return "CHALLENGE";
+    default:
+      throw new Error(`Unsupported problem attempt difficulty: ${String(value)}`);
   }
 }
 

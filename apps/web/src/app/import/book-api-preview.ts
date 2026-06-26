@@ -55,6 +55,9 @@ export interface BookApiPreviewViewModel {
 }
 
 export interface BookApiPreviewBookViewModel {
+  /** Provider identifier used for local draft keys. */
+  providerId: string;
+
   /** External book ID (provider-specific). */
   externalBookId: string;
 
@@ -72,6 +75,9 @@ export interface BookApiPreviewBookViewModel {
 
   /** License hint. */
   licenseHint: string;
+
+  /** Source URL for attribution/import preview. */
+  sourceUrl: string;
 
   /** Cover image URL (may be empty). */
   coverImageUrl: string;
@@ -110,6 +116,11 @@ export interface PreviewBookApiSearchInput {
 export async function previewBookApiSearch(
   provider: BookSourceProvider,
   input: PreviewBookApiSearchInput,
+  _context?: {
+    providerMode: string;
+    blockedReason: string | null;
+    missingEnvNames: string[];
+  },
 ): Promise<BookApiPreviewViewModel> {
   const guardStatus = provider.getGuardStatus();
 
@@ -155,15 +166,27 @@ function mapSearchResultToViewModel(
 }
 
 function mapBookToViewModel(
-  book: { externalBookId: string; title: string; authors: string[]; description: string; language: string; licenseHint: string; coverImageUrl: string },
+  book: {
+    providerId?: string;
+    externalBookId: string;
+    title: string;
+    authors: string[];
+    description: string;
+    language: string;
+    sourceUrl?: string;
+    licenseHint: string;
+    coverImageUrl: string;
+  },
 ): BookApiPreviewBookViewModel {
   return {
+    providerId: book.providerId ?? "unknown",
     externalBookId: book.externalBookId,
     title: book.title,
     authors: book.authors,
     description: book.description,
     language: book.language,
     licenseHint: book.licenseHint,
+    sourceUrl: book.sourceUrl ?? "",
     coverImageUrl: book.coverImageUrl,
     importable: false,
   };

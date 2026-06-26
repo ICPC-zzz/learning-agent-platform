@@ -49,6 +49,7 @@ export async function saveAnalysisResult(input: {
   findingCount: number;
   personalized: boolean;
   modelName: string;
+  fullReport?: unknown;
   fullResult?: unknown;
 }): Promise<{ success: boolean }> {
   try {
@@ -64,13 +65,14 @@ export async function saveAnalysisResult(input: {
       findingCount: input.findingCount,
       personalized: input.personalized,
       modelName: input.modelName,
-      hasFullReport: input.fullReport != null,
+      hasFullReport: (input.fullReport ?? input.fullResult) != null,
     };
     records.unshift(record);
     if (records.length > MAX_HISTORY) records = records.slice(0, MAX_HISTORY);
     writeHistory(session.userId, records);
-    if (input.fullResult) {
-      fs.writeFileSync(reportFile(input.runId), JSON.stringify(input.fullResult), "utf-8");
+    var fullPayload = input.fullResult ?? input.fullReport;
+    if (fullPayload) {
+      fs.writeFileSync(reportFile(input.runId), JSON.stringify(fullPayload), "utf-8");
     }
     return { success: true };
   } catch (_) { return { success: false }; }

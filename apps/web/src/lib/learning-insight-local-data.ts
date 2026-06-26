@@ -253,10 +253,14 @@ export function sanitizeUnifiedInput(raw: unknown): UnifiedLocalLearningInput {
 
   const obj = raw as Record<string, unknown>;
 
-  function safeArray(key: string): unknown[] {
+  function safeArray<K extends keyof Omit<UnifiedLocalLearningInput, "hasSession">>(
+    key: K,
+  ): UnifiedLocalLearningInput[K] {
     const val = obj[key];
-    if (Array.isArray(val) && !hasSensitiveInArray(val)) return val;
-    return [];
+    if (Array.isArray(val) && !hasSensitiveInArray(val)) {
+      return val as UnifiedLocalLearningInput[K];
+    }
+    return [] as unknown as UnifiedLocalLearningInput[K];
   }
 
   return {

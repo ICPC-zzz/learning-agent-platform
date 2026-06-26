@@ -8,18 +8,70 @@
  * @previewOnly — dev preview / rules engine / no LLM
  */
 
+import type {
+  DailyChallengeState,
+  DailyChallengeStatus,
+} from "../../lib/local-daily-challenge-store";
+import type { DailyChallengeRecommendation } from "./daily-challenge-rules";
+
+export interface DailyChallengeActionView {
+  actionId: string;
+  label: string;
+  targetStatus: DailyChallengeStatus;
+  description: string;
+}
+
+export interface DailyChallengeRelatedLink {
+  label: string;
+  href: string;
+  description: string;
+}
+
+export interface DailyChallengePageView {
+  hasChallenge: boolean;
+  challengeState: DailyChallengeState | null;
+  recommendation: DailyChallengeRecommendation | null;
+  statusLabel: string;
+  statusDescription: string;
+  availableActions: DailyChallengeActionView[];
+  relatedLinks: DailyChallengeRelatedLink[];
+  safetyNotices: string[];
+  dataSourceNotice: string;
+  isError: boolean;
+  errorMessage: string | null;
+}
+
+interface DailyChallengePageViewParams {
+  challengeState: DailyChallengeState | null;
+  recommendation: DailyChallengeRecommendation | null;
+  hasError: boolean;
+  errorMessage: string | null;
+}
+
+export interface DailyChallengeSummaryView {
+  hasChallenge: boolean;
+  title: string | null;
+  difficulty: string | null;
+  statusLabel: string;
+  statusBadge: DailyChallengeStatus | "not-available";
+  recommendationReason: string | null;
+  challengeDate: string | null;
+  href: string;
+  sourceNotice: string;
+}
+
 // ---------------------------------------------------------------------------
 // Status labels
 // ---------------------------------------------------------------------------
 
-var STATUS_LABELS = {
+var STATUS_LABELS: Record<DailyChallengeStatus, string> = {
   "not-started": "未开始",
   "in-progress": "进行中",
   "completed": "已完成",
   "needs-review": "需要复习",
 };
 
-var STATUS_DESCRIPTIONS = {
+var STATUS_DESCRIPTIONS: Record<DailyChallengeStatus, string> = {
   "not-started": "今日挑战尚未开始，点击开始挑战进入练习。",
   "in-progress": "挑战进行中，完成题目后点击标记完成。",
   "completed": "今日挑战已完成！",
@@ -57,7 +109,9 @@ var SENSITIVE_PATTERNS = [
 // View model builder
 // ---------------------------------------------------------------------------
 
-export function buildDailyChallengePageView(params) {
+export function buildDailyChallengePageView(
+  params: DailyChallengePageViewParams,
+): DailyChallengePageView {
   var challengeState = params.challengeState;
   var recommendation = params.recommendation;
   var hasError = params.hasError;
@@ -79,8 +133,10 @@ export function buildDailyChallengePageView(params) {
   return buildActiveChallengeView(challengeState, recommendation);
 }
 
-function buildNewChallengeView(recommendation) {
-  var actions = [
+function buildNewChallengeView(
+  recommendation: DailyChallengeRecommendation,
+): DailyChallengePageView {
+  var actions: DailyChallengeActionView[] = [
     { actionId: "start", label: "开始挑战", targetStatus: "in-progress", description: "开始今日挑战题目" },
   ];
 
@@ -99,7 +155,10 @@ function buildNewChallengeView(recommendation) {
   };
 }
 
-function buildActiveChallengeView(state, recommendation) {
+function buildActiveChallengeView(
+  state: DailyChallengeState,
+  recommendation: DailyChallengeRecommendation,
+): DailyChallengePageView {
   var actions = buildAvailableActions(state.status);
 
   return {
@@ -117,7 +176,7 @@ function buildActiveChallengeView(state, recommendation) {
   };
 }
 
-function buildErrorView(message) {
+function buildErrorView(message: string): DailyChallengePageView {
   return {
     hasChallenge: false,
     challengeState: null,
@@ -140,7 +199,7 @@ function buildErrorView(message) {
 // Available actions
 // ---------------------------------------------------------------------------
 
-function buildAvailableActions(status) {
+function buildAvailableActions(status: DailyChallengeStatus): DailyChallengeActionView[] {
   if (status === "not-started") {
     return [
       { actionId: "start", label: "开始挑战", targetStatus: "in-progress", description: "开始今日挑战题目" },
@@ -172,8 +231,10 @@ function buildAvailableActions(status) {
 // Related links
 // ---------------------------------------------------------------------------
 
-function buildRelatedLinks(recommendation) {
-  var links = [];
+function buildRelatedLinks(
+  recommendation: DailyChallengeRecommendation,
+): DailyChallengeRelatedLink[] {
+  var links: DailyChallengeRelatedLink[] = [];
 
   if (recommendation && recommendation.problemId) {
     links.push({
@@ -197,7 +258,7 @@ function buildRelatedLinks(recommendation) {
 // Safety notices
 // ---------------------------------------------------------------------------
 
-function buildSafetyNotices() {
+function buildSafetyNotices(): string[] {
   return [
     "开发预览",
     "规则生成",
@@ -213,12 +274,15 @@ function buildSafetyNotices() {
 // Dashboard summary builder
 // ---------------------------------------------------------------------------
 
-export function buildDailyChallengeSummary(params) {
+export function buildDailyChallengeSummary(params: {
+  challengeState: DailyChallengeState | null;
+  recommendation: DailyChallengeRecommendation | null;
+}): DailyChallengeSummaryView {
   var challengeState = params.challengeState;
   var recommendation = params.recommendation;
   var hasChallenge = challengeState !== null && recommendation !== null;
 
-  if (!hasChallenge) {
+  if (!hasChallenge || challengeState === null || recommendation === null) {
     return {
       hasChallenge: false,
       title: null,
@@ -249,8 +313,11 @@ export function buildDailyChallengeSummary(params) {
 // Safety checks
 // ---------------------------------------------------------------------------
 
-export function dailyChallengeViewIsSafe(view) {
-  var violations = [];
+export function dailyChallengeViewIsSafe(view: DailyChallengePageView): {
+  safe: boolean;
+  violations: string[];
+} {
+  var violations: string[] = [];
   var json = JSON.stringify(view);
 
   for (var i = 0; i < SENSITIVE_PATTERNS.length; i++) {
@@ -273,8 +340,11 @@ export function dailyChallengeViewIsSafe(view) {
   return { safe: violations.length === 0, violations: violations };
 }
 
-export function dailyChallengeSummaryIsSafe(view) {
-  var violations = [];
+export function dailyChallengeSummaryIsSafe(view: DailyChallengeSummaryView): {
+  safe: boolean;
+  violations: string[];
+} {
+  var violations: string[] = [];
   var json = JSON.stringify(view);
 
   for (var i = 0; i < SENSITIVE_PATTERNS.length; i++) {

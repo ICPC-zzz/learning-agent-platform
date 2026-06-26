@@ -8,7 +8,7 @@ import {
   removeReaderBookmark,
   persistReaderBookmarks,
   type ReaderLocalBookmark,
-} from "../../lib/local-reader-annotation-store";
+} from "../../../lib/local-reader-annotation-store";
 
 // ---------------------------------------------------------------------------
 // Types

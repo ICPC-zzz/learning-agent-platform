@@ -4,7 +4,7 @@ export type {
   LlmGenerateResponse,
   LlmMessage,
   LlmMetadata,
-  LlmProvider,
+  LlmProvider as LegacyLlmProvider,
   LlmUsage,
 } from "./types";
 export type {

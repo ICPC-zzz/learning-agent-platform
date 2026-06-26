@@ -1,8 +1,7 @@
-// Reader Sync Safe Server Context v1 (A299)
+﻿// Reader Sync Safe Server Context v1 (A299)
 //
 // Status: preview-only / no real auth / not implemented
 
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderProgressSyncDecisionServerContext } from "./reader-progress-sync-decision.ts";
 
 export type ReaderSyncSafeServerContextAuthSource =

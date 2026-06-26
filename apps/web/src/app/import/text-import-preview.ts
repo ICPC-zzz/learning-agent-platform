@@ -1,5 +1,4 @@
-// @ts-expect-error TS5097: direct .ts import keeps the preview helper runnable in node:test.
-import { BOOK_IMPORT_MAX_CONTENT_CHARS, BOOK_IMPORT_MIN_CONTENT_CHARS } from "./book-import-save-types.ts";
+﻿import { BOOK_IMPORT_MAX_CONTENT_CHARS, BOOK_IMPORT_MIN_CONTENT_CHARS } from "./book-import-save-types.ts";
 
 export interface TextImportPreviewChapter {
   title: string;

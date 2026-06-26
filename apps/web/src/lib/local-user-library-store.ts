@@ -191,6 +191,10 @@ export function loadFavorites(): FavoriteBookEntry[] {
   return parsed.filter(isValidFavoriteEntry);
 }
 
+export function loadFavoriteBooks(): FavoriteBookEntry[] {
+  return loadFavorites();
+}
+
 export function persistFavorites(favorites: readonly FavoriteBookEntry[]): boolean {
   const safe = favorites.filter(isValidFavoriteEntry);
   return safeSetItem(FAVORITES_KEY, JSON.stringify(safe));

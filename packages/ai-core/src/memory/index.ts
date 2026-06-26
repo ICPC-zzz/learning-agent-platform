@@ -11,9 +11,28 @@ export type {
   MemorySessionSummaryInput,
   MemorySessionSummaryRequest,
   MemoryStore,
+  WorkingMemoryMessage,
+  WorkingMemoryRole,
 } from "./types";
 export { MemoryLayer } from "./types";
 export { InMemoryMemoryStore } from "./in-memory-store";
+export {
+  buildMemoryContextBundle,
+  flattenMemoryItemsForPrompt,
+} from "./MemoryContextBuilder";
+export {
+  createCompactionBoundary,
+  createSessionSummaryBundle,
+  summarizeWorkingMemoryMessages,
+} from "./MemoryCompressor";
+export {
+  buildMemoryRetrievalText,
+  retrieveRelevantMemories,
+} from "./MemoryRetriever";
+export {
+  extractMemoryCandidates,
+  isForgetRequest,
+} from "./MemoryExtractor";
 export {
   calculateKeywordMatchScore,
   getMemorySearchText,

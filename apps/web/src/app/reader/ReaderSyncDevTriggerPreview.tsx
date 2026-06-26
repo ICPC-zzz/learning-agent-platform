@@ -1,10 +1,8 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncAuthSessionAdapterPreview } from "./reader-sync-auth-session-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { createBlockedReaderSyncAuthSessionAdapter } from "./reader-sync-auth-session-adapter.ts";
 
 export interface ReaderSyncDevTriggerProgressPayload {

@@ -26,9 +26,9 @@ import {
 // Action: Toggle favorite (add or remove)
 // ---------------------------------------------------------------------------
 
-export interface ToggleFavoriteResult extends FavoritesDbActionResult {
+export type ToggleFavoriteResult = FavoritesDbActionResult & {
   uiMessage: string;
-}
+};
 
 /**
  * Toggle a book favorite: add if not favorited, remove if favorited.

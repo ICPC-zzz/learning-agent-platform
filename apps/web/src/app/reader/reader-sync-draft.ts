@@ -1,5 +1,4 @@
-// Node --test 直接执行 .ts 单测时需要显式后缀；由 A271 保持最小改动接入。
-// @ts-expect-error TS5097: 本文件在单测链路使用 .ts 后缀导入。
+﻿// Node --test 直接执行 .ts 单测时需要显式后缀；由 A271 保持最小改动接入。
 import { validateSyncableFields, type ReaderSyncValidationResult } from "./reader-sync-validation.ts";
 
 export type ReaderSyncDraftStatus = "ready" | "empty" | "invalid" | "partial";

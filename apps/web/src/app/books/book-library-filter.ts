@@ -18,11 +18,14 @@ export interface BookLibraryFilterInput {
   searchQuery?: string;
   tagFilter?: string;
   difficultyFilter?: string;
+  categoryFilter?: string;
 }
 
 export interface BookLibraryFilterResult {
   books: BookLibraryItemView[];
   hasActiveFilters: boolean;
+  totalBefore: number;
+  totalAfter: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -36,9 +39,17 @@ export function filterBooks(
   const q = (input.searchQuery ?? "").trim().toLocaleLowerCase();
   const tag = (input.tagFilter ?? "").trim().toLocaleLowerCase();
   const diff = (input.difficultyFilter ?? "").trim().toLocaleLowerCase();
+  const category = (input.categoryFilter ?? "").trim().toLocaleLowerCase();
 
-  const active = q.length > 0 || tag.length > 0 || diff.length > 0;
-  if (!active) return { books: [...books], hasActiveFilters: false };
+  const active = q.length > 0 || tag.length > 0 || diff.length > 0 || category.length > 0;
+  if (!active) {
+    return {
+      books: [...books],
+      hasActiveFilters: false,
+      totalBefore: books.length,
+      totalAfter: books.length,
+    };
+  }
 
   const filtered = books.filter((book) => {
     const matchSearch = q.length === 0 || [
@@ -54,11 +65,18 @@ export function filterBooks(
 
     const matchDiff = diff.length === 0 ||
       (book.difficulty ?? "").trim().toLocaleLowerCase() === diff;
+    const matchCategory = category.length === 0 ||
+      (book.category ?? "").trim().toLocaleLowerCase() === category;
 
-    return matchSearch && matchTag && matchDiff;
+    return matchSearch && matchTag && matchDiff && matchCategory;
   });
 
-  return { books: filtered, hasActiveFilters: true };
+  return {
+    books: filtered,
+    hasActiveFilters: true,
+    totalBefore: books.length,
+    totalAfter: filtered.length,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -85,6 +103,36 @@ export function collectDifficulties(books: BookLibraryItemView[]): string[] {
     if (d.length > 0) s.add(d);
   }
   return Array.from(s).sort((a, b) => a.localeCompare(b));
+}
+
+export function collectCategories(books: BookLibraryItemView[]): string[] {
+  const s = new Set<string>();
+  for (const b of books) {
+    const category = (b.category ?? "").trim();
+    if (category.length > 0) s.add(category);
+  }
+  return Array.from(s).sort((a, b) => a.localeCompare(b));
+}
+
+export function getDefinedCategories(): string[] {
+  return [
+    "Python",
+    "JavaScript",
+    "Algorithm",
+    "Data Structures",
+    "Database",
+    "Web Dev",
+    "Machine Learning",
+    "System Design",
+    "Java",
+    "Go",
+    "Rust",
+    "C/C++",
+    "Linux",
+    "Security",
+    "Testing",
+    "DevOps",
+  ];
 }
 
 // ---------------------------------------------------------------------------

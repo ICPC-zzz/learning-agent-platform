@@ -21,7 +21,12 @@ import {
 import { getCodeforcesUserAnalysisSnapshot } from "../../lib/codeforces-agent-snapshot";
 import { queryCodeforcesCandidatesForUser } from "../../lib/codeforces-agent-candidates-user";
 import type { AgentCandidateProblemRecord } from "../../lib/codeforces-agent-candidates";
-import { getCachedComputation, setCachedComputation } from "../../lib/cf-computation-cache.ts";
+import { getCachedComputation } from "../../lib/cf-computation-cache.ts";
+import type { RatingEstimate } from "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-rating-estimator.ts";
+import type {
+  CodeforcesAgentCandidate as TrainingPlanCandidate,
+  RecommendationEntry,
+} from "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-training-plan.ts";
 
 function isFeatureEnabled() { return process.env.ENABLE_CF_LEARNING_AGENT === "true"; }
 
@@ -59,7 +64,7 @@ export async function generateCfLearningAnalysis(
 
   try {
     const runId = `run_cf_${Date.now()}`;
-    const events: CfLearningAgentActionOutput["safeEvents"] = [];
+    const events: NonNullable<CfLearningAgentActionOutput["safeEvents"]> = [];
     let seq = 0;
     function emit(t: string, m: string) { seq++; events.push({ type: t, sequence: seq, timestamp: new Date().toISOString().slice(11, 19), message: m }); }
 
@@ -86,16 +91,36 @@ export async function generateCfLearningAnalysis(
 
     emit("agent.progress", "正在计算预估Rating...");
     var cachedRating = getCachedComputation<Record<string, unknown>>(userId, "estimated-rating");
-    var estimate: any;
+    var estimate: RatingEstimate;
     if (cachedRating) {
       emit("agent.progress", "Rating 命中共享缓存，跳过重复计算");
+      const estimatedRating = readFiniteNumber(cachedRating.estimatedRating, 800);
+      const currentRating = readFiniteNumber(cachedRating.currentOfficialRating, 0);
+      const maxRating = readFiniteNumber(cachedRating.maxOfficialRating, currentRating);
       estimate = {
-        estimatedRating: cachedRating.estimatedRating,
-        confidence: cachedRating.confidence,
-        currentRating: cachedRating.currentOfficialRating || 0,
-        maxRating: cachedRating.maxOfficialRating || 0,
+        estimatedRating,
+        currentRating,
+        maxRating,
+        ratingDelta: estimatedRating - currentRating,
+        confidence: readFiniteNumber(cachedRating.confidence, 0.3),
         modelType: cachedRating.source === "official_and_practice" ? "rated" : "unrated",
-        explanationItems: cachedRating.basis || [],
+        historyAnchor: currentRating > 0 ? currentRating : null,
+        practiceSignal: estimatedRating,
+        trendBonus: 0,
+        inactivityDecay: 0,
+        ratedSolvedCount: 0,
+        recentRatedSolvedCount: 0,
+        evidence: {
+          p65: null,
+          p80: null,
+          p95: null,
+          hardSolveCount: 0,
+          tagBreadth: 0,
+          lastMeaningfulActivity: null,
+        },
+        explanationItems: Array.isArray(cachedRating.basis)
+          ? cachedRating.basis.filter((item): item is string => typeof item === "string")
+          : [],
       };
     } else {
       const { estimateUserRating } = await import(
@@ -232,25 +257,27 @@ export async function generateCfLearningAnalysis(
 
     // Unfinished candidates
     const unfinishedKeys = snapshot.problemStates.unfinishedProblemKeys;
-    let unfinishedCandidates: Array<Record<string, unknown>> = [];
+    let unfinishedCandidates: TrainingPlanCandidate[] = [];
     if (unfinishedKeys.length > 0) {
       const allResult = await queryCodeforcesCandidatesForUser(userId, records, { mode: "new_training", minRating: 800, maxRating: 3500, limit: 100 }, repo);
-      unfinishedCandidates = (allResult.candidates as Array<Record<string, unknown>>).filter((c) => unfinishedKeys.includes(String(c.problemKey ?? "")));
+      unfinishedCandidates = allResult.candidates
+        .filter((c) => unfinishedKeys.includes(c.problemKey))
+        .map(toTrainingPlanCandidate);
     }
 
     const solvedKeys = new Set(snapshot.problemStates.solvedProblemKeys);
     const legacyPlan = generateTrainingPlan({
-      warmupCandidates: (warmupResult?.candidates ?? []) as Parameters<typeof generateTrainingPlan>[0]["warmupCandidates"],
-      weakTagCandidates: (trainingResult?.candidates ?? []) as Parameters<typeof generateTrainingPlan>[0]["weakTagCandidates"],
-      challengeCandidates: (challengeResult?.candidates ?? []) as Parameters<typeof generateTrainingPlan>[0]["challengeCandidates"],
-      unfinishedCandidates: unfinishedCandidates as Parameters<typeof generateTrainingPlan>[0]["unfinishedCandidates"],
+      warmupCandidates: (warmupResult?.candidates ?? []).map(toTrainingPlanCandidate),
+      weakTagCandidates: (trainingResult?.candidates ?? []).map(toTrainingPlanCandidate),
+      challengeCandidates: (challengeResult?.candidates ?? []).map(toTrainingPlanCandidate),
+      unfinishedCandidates,
       weakTags: legacyWeakTags as Parameters<typeof generateTrainingPlan>[0]["weakTags"],
       solvedProblemKeys: solvedKeys,
     });
 
     // Merge v3 review recommendations into legacy format
-    const v3Recs = reviewReport.recommendations.map((r: Record<string, unknown>) => ({
-      problemKey: r.problemKey, name: r.name, rating: r.rating, tags: r.tags,
+    const v3Recs: RecommendationEntry[] = reviewReport.recommendations.map((r) => ({
+      problemKey: r.problemKey, name: r.name, rating: r.rating ?? estimate.estimatedRating, tags: r.tags,
       originalUrl: r.originalUrl,
       recommendationType: r.recommendationType === "historical_failure" ? "unfinished_review" : r.recommendationType === "spaced_review" ? "warmup" : r.recommendationType === "close_call" ? "unfinished_review" : "weak_tag",
       reasonCodes: r.reasonCodes,
@@ -260,9 +287,9 @@ export async function generateCfLearningAnalysis(
     const allRecommendations = [...legacyPlan.recommendations];
     const usedKeys = new Set(allRecommendations.map((r) => r.problemKey));
     for (const r of v3Recs) {
-      if (!usedKeys.has(r.problemKey as string) && allRecommendations.length < 8) {
-        allRecommendations.push(r as Record<string, unknown>);
-        usedKeys.add(r.problemKey as string);
+      if (!usedKeys.has(r.problemKey) && allRecommendations.length < 8) {
+        allRecommendations.push(r);
+        usedKeys.add(r.problemKey);
       }
     }
 
@@ -300,6 +327,28 @@ export async function generateCfLearningAnalysis(
     console.error("[cf-analysis] Internal error:", msg);
     return { success: false, errorCode: "INTERNAL_ERROR", errorMessage: "分析过程中发生内部错误，请稍后重试" };
   }
+}
+
+function readFiniteNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function toTrainingPlanCandidate(candidate: {
+  problemKey: string;
+  name: string;
+  rating: number;
+  tags: readonly string[];
+  originalUrl: string;
+  solvedCount?: number | null;
+}): TrainingPlanCandidate {
+  return {
+    problemKey: candidate.problemKey,
+    name: candidate.name,
+    rating: candidate.rating,
+    tags: [...candidate.tags],
+    originalUrl: candidate.originalUrl,
+    ...(typeof candidate.solvedCount === "number" ? { solvedCount: candidate.solvedCount } : {}),
+  };
 }
 
 function buildKey(m: Record<string, unknown> | null): string | null {

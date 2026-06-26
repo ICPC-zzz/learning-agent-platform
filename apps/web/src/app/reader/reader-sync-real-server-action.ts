@@ -1,21 +1,13 @@
-// Helper-only module for the disabled-by-default Reader sync preview path.
+﻿// Helper-only module for the disabled-by-default Reader sync preview path.
 // The actual Next 15 server action wrapper lives in reader-sync-real-server-action.server.ts.
 
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncRealServerActionCoreInput, ReaderSyncRealServerActionCoreResult } from "./reader-sync-real-server-action-core.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { buildReaderSyncRealServerActionCoreResult } from "./reader-sync-real-server-action-core.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncRealServerActionRepositoryAdapterPreview } from "./reader-sync-real-server-action-core.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncAuthSessionAdapterPreview } from "./reader-sync-auth-session-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncAuthSessionAdapter } from "./reader-sync-auth-session-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import { createBlockedReaderSyncAuthSessionAdapter } from "./reader-sync-auth-session-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReaderSyncPersistentRepositoryAdapter } from "./reader-sync-persistent-repository-adapter.ts";
-// @ts-expect-error TS5097: test-time direct .ts import is intentional in this repo.
 import type { ReadingProgressDbIntegrationGuardPreview } from "../../../../../packages/db/src/reading-progress-db-integration-guard.ts";
 
 export interface ReaderSyncRealServerActionAuthSessionStubPreview {

@@ -1,5 +1,4 @@
-// @ts-expect-error TS5097: direct .ts import keeps the confirmation helper runnable in node:test.
-import type { TextImportPreviewResult } from "./text-import-preview.ts";
+﻿import type { TextImportPreviewResult } from "./text-import-preview.ts";
 
 export type TextImportConfirmationStatus = "ready" | "blocked";
 

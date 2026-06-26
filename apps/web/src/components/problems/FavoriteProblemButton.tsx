@@ -8,7 +8,7 @@ import {
   persistFavorites,
   removeFavoriteProblem,
   type FavoriteProblemEntry,
-} from "../lib/local-user-problem-store";
+} from "../../lib/local-user-problem-store";
 
 interface FavoriteProblemButtonProps {
   problemId: string;

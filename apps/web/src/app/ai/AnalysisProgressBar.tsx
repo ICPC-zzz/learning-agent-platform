@@ -53,7 +53,8 @@ export function AnalysisProgressBar({
 
   if (!isRunning) return null;
 
-  var pct = progress ? Math.round((progress.phaseIndex / progress.totalPhases) * 100) : 0;
+  var currentProgress = progress;
+  var pct = currentProgress ? Math.round((currentProgress.phaseIndex / currentProgress.totalPhases) * 100) : 0;
 
   return (
     <div style={{
@@ -86,9 +87,10 @@ export function AnalysisProgressBar({
 
       {/* Phase dots */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px" }}>
-        {progress && Array.from({ length: progress.totalPhases }, function(_, i) {
-          var done = i < progress.phaseIndex;
-          var current = i === progress.phaseIndex - 1;
+        {currentProgress && Array.from({ length: currentProgress.totalPhases }, function(_, i) {
+          var activeProgress = currentProgress as ProgressState;
+          var done = i < activeProgress.phaseIndex;
+          var current = i === activeProgress.phaseIndex - 1;
           return (
             <span key={i} style={{
               width: "8px", height: "8px", borderRadius: "50%",

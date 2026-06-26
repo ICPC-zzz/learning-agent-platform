@@ -4,7 +4,7 @@
  * @previewOnly
  */
 
-import type { LlmChatMessage, LlmChatRequest, LlmProvider } from "./llm-provider-contract.ts";
+import type { LlmChatRequest, LlmChatResult, LlmProvider } from "./llm-provider-contract.ts";
 import { LlmProviderMode } from "./llm-provider-contract.ts";
 import { createMockSuccessResult, createSafeError, createSafeResult } from "./llm-safe-result.ts";
 
@@ -12,7 +12,7 @@ export class MockLlmProvider implements LlmProvider {
   readonly mode = LlmProviderMode.Mock;
   readonly label = "Mock LLM Provider (dev preview)";
 
-  async generate(request: LlmChatRequest): Promise<ReturnType<LlmProvider["generate"]>> {
+  async generate(request: LlmChatRequest): Promise<LlmChatResult> {
     const validationError = validateRequest(request);
     if (validationError) {
       return createSafeResult({

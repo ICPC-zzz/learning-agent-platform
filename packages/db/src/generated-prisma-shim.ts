@@ -451,21 +451,234 @@ interface ProblemWrongBookDelegate {
 }
 
 // ---------------------------------------------------------------------------
-// Module augmentation — merge missing delegates into PrismaClient
+// Delegates still missing from the currently generated Prisma Client
 // ---------------------------------------------------------------------------
 
-declare module "@prisma/client" {
-  interface PrismaClient {
-    readonly bookFavorite: BookFavoriteDelegate;
-    readonly problemFavorite: ProblemFavoriteDelegate;
-    readonly problemPracticeActivity: ProblemPracticeActivityDelegate;
-    // A390
-    readonly readerBookmark: ReaderBookmarkDelegate;
-    readonly readerNote: ReaderNoteDelegate;
-    // A392
-    readonly learningActivity: LearningActivityDelegate;
-    readonly readingSession: ReadingSessionDelegate;
-    // A395
-    readonly problemWrongBook: ProblemWrongBookDelegate;
-  }
+interface EmailOtpCodeDelegateRecord {
+  id: string;
+  email: string;
+  codeHash: string;
+  purpose: string;
+  expiresAt: Date;
+  consumedAt: Date | null;
+  attemptCount: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
+
+interface EmailOtpCodeDelegate {
+  create(args: { data: Record<string, unknown> }): Promise<EmailOtpCodeDelegateRecord>;
+  findFirst(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord | null>;
+  update(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord>;
+  deleteMany(args: Record<string, unknown>): Promise<{ count: number }>;
+  findUnique(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord | null>;
+}
+
+interface ArticleFavoriteDelegateRecord {
+  id: string;
+  userId: string;
+  articleId: string;
+  articleTitle: string;
+  sourcePlatform: string;
+  sourceName: string;
+  originalUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ArticleReadingDelegateRecord extends ArticleFavoriteDelegateRecord {
+  lastReadAt: Date;
+}
+
+interface ArticleFavoriteDelegate {
+  upsert(args: Record<string, unknown>): Promise<ArticleFavoriteDelegateRecord>;
+  delete(args: Record<string, unknown>): Promise<ArticleFavoriteDelegateRecord>;
+  findMany(args: Record<string, unknown>): Promise<ArticleFavoriteDelegateRecord[]>;
+  count(args: Record<string, unknown>): Promise<number>;
+}
+
+interface ArticleReadingDelegate {
+  upsert(args: Record<string, unknown>): Promise<ArticleReadingDelegateRecord>;
+  findMany(args: Record<string, unknown>): Promise<ArticleReadingDelegateRecord[]>;
+}
+
+interface ModelProviderDelegateRecord {
+  id: string;
+  ownerId: string;
+  name: string;
+  providerType: string;
+  baseUrl: string;
+  authMode: string;
+  enabled: boolean;
+  requestTimeoutMs: number;
+  maxRetries: number;
+  lastTestedAt: Date | null;
+  lastTestStatus: string | null;
+  lastTestLatencyMs: number | null;
+  lastTestErrorCode: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ModelProfileDelegateRecord {
+  id: string;
+  providerId: string;
+  displayName: string;
+  modelId: string;
+  contextWindow: number;
+  maxOutputTokens: number;
+  temperature: number;
+  supportsStreaming: boolean;
+  supportsTools: boolean;
+  supportsJsonSchema: boolean;
+  supportsFiles: boolean;
+  enabled: boolean;
+  usageType: string;
+  priority: number;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface UserModelCredentialDelegateRecord {
+  encryptionVersion: number;
+  encryptedPayload: string;
+  iv: string;
+  authTag: string | null;
+  maskedHintsJson: string;
+}
+
+interface ModelProviderDelegate {
+  create(args: Record<string, unknown>): Promise<ModelProviderDelegateRecord>;
+  findFirst(args: Record<string, unknown>): Promise<ModelProviderDelegateRecord | null>;
+  findMany(args: Record<string, unknown>): Promise<Array<ModelProviderDelegateRecord & { profiles?: ModelProfileDelegateRecord[]; credential?: { maskedHintsJson: string } | null }>>;
+  update(args: Record<string, unknown>): Promise<ModelProviderDelegateRecord>;
+  delete(args: Record<string, unknown>): Promise<ModelProviderDelegateRecord>;
+  count(args: Record<string, unknown>): Promise<number>;
+}
+
+interface ModelProfileDelegate {
+  create(args: Record<string, unknown>): Promise<ModelProfileDelegateRecord>;
+  findFirst(args: Record<string, unknown>): Promise<ModelProfileDelegateRecord | null>;
+  findMany(args: Record<string, unknown>): Promise<ModelProfileDelegateRecord[]>;
+  update(args: Record<string, unknown>): Promise<ModelProfileDelegateRecord>;
+  updateMany(args: Record<string, unknown>): Promise<{ count: number }>;
+  delete(args: Record<string, unknown>): Promise<ModelProfileDelegateRecord>;
+}
+
+interface UserModelCredentialDelegate {
+  upsert(args: Record<string, unknown>): Promise<UserModelCredentialDelegateRecord>;
+  findFirst(args: Record<string, unknown>): Promise<UserModelCredentialDelegateRecord | null>;
+  deleteMany(args: Record<string, unknown>): Promise<{ count: number }>;
+}
+
+interface DailyContentItemDelegateRecord {
+  id: string;
+  kind: string;
+  source: string;
+  externalId: string;
+  title: string;
+  summary: string | null;
+  originalUrl: string | null;
+  discussionUrl: string | null;
+  author: string | null;
+  publishedAt: Date | null;
+  dailyDate: Date;
+  score: number | null;
+  commentCount: number | null;
+  metadataJson: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface DailyContentItemDelegate {
+  upsert(args: Record<string, unknown>): Promise<DailyContentItemDelegateRecord>;
+  findMany(args: Record<string, unknown>): Promise<DailyContentItemDelegateRecord[]>;
+  findFirst(args: Record<string, unknown>): Promise<{ dailyDate: Date } | null>;
+  count(args: Record<string, unknown>): Promise<number>;
+}
+
+interface CodeforcesAccountDelegate extends BasicPrismaDelegate<CodeforcesAccountDelegateRecord> {}
+interface CodeforcesUserProblemStatDelegate extends BasicPrismaDelegate<CodeforcesUserProblemStatDelegateRecord> {}
+interface CodeforcesRatingChangeDelegate extends BasicPrismaDelegate<CodeforcesRatingChangeDelegateRecord> {}
+interface CodeforcesRecentSubmissionDelegate extends BasicPrismaDelegate<CodeforcesRecentSubmissionDelegateRecord> {}
+
+interface BasicPrismaDelegate<TRecord> {
+  create(args: Record<string, unknown>): Promise<TRecord>;
+  findUnique(args: Record<string, unknown>): Promise<TRecord | null>;
+  findFirst(args: Record<string, unknown>): Promise<TRecord | null>;
+  findMany(args: Record<string, unknown>): Promise<TRecord[]>;
+  update(args: Record<string, unknown>): Promise<TRecord>;
+  upsert(args: Record<string, unknown>): Promise<TRecord>;
+  delete(args: Record<string, unknown>): Promise<TRecord>;
+}
+
+interface CodeforcesAccountDelegateRecord {
+  id: string;
+  userId: string;
+  canonicalHandle: string;
+  normalizedHandle: string;
+  currentRating: number | null;
+  maxRating: number | null;
+  rank: string | null;
+  maxRank: string | null;
+  contribution: number | null;
+  friendOfCount: number | null;
+  lastOnlineAt: Date | null;
+  registrationAt: Date | null;
+  lastSubmissionAt: Date | null;
+  lastSyncedAt: Date | null;
+  lastSyncedSubmissionId: number | null;
+  syncStatus: string;
+  syncErrorCode: string | null;
+  dataTruncated: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CodeforcesUserProblemStatDelegateRecord {
+  id: string;
+  accountId: string;
+  problemKey: string;
+  contestId: number;
+  index: string;
+  name: string;
+  rating: number | null;
+  tags: string[];
+  attempts: number;
+  accepted: boolean;
+  firstSubmittedAt: Date | null;
+  firstAcceptedAt: Date | null;
+  lastSubmittedAt: Date | null;
+  lastVerdict: string | null;
+  lastSubmissionId: number | null;
+}
+
+interface CodeforcesRatingChangeDelegateRecord {
+  id: string;
+  accountId: string;
+  contestId: number;
+  contestName: string;
+  rank: number | null;
+  oldRating: number;
+  newRating: number;
+  ratingUpdateAt: Date;
+}
+
+interface CodeforcesRecentSubmissionDelegateRecord {
+  submissionId: number;
+  problemKey: string;
+  contestId: number | null;
+  index: string | null;
+  name: string | null;
+  verdict: string | null;
+  creationTimeSeconds: number;
+  language: string | null;
+  passedTestCount: number | null;
+  timeConsumedMillis: number | null;
+  memoryConsumedBytes: number | null;
+}
+
+// The current generated Prisma Client already contains all delegates used by
+// the restored repositories. Keep this file as an inert module so the existing
+// side-effect import remains harmless until the import can be removed cleanly.

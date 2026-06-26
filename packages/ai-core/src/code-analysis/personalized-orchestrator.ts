@@ -174,7 +174,7 @@ export async function runPersonalizedCodeAnalysis(
     );
 
     // =====================================================================
-    // Step 2: ProblemProfileAgent (LLM call — only if user didn't provide rating)
+    // Step 2: ProblemProfileAgent (user rating or rule estimate first; short model enrichment when available)
     // =====================================================================
     deps.reportProgress?.("分析题目画像", 2, 7);
     pushEvent("problem_profile_agent", "problem-profiler", "running", "分析题目难度与标签");
@@ -194,7 +194,7 @@ export async function runPersonalizedCodeAnalysis(
       }
 
       pushEvent("problem_profile_agent", "problem-profiler", "completed",
-        `Rating: ${problemProfile.rating.value ?? "未知"} (${problemProfile.rating.source === "user_provided" ? "用户填写" : problemProfile.rating.source === "model_inferred" ? "模型推断" : "未推断"}), 置信度: ${Math.round(problemProfile.rating.confidence * 100)}%` +
+        `Rating: ${problemProfile.rating.value ?? "未知"} (${problemProfile.rating.source === "user_provided" ? "用户填写" : problemProfile.rating.source === "model_inferred" ? "模型推断" : problemProfile.rating.source === "rule_estimated" ? "规则估算" : "未推断"}), 置信度: ${Math.round(problemProfile.rating.confidence * 100)}%` +
         (problemProfile.tags.length > 0 ? `, 标签: ${problemProfile.tags.map(function(t) { return t.tag; }).join(", ")}` : ""),
         { toolName: "cf.problem.rating.estimate", confidence: problemProfile.rating.confidence }
       );
@@ -483,65 +483,86 @@ async function queryFollowUpCandidates(
 ): Promise<CandidateProblem[]> {
   const problemRating = problemProfile.rating.value;
   const learnerRating = learnerProfile.estimatedRating;
-
-  // Build query: prefer weak tags, appropriate difficulty
   const weakTagNames = learnerProfile.weakTags.map((w) => w.tag);
   const problemTagNames = problemProfile.tags.map((t) => t.tag);
-
-  // Priority: problem's own tags + user's weak tags
   const queryTags = [...new Set([...problemTagNames, ...weakTagNames])].slice(0, 5);
+  const baseRating = clampRatingToCf(learnerRating ?? problemRating ?? 1200);
 
-  // Rating range: prefer problems near learner's level
-  let ratingMin: number | undefined;
-  let ratingMax: number | undefined;
-  if (learnerRating !== null) {
-    if (problemRating !== null && problemRating > learnerRating + 300) {
-      // Problem is far too hard → recommend easier prerequisite
-      ratingMin = Math.max(800, learnerRating - 200);
-      ratingMax = learnerRating + 100;
-    } else if (problemRating !== null && problemRating < learnerRating - 300) {
-      // Problem is far too easy → recommend harder challenges
-      ratingMin = learnerRating;
-      ratingMax = Math.min(3500, learnerRating + 300);
-    } else {
-      // Near-level → recommend same range with weak tags
-      ratingMin = Math.max(800, (learnerRating ?? 1200) - 200);
-      ratingMax = Math.min(3500, (learnerRating ?? 1200) + 200);
-    }
+  const tiers = [
+    {
+      suggestionType: "prerequisite" as const,
+      ratingMin: clampRatingToCf(baseRating - 200),
+      ratingMax: clampRatingToCf(baseRating),
+      targetRating: clampRatingToCf(baseRating - 100),
+      reason: "相似标签热身题，难度略低于当前预估水平。",
+    },
+    {
+      suggestionType: "same_tag_practice" as const,
+      ratingMin: clampRatingToCf(baseRating),
+      ratingMax: clampRatingToCf(baseRating + 200),
+      targetRating: clampRatingToCf(baseRating + 100),
+      reason: "相似标签主训练题，难度贴近当前预估水平。",
+    },
+    {
+      suggestionType: "next_challenge" as const,
+      ratingMin: clampRatingToCf(baseRating + 200),
+      ratingMax: clampRatingToCf(baseRating + 400),
+      targetRating: clampRatingToCf(baseRating + 300),
+      reason: "相似标签挑战题，用于向下一档难度过渡。",
+    },
+  ];
+
+  const picked: CandidateProblem[] = [];
+  const usedKeys = new Set<string>();
+
+  for (const tier of tiers) {
+    const candidates = await queryTierCandidates(userId, getCandidates, {
+      ratingMin: tier.ratingMin,
+      ratingMax: tier.ratingMax,
+      targetRating: tier.targetRating,
+      tags: queryTags.length > 0 ? queryTags : undefined,
+      limit: 8,
+    });
+
+    const candidate = candidates.find((c) => {
+      const key = `${c.cfContestId}:${c.cfIndex}`;
+      return !usedKeys.has(key) && c.cfContestId > 0 && c.cfIndex.length > 0;
+    });
+
+    if (!candidate) continue;
+
+    usedKeys.add(`${candidate.cfContestId}:${candidate.cfIndex}`);
+    picked.push({
+      cfContestId: candidate.cfContestId,
+      cfIndex: candidate.cfIndex,
+      name: candidate.name,
+      rating: candidate.rating,
+      tags: candidate.tags,
+      cfUrl: candidate.cfUrl,
+      suggestionType: tier.suggestionType,
+      suggestionReason: tier.reason,
+    });
   }
 
-  const result = await getCandidates(userId, {
-    ratingMin,
-    ratingMax,
-    tags: queryTags.length > 0 ? queryTags : undefined,
-    limit: MAX_CANDIDATE_PROBLEMS,
-  });
+  return picked.slice(0, MAX_CANDIDATE_PROBLEMS);
+}
 
-  return result.candidates.map((c, i) => {
-    let suggestionType: CandidateProblem["suggestionType"];
-    if (problemRating !== null && learnerRating !== null && c.rating !== null) {
-      if (c.rating < problemRating - 100) suggestionType = "prerequisite";
-      else if (weakTagNames.some((t) => c.tags.includes(t))) suggestionType = "same_tag_practice";
-      else suggestionType = "next_challenge";
-    } else {
-      suggestionType = "same_tag_practice";
-    }
+async function queryTierCandidates(
+  userId: string,
+  getCandidates: (userId: string, input: CfCandidatesInput) => Promise<CfCandidatesOutput>,
+  input: CfCandidatesInput,
+): Promise<CfCandidatesOutput["candidates"]> {
+  const taggedResult = await getCandidates(userId, input);
+  if (taggedResult.candidates.length > 0 || !input.tags || input.tags.length === 0) {
+    return taggedResult.candidates;
+  }
 
-    return {
-      cfContestId: c.cfContestId,
-      cfIndex: c.cfIndex,
-      name: c.name,
-      rating: c.rating,
-      tags: c.tags,
-      cfUrl: c.cfUrl,
-      suggestionType,
-      suggestionReason: suggestionType === "prerequisite"
-        ? "前置训练题"
-        : suggestionType === "same_tag_practice"
-        ? "同标签练习"
-        : "难度进阶",
-    };
-  });
+  const fallbackResult = await getCandidates(userId, { ...input, tags: undefined });
+  return fallbackResult.candidates;
+}
+
+function clampRatingToCf(value: number): number {
+  return Math.max(800, Math.min(3500, Math.round(value / 100) * 100));
 }
 
 // ---------------------------------------------------------------------------
@@ -615,9 +636,11 @@ function computeEvidenceSummary(
   // Problem profile
   if (problemProfile.rating.source === "user_provided") userProvidedCount++;
   else if (problemProfile.rating.source === "model_inferred") modelInferenceCount++;
+  else if (problemProfile.rating.source === "rule_estimated") deterministicStatisticCount++;
   for (const tag of problemProfile.tags) {
     if (tag.source === "user_provided") userProvidedCount++;
     else if (tag.source === "model_inferred") modelInferenceCount++;
+    else if (tag.source === "rule_estimated") deterministicStatisticCount++;
   }
 
   // Learner profile

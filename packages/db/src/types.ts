@@ -231,6 +231,7 @@ export interface CreateBookWithContentInput {
 
 export interface CreateBookWithContentResult {
   bookId: string;
+  chapterIds: string[];
   chapterCount: number;
   chunkCount: number;
 }
@@ -244,6 +245,7 @@ export interface BookReaderData {
 export interface ListBooksInput {
   limit?: number;
   sourceType?: BookSourceType;
+  ownerId?: string;
 }
 
 export type BookListItem = Pick<
@@ -257,9 +259,32 @@ export type BookListItem = Pick<
   | "sourceUrl"
   | "language"
   | "tags"
+  | "metadata"
   | "createdAt"
   | "updatedAt"
 >;
+
+export interface DeleteBookInput {
+  bookId: string;
+}
+
+export interface DeleteBookResult {
+  deleted: boolean;
+  bookId: string;
+  chapterCount: number;
+  chunkCount: number;
+}
+
+export interface UpdateBookMetadataInput {
+  bookId: string;
+  metadata: PrismaTypes.InputJsonValue;
+}
+
+export interface UpdateBookMetadataResult {
+  updated: boolean;
+  bookId: string;
+  metadata: PrismaTypes.JsonValue | null;
+}
 
 export interface BookRepository {
   createBookWithContent(
@@ -269,6 +294,12 @@ export interface BookRepository {
   getBookReaderData(bookId: string): Promise<BookReaderData | null>;
 
   listBooks(input?: ListBooksInput): Promise<BookListItem[]>;
+
+  deleteBook(input: DeleteBookInput): Promise<DeleteBookResult>;
+
+  updateBookMetadata(
+    input: UpdateBookMetadataInput,
+  ): Promise<UpdateBookMetadataResult>;
 }
 
 export interface CreateUserInput {
@@ -997,4 +1028,242 @@ export interface ProblemWrongBookRepository {
   updateProblemWrongBookNote(input: UpdateProblemWrongBookNoteInput): Promise<ProblemWrongBookRecord>;
   listProblemWrongBookByOwner(input: ListProblemWrongBookByOwnerInput): Promise<ProblemWrongBookRecord[]>;
   isProblemInWrongBook(input: IsProblemInWrongBookInput): Promise<boolean>;
+}
+
+// ---------------------------------------------------------------------------
+// DailyChallengeProgress (guarded preview persistence)
+// ---------------------------------------------------------------------------
+
+export type DailyChallengeProgressStatus =
+  | "not-started"
+  | "in-progress"
+  | "completed"
+  | "needs-review";
+
+export interface DailyChallengeProgressRecord {
+  challengeDate: string;
+  problemId: string;
+  title: string;
+  difficulty: string;
+  tags: string[];
+  status: DailyChallengeProgressStatus;
+  startedAt: string | null;
+  completedAt: string | null;
+  updatedAt: string;
+  recommendationSource: string;
+  recommendationReason: string;
+}
+
+export interface DailyChallengeProgressUpsertInput {
+  challengeDate: string;
+  problemId: string;
+  title: string;
+  difficulty: string;
+  tags: string[];
+  status: DailyChallengeProgressStatus;
+  startedAt: string | null;
+  completedAt: string | null;
+  updatedAt: string;
+  recommendationSource: string;
+  recommendationReason: string;
+}
+
+export interface DailyChallengeProgressSafetyMetadata {
+  productionReady: false;
+  llmUsed: false;
+  externalApiUsed: false;
+  safeToExposeToClient: true;
+  writesDatabase: boolean;
+  guardActive: boolean;
+  status: "blocked" | "preview";
+  blockedReasons: string[];
+}
+
+export interface DailyChallengeProgressFindResult {
+  record: DailyChallengeProgressRecord | null;
+  metadata: DailyChallengeProgressSafetyMetadata;
+}
+
+export interface DailyChallengeProgressUpsertResult {
+  record: DailyChallengeProgressRecord | null;
+  metadata: DailyChallengeProgressSafetyMetadata;
+}
+
+export interface DailyChallengeProgressClearResult {
+  success: boolean;
+  metadata: DailyChallengeProgressSafetyMetadata;
+}
+
+export interface DailyChallengeProgressRepository {
+  findByDate(date: string): Promise<DailyChallengeProgressFindResult>;
+  upsertProgress(input: DailyChallengeProgressUpsertInput): Promise<DailyChallengeProgressUpsertResult>;
+  clearToday(date: string): Promise<DailyChallengeProgressClearResult>;
+}
+
+// ---------------------------------------------------------------------------
+// Email OTP (email login/register mainline)
+// ---------------------------------------------------------------------------
+
+export type EmailOtpPurpose = "login" | "register";
+
+export const VALID_EMAIL_OTP_PURPOSES: ReadonlySet<EmailOtpPurpose> = new Set([
+  "login",
+  "register",
+]);
+
+export interface CreateEmailOtpInput {
+  email: string;
+  codeHash: string;
+  purpose: EmailOtpPurpose;
+  expiresAt: Date;
+}
+
+export interface EmailOtpRecordSafe {
+  id: string;
+  email: string;
+  purpose: EmailOtpPurpose;
+  expiresAt: Date;
+  consumedAt: Date | null;
+  attemptCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface EmailOtpRepository {
+  createEmailOtp(input: CreateEmailOtpInput): Promise<EmailOtpRecordSafe>;
+  findLatestActiveEmailOtp(email: string, purpose: EmailOtpPurpose): Promise<EmailOtpRecordSafe | null>;
+  markEmailOtpConsumed(id: string): Promise<EmailOtpRecordSafe | null>;
+  incrementEmailOtpAttempts(id: string): Promise<EmailOtpRecordSafe | null>;
+  deleteExpiredEmailOtps(): Promise<number>;
+  getEmailOtpById(id: string): Promise<EmailOtpRecordSafe | null>;
+  getCodeHashForVerification(id: string): Promise<string | null>;
+}
+
+// ---------------------------------------------------------------------------
+// Article favorites and recent readings
+// ---------------------------------------------------------------------------
+
+export interface ArticleFavoriteRecord {
+  id: string;
+  userId: string;
+  articleId: string;
+  articleTitle: string;
+  sourcePlatform: string;
+  sourceName: string;
+  originalUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ArticleReadingRecord extends ArticleFavoriteRecord {
+  lastReadAt: Date;
+}
+
+export interface AddFavoriteArticleInput {
+  userId: string;
+  articleId: string;
+  articleTitle: string;
+  sourcePlatform: string;
+  sourceName: string;
+  originalUrl: string;
+}
+
+export interface RemoveFavoriteArticleInput {
+  userId: string;
+  articleId: string;
+}
+
+export interface IsFavoriteArticleInput {
+  userId: string;
+  articleId: string;
+}
+
+export interface ListFavoriteArticlesByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface RecordArticleReadingInput extends AddFavoriteArticleInput {
+  lastReadAt?: Date;
+}
+
+export interface ListArticleReadingsByOwnerInput {
+  userId: string;
+  limit?: number;
+}
+
+export interface ArticleRepository {
+  addFavoriteArticle(input: AddFavoriteArticleInput): Promise<ArticleFavoriteRecord>;
+  removeFavoriteArticle(input: RemoveFavoriteArticleInput): Promise<boolean>;
+  listFavoriteArticlesByOwner(input: ListFavoriteArticlesByOwnerInput): Promise<ArticleFavoriteRecord[]>;
+  isFavoriteArticle(input: IsFavoriteArticleInput): Promise<boolean>;
+  recordArticleReading(input: RecordArticleReadingInput): Promise<ArticleReadingRecord>;
+  listArticleReadingsByOwner(input: ListArticleReadingsByOwnerInput): Promise<ArticleReadingRecord[]>;
+}
+
+// ---------------------------------------------------------------------------
+// Assistant memory persistence
+// ---------------------------------------------------------------------------
+
+export type MemoryRecordCategory =
+  | "preference"
+  | "goal"
+  | "learning"
+  | "project"
+  | "other";
+
+export type MemoryRecordSource =
+  | "assistant_suggested"
+  | "user_created";
+
+export interface MemoryRecord {
+  id: string;
+  userId: string;
+  sessionId: string | null;
+  sourceMessageId: string | null;
+  memoryType: "PROFILE" | "SESSION_SUMMARY" | "RETRIEVABLE";
+  content: string;
+  category: MemoryRecordCategory;
+  source: MemoryRecordSource;
+  enabled: boolean;
+  importance: number;
+  metadata: PrismaTypes.JsonValue | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AddMemoryInput {
+  userId: string;
+  content: string;
+  category?: MemoryRecordCategory;
+  source?: MemoryRecordSource;
+  enabled?: boolean;
+  importance?: number;
+  sessionId?: string | null;
+  sourceMessageId?: string | null;
+  metadata?: PrismaTypes.InputJsonValue | null;
+}
+
+export interface ToggleMemoryEnabledInput {
+  userId: string;
+  memoryId: string;
+  enabled: boolean;
+}
+
+export interface DeleteMemoryInput {
+  userId: string;
+  memoryId: string;
+}
+
+export interface ListMemoriesByOwnerInput {
+  userId: string;
+  limit?: number;
+  includeDisabled?: boolean;
+}
+
+export interface MemoryRepository {
+  listMemoriesByOwner(input: ListMemoriesByOwnerInput): Promise<MemoryRecord[]>;
+  addMemory(input: AddMemoryInput): Promise<MemoryRecord>;
+  toggleMemoryEnabled(input: ToggleMemoryEnabledInput): Promise<MemoryRecord | null>;
+  deleteMemory(input: DeleteMemoryInput): Promise<boolean>;
 }

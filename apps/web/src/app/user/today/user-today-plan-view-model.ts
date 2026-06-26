@@ -16,7 +16,73 @@ var SENSITIVE_PATTERNS = [
 var MAX_NOTE_TEXT = 1000;
 var MAX_TASKS = 5;
 
-function sanitizeTitle(raw, maxLen) {
+interface TodayPlanProblemEntry {
+  problemId: string;
+  title: string;
+  difficulty: string;
+  reviewStatus?: string;
+}
+
+interface TodayPlanReadingEntry {
+  bookId: string;
+  chapterId: string;
+  bookTitle: string;
+  chapterTitle: string;
+  progressRatio: number;
+}
+
+interface TodayPlanNoteEntry {
+  noteId: string;
+  bookTitle: string;
+}
+
+interface TodayPlanAiHistoryEntry {
+  bookTitle: string;
+  chapterTitle: string;
+  questionPreview: string;
+  chapterId: string;
+}
+
+interface TodayPlanInput {
+  hasSession: boolean;
+  wrongBookEntries?: TodayPlanProblemEntry[];
+  recentReading?: TodayPlanReadingEntry[];
+  readingSessionSummary?: {
+    totalSessions: number;
+    totalDurationMinutes: number;
+    todayDurationMinutes: number;
+  };
+  recentPractice?: unknown[];
+  notes?: TodayPlanNoteEntry[];
+  aiHistory?: TodayPlanAiHistoryEntry[];
+  favoriteProblems?: TodayPlanProblemEntry[];
+  hasDailyChallenge?: boolean;
+  dailyChallengeTitle?: string | null;
+}
+
+interface TodayPlanTask {
+  taskId: string;
+  title: string;
+  description: string;
+  estimatedMinutes: number;
+  targetType: "problem" | "chapter" | "book" | "note";
+  targetId: string;
+  targetLink: string;
+  status: "todo" | "suggested";
+  reason: string;
+  devOnlyLabel: string;
+}
+
+interface TodayPlanView {
+  tasks: TodayPlanTask[];
+  totalTasks: number;
+  totalEstimatedMinutes: number;
+  dataSourceNotice: string;
+  hasSession: boolean;
+  message: string;
+}
+
+function sanitizeTitle(raw: unknown, maxLen: number): string {
   if (typeof raw !== "string") return "unknown";
   return raw.trim().slice(0, maxLen);
 }
@@ -27,8 +93,8 @@ function nextTaskId() {
   return "task-" + Date.now().toString(36) + "-" + _taskIdCounter;
 }
 
-function generateTodayPlan(params) {
-  var tasks = [];
+function generateTodayPlan(params: Required<TodayPlanInput>): TodayPlanTask[] {
+  var tasks: TodayPlanTask[] = [];
 
   // Task 1: Review wrong book entries
   var needsReview = params.wrongBookEntries.filter(function(e) { return e.reviewStatus === "needs-review"; }).slice(0, 2);
@@ -162,7 +228,7 @@ function generateTodayPlan(params) {
   return tasks;
 }
 
-function capTasks(tasks, maxTasks) {
+function capTasks(tasks: TodayPlanTask[], maxTasks: number): TodayPlanTask[] {
   if (tasks.length <= maxTasks) return tasks;
   var dcTask = null;
   var nonDcTasks = [];
@@ -186,8 +252,8 @@ function capTasks(tasks, maxTasks) {
   return result;
 }
 
-function todayPlanTasksAreSafe(tasks) {
-  var violations = [];
+function todayPlanTasksAreSafe(tasks: TodayPlanTask[]): { safe: boolean; violations: string[] } {
+  var violations: string[] = [];
   var json = JSON.stringify(tasks);
 
   for (var i = 0; i < SENSITIVE_PATTERNS.length; i++) {
@@ -215,9 +281,10 @@ function todayPlanTasksAreSafe(tasks) {
   return { safe: violations.length === 0, violations: violations };
 }
 
-export function buildTodayPlanView(input) {
+export function buildTodayPlanView(input: TodayPlanInput): TodayPlanView {
   var hasSession = input.hasSession;
   var tasks = hasSession ? generateTodayPlan({
+    hasSession: input.hasSession,
     wrongBookEntries: input.wrongBookEntries || [],
     recentReading: input.recentReading || [],
     readingSessionSummary: input.readingSessionSummary || { totalSessions: 0, totalDurationMinutes: 0, todayDurationMinutes: 0 },
@@ -232,9 +299,9 @@ export function buildTodayPlanView(input) {
   var cappedTasks = capTasks(tasks, MAX_TASKS);
 
   var safetyCheck = todayPlanTasksAreSafe(cappedTasks);
-  var safeTasks = safetyCheck.safe ? cappedTasks : cappedTasks.filter(function(t) { return t.devOnlyLabel && t.devOnlyLabel.length > 0; });
+  var safeTasks = safetyCheck.safe ? cappedTasks : cappedTasks.filter(function(t: TodayPlanTask) { return t.devOnlyLabel && t.devOnlyLabel.length > 0; });
 
-  var totalEstimatedMinutes = safeTasks.reduce(function(sum, t) { return sum + t.estimatedMinutes; }, 0);
+  var totalEstimatedMinutes = safeTasks.reduce(function(sum: number, t: TodayPlanTask) { return sum + t.estimatedMinutes; }, 0);
 
   var message = safeTasks.length > 0
     ? "Today: " + safeTasks.length + " suggested tasks, estimated " + totalEstimatedMinutes + " min (rules engine)"
@@ -252,8 +319,8 @@ export function buildTodayPlanView(input) {
   };
 }
 
-export function todayPlanViewIsSafe(view) {
-  var violations = [];
+export function todayPlanViewIsSafe(view: TodayPlanView): { safe: boolean; violations: string[] } {
+  var violations: string[] = [];
   var json = JSON.stringify(view);
 
   for (var i = 0; i < SENSITIVE_PATTERNS.length; i++) {
