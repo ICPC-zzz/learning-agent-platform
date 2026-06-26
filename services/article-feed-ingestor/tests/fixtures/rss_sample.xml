@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Sample RSS</title>
+    <item>
+      <title><![CDATA[  <b>Python</b> Async Tips  ]]></title>
+      <link>https://example.com/python-async?utm_source=feed</link>
+      <guid isPermaLink="false">python-async-001</guid>
+      <pubDate>Tue, 18 Jun 2024 10:00:00 GMT</pubDate>
+      <description><![CDATA[<p>这是一段 <em>HTML</em> 摘要，应该被清洗。</p>]]></description>
+      <category>Python</category>
+    </item>
+    <item>
+      <title>Dangerous URL</title>
+      <link>javascript:alert(1)</link>
+      <pubDate>Tue, 18 Jun 2024 10:00:00 GMT</pubDate>
+      <description><![CDATA[<p>Should be rejected.</p>]]></description>
+    </item>
+    <item>
+      <title>Missing date article</title>
+      <link>https://example.com/missing-date</link>
+      <guid>missing-date-guid</guid>
+      <description><![CDATA[<p>Short summary should still be usable.</p>]]></description>
+    </item>
+  </channel>
+</rss>
+

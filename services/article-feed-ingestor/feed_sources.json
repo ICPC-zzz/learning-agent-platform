@@ -1,0 +1,35 @@
+[
+  {
+    "id": "cnblogs-sitehome",
+    "name": "博客园首页精选",
+    "platform": "cnblogs",
+    "feedUrl": "https://feed.cnblogs.com/blog/sitehome/rss",
+    "category": "其他",
+    "enabled": true
+  },
+  {
+    "id": "cnblogs-yanhuihang",
+    "name": "yanhuihang 的博客园",
+    "platform": "cnblogs",
+    "feedUrl": "https://www.cnblogs.com/yanhuihang/rss",
+    "category": "Python",
+    "enabled": true
+  },
+  {
+    "id": "csdn-v-july-v",
+    "name": "v_JULY_v 的 CSDN 博客",
+    "platform": "csdn",
+    "feedUrl": "https://blog.csdn.net/v_JULY_v/rss/list",
+    "category": "算法",
+    "enabled": true
+  },
+  {
+    "id": "csdn-huang9604",
+    "name": "huang9604 的 CSDN 博客",
+    "platform": "csdn",
+    "feedUrl": "https://blog.csdn.net/huang9604/rss/list",
+    "category": "AI",
+    "enabled": true
+  }
+]
+

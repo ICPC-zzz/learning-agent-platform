@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Sample Atom</title>
+  <entry>
+    <title>Java Performance Deep Dive</title>
+    <id>tag:example.com,2024:java-performance</id>
+    <link href="https://example.com/java-performance#section" />
+    <updated>2024-06-17T08:30:00Z</updated>
+    <summary type="html"><![CDATA[<p>这是一段 <strong>Atom</strong> 摘要，带有 HTML 标记。</p>]]></summary>
+    <category term="Java" />
+  </entry>
+  <entry>
+    <title>Duplicate Article</title>
+    <id>tag:example.com,2024:python-async-001</id>
+    <link href="https://example.com/python-async?utm_source=atom" />
+    <updated>2024-06-17T08:30:00Z</updated>
+    <summary>Duplicate content.</summary>
+  </entry>
+</feed>
+
