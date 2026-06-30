@@ -7,7 +7,12 @@
  * @adminDev — admin-only, not for regular users
  */
 
-import { adminRefreshHotspots, adminRefreshGitHub, adminGetSyncStatus } from "./admin-sync-actions";
+import {
+  adminGetSyncStatus,
+  adminRefreshArticles,
+  adminRefreshGitHub,
+  adminRefreshHotspots,
+} from "./admin-sync-actions";
 import { SyncManagementClient } from "./SyncManagementClient";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +27,7 @@ export default async function AdminSyncPage() {
           内容同步管理
         </h1>
         <p style={{ margin: "4px 0 0", fontSize: "0.8125rem", color: "#94a3b8" }}>
-          手动刷新每日技术热点和 GitHub 日报。刷新有冷却时间限制。
+          手动刷新每日技术热点、GitHub 日报和技术文章。刷新有冷却时间限制。
         </p>
       </div>
 
@@ -30,6 +35,7 @@ export default async function AdminSyncPage() {
         initialStatus={status}
         refreshHotspots={adminRefreshHotspots}
         refreshGitHub={adminRefreshGitHub}
+        refreshArticles={adminRefreshArticles}
       />
     </div>
   );

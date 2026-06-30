@@ -22,6 +22,7 @@ import { getCodeforcesUserAnalysisSnapshot } from "../../lib/codeforces-agent-sn
 import { queryCodeforcesCandidatesForUser } from "../../lib/codeforces-agent-candidates-user";
 import type { AgentCandidateProblemRecord } from "../../lib/codeforces-agent-candidates";
 import { getCachedComputation } from "../../lib/cf-computation-cache.ts";
+import { persistCfLearningReportMemory } from "../../lib/assistant/learning-artifact-memory.ts";
 import type { RatingEstimate } from "../../../../../packages/ai-core/src/agent-runtime/cf-analysis/cf-rating-estimator.ts";
 import type {
   CodeforcesAgentCandidate as TrainingPlanCandidate,
@@ -321,6 +322,7 @@ export async function generateCfLearningAnalysis(
       contestRecommendation,
     };
 
+    await persistCfLearningReportMemory({ userId, report, runId }).catch(() => undefined);
     return { success: true, runId, safeEvents: events, report };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

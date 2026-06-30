@@ -11,6 +11,7 @@ import {
 export async function loadDbArticleRecentReadings(
   cookieValue: string | undefined,
   limit: number = 15,
+  options: { sinceDays?: number | null } = {},
 ): Promise<DbArticleRecentReadingLoadResult> {
   const guard = evaluateArticleLibraryDbGuard(cookieValue);
 
@@ -33,16 +34,47 @@ export async function loadDbArticleRecentReadings(
   try {
     const prisma = getPrismaClient();
     const repository = new PrismaArticleRepository(prisma);
+    const cutoff =
+      typeof options.sinceDays === "number" && Number.isFinite(options.sinceDays) && options.sinceDays > 0
+        ? new Date(Date.now() - options.sinceDays * 24 * 60 * 60 * 1000)
+        : null;
     const records = await repository.listArticleReadingsByOwner({
       userId: guard.sessionPayload.userIdPreview,
       limit: Math.min(Math.max(limit, 1), 50),
+      since: cutoff ?? undefined,
     });
-
     return buildDbArticleRecentReadingLoadResult(records, guard.sessionPayload.displayName);
   } catch {
     return createEmptyDbArticleRecentReadingLoadResult(
       true,
       "DB 最近阅读文章读取失败。页面将继续使用本地 fallback。",
+    );
+  }
+}
+
+export async function loadDbArticleRecentReadingsForUser(
+  userId: string,
+  ownerLabel: string,
+  limit: number = 15,
+  options: { sinceDays?: number | null } = {},
+): Promise<DbArticleRecentReadingLoadResult> {
+  try {
+    const prisma = getPrismaClient();
+    const repository = new PrismaArticleRepository(prisma);
+    const cutoff =
+      typeof options.sinceDays === "number" && Number.isFinite(options.sinceDays) && options.sinceDays > 0
+        ? new Date(Date.now() - options.sinceDays * 24 * 60 * 60 * 1000)
+        : null;
+    const records = await repository.listArticleReadingsByOwner({
+      userId,
+      limit: Math.min(Math.max(limit, 1), 50),
+      since: cutoff ?? undefined,
+    });
+    return buildDbArticleRecentReadingLoadResult(records, ownerLabel);
+  } catch {
+    return createEmptyDbArticleRecentReadingLoadResult(
+      true,
+      "DB 最近阅读文章读取失败。",
     );
   }
 }

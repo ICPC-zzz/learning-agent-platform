@@ -7,8 +7,6 @@
  * @serverOnly
  */
 
-import { cookies } from "next/headers";
-import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
 import {
   getPrismaClient,
   PrismaCodeforcesAccountRepository,
@@ -17,6 +15,7 @@ import {
   type CodeforcesRatingChangeRecord,
   type CodeforcesAccountStats,
 } from "@learning-agent-platform/db";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 
 // ---------------------------------------------------------------------------
 // Dashboard data type
@@ -47,19 +46,8 @@ export async function loadCodeforcesDashboard(): Promise<CodeforcesDashboardData
   const prisma = getPrismaClient();
   const repository = new PrismaCodeforcesAccountRepository(prisma);
 
-  // Get current user
-  let userId: string | null = null;
-  try {
-    const cookieStore = await cookies();
-    const raw = cookieStore.get("lap-web-dev-session")?.value;
-    const payload = deserializeDevSession(raw);
-    const summary = getSafeSessionSummary(payload);
-    userId = summary.user?.userIdPreview ?? null;
-  } catch {
-    // Not logged in
-  }
-
-  if (!userId) {
+  const session = await getCurrentAuthSession();
+  if (!session.hasSession) {
     return {
       hasAccount: false,
       account: null,
@@ -71,7 +59,7 @@ export async function loadCodeforcesDashboard(): Promise<CodeforcesDashboardData
     };
   }
 
-  const account = await repository.getAccountByUserId(userId);
+  const account = await repository.getAccountByUserId(session.userId);
   if (!account) {
     return {
       hasAccount: false,

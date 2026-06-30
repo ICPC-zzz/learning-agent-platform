@@ -30,16 +30,16 @@ export interface HotTechnicalArticlesInput {
 export function createSearchTechnicalArticlesDefinition(): AssistantToolDefinition<SearchTechnicalArticlesInput, AssistantArticleResult> {
   return {
     name: "search_technical_articles",
-    description: "Search technical articles from CNBlogs and CSDN caches.",
+    description: "从博客园和 CSDN 缓存中搜索技术文章。",
     inputSchema: {
       type: "object",
-      title: "Search technical articles input",
-      description: "Search by keyword and tags, with an optional source filter.",
+      title: "搜索技术文章输入",
+      description: "按关键词、标签和来源筛选。",
       properties: {
-        query: { type: "string", description: "Free text keyword." },
-        tags: { type: "array", description: "Category tags.", items: { type: "string", description: "One tag." } },
+        query: { type: "string", description: "搜索关键词。" },
+        tags: { type: "array", description: "分类标签。", items: { type: "string", description: "单个标签。" } },
         source: { type: "string", description: '"all" | "cnblogs" | "csdn"' },
-        limit: { type: "number", description: "Max result count." },
+        limit: { type: "number", description: "最多返回数量。" },
       },
       additionalProperties: false,
     },
@@ -47,7 +47,7 @@ export function createSearchTechnicalArticlesDefinition(): AssistantToolDefiniti
     timeoutMs: 5_000,
     maxResults: 10,
     maxSummaryChars: 900,
-    sourceLabel: "article cache",
+    sourceLabel: "技术文章缓存",
     validateInput: isSearchTechnicalArticlesInput,
     execute: (input, context) => executeSearchTechnicalArticles(input, context),
   };
@@ -56,15 +56,15 @@ export function createSearchTechnicalArticlesDefinition(): AssistantToolDefiniti
 export function createHotTechnicalArticlesDefinition(): AssistantToolDefinition<HotTechnicalArticlesInput, AssistantArticleResult> {
   return {
     name: "get_hot_technical_articles",
-    description: "Return recent or hot technical articles from the public cache.",
+    description: "从公开缓存读取近期或热门技术文章。",
     inputSchema: {
       type: "object",
-      title: "Hot technical articles input",
-      description: "Return recent/hot articles with an optional source filter.",
+      title: "热门技术文章输入",
+      description: "按来源和标签读取近期或热门文章。",
       properties: {
         source: { type: "string", description: '"all" | "cnblogs" | "csdn"' },
-        tags: { type: "array", description: "Category tags.", items: { type: "string", description: "One tag." } },
-        limit: { type: "number", description: "Max result count." },
+        tags: { type: "array", description: "分类标签。", items: { type: "string", description: "单个标签。" } },
+        limit: { type: "number", description: "最多返回数量。" },
       },
       additionalProperties: false,
     },
@@ -72,7 +72,7 @@ export function createHotTechnicalArticlesDefinition(): AssistantToolDefinition<
     timeoutMs: 5_000,
     maxResults: 10,
     maxSummaryChars: 900,
-    sourceLabel: "article cache",
+    sourceLabel: "技术文章缓存",
     validateInput: isHotTechnicalArticlesInput,
     execute: (input, context) => executeHotTechnicalArticles(input, context),
   };
@@ -99,14 +99,14 @@ export async function executeSearchTechnicalArticles(
   return {
     name: "search_technical_articles",
     ok: items.length > 0,
-    summary: summarizeArticles(items, "Technical article search results"),
+    summary: summarizeArticles(items, "技术文章搜索结果"),
     items,
     sources: toAssistantSources(items),
-    warnings: items.length > 0 ? [] : ["no article matches"],
+    warnings: items.length > 0 ? [] : ["未找到匹配的技术文章"],
     timedOut: false,
     rawResponseStored: false,
     errorCode: items.length > 0 ? undefined : "empty",
-    errorMessage: items.length > 0 ? undefined : "No technical article matches were found.",
+    errorMessage: items.length > 0 ? undefined : "未找到匹配的技术文章。",
   };
 }
 
@@ -130,14 +130,14 @@ export async function executeHotTechnicalArticles(
   return {
     name: "get_hot_technical_articles",
     ok: items.length > 0,
-    summary: summarizeArticles(items, "Hot technical articles"),
+    summary: summarizeArticles(items, "热门技术文章"),
     items,
     sources: toAssistantSources(items),
-    warnings: items.length > 0 ? [] : ["no hot article matches"],
+    warnings: items.length > 0 ? [] : ["未找到匹配的热门技术文章"],
     timedOut: false,
     rawResponseStored: false,
     errorCode: items.length > 0 ? undefined : "empty",
-    errorMessage: items.length > 0 ? undefined : "No hot technical articles were found.",
+    errorMessage: items.length > 0 ? undefined : "未找到匹配的热门技术文章。",
   };
 }
 
@@ -189,7 +189,7 @@ function mergeAndDedupe(items: readonly AssistantArticleResult[], limit: number)
 
 function summarizeArticles(items: readonly AssistantArticleResult[], prefix: string): string {
   if (items.length === 0) {
-    return `${prefix}: no results`;
+    return `${prefix}：没有结果。`;
   }
 
   const lines = [prefix];
@@ -242,17 +242,17 @@ function clampLimit(value: number): number {
 function articleOutputSchema() {
   return {
     type: "object" as const,
-    title: "Technical article item",
-    description: "Safe article preview result.",
+    title: "技术文章条目",
+    description: "安全的文章预览结果。",
     properties: {
-      id: { type: "string" as const, description: "Stable id." },
-      title: { type: "string" as const, description: "Article title." },
-      summary: { type: "string" as const, description: "Short summary." },
-      source: { type: "string" as const, description: "Source platform." },
-      sourceName: { type: "string" as const, description: "Readable source name." },
-      publishedAt: { type: "string" as const, description: "Publish time." },
-      originalUrl: { type: "string" as const, description: "Original link." },
-      tags: { type: "array" as const, description: "Article tags.", items: { type: "string" as const, description: "One tag." } },
+      id: { type: "string" as const, description: "稳定 ID。" },
+      title: { type: "string" as const, description: "文章标题。" },
+      summary: { type: "string" as const, description: "短摘要。" },
+      source: { type: "string" as const, description: "来源平台。" },
+      sourceName: { type: "string" as const, description: "可读来源名称。" },
+      publishedAt: { type: "string" as const, description: "发布时间。" },
+      originalUrl: { type: "string" as const, description: "原文链接。" },
+      tags: { type: "array" as const, description: "文章标签。", items: { type: "string" as const, description: "单个标签。" } },
     },
     additionalProperties: false as const,
   };

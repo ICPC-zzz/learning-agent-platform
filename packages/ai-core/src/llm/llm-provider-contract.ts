@@ -31,6 +31,7 @@ export const LlmChatRole = {
   System: "system",
   User: "user",
   Assistant: "assistant",
+  Tool: "tool",
 } as const;
 
 export type LlmChatRole =
@@ -47,7 +48,64 @@ export type LlmChatRole =
 export interface LlmChatMessage {
   role: LlmChatRole;
   content: string;
+  /** Required when role is tool. */
+  toolCallId?: string;
+  /** Present on assistant messages when the model requested tools. */
+  toolCalls?: readonly LlmToolCall[];
 }
+
+// ---------------------------------------------------------------------------
+// Provider capabilities and tool-call protocol
+// ---------------------------------------------------------------------------
+
+export interface LlmProviderCapabilities {
+  supportsChat: boolean;
+  supportsToolCalling: boolean;
+  supportsParallelToolCalls?: boolean;
+  toolCallProtocol?: "openai-chat-completions";
+}
+
+export interface LlmToolDefinition {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters?: Record<string, unknown>;
+  };
+  /**
+   * Runtime-only canonical name. This is never sent to providers; it lets the
+   * Agent Loop map provider-safe function names back to canonical tool names.
+   */
+  runtimeName?: string;
+}
+
+export interface LlmToolCall {
+  id: string;
+  type: "function";
+  name: string;
+  arguments: Record<string, unknown>;
+  argumentsText?: string;
+  argumentsParseError?: string;
+}
+
+export type LlmToolChoice =
+  | "auto"
+  | "none"
+  | "required"
+  | {
+      type: "function";
+      function: {
+        name: string;
+      };
+    };
+
+export type LlmChatCompletionFinishReason =
+  | "stop"
+  | "tool_calls"
+  | "length"
+  | "content_filter"
+  | "error"
+  | "unknown";
 
 // ---------------------------------------------------------------------------
 // Chat request
@@ -67,6 +125,31 @@ export interface LlmChatRequest {
   maxOutputChars?: number;
   /** Human-readable purpose for audit logs (never raw prompt). */
   purposeSummary: string;
+  /** Optional caller cancellation signal. */
+  signal?: AbortSignal;
+  /** Provider-neutral function tools available to the model. */
+  tools?: readonly LlmToolDefinition[];
+  /** Tool-choice policy, mapped to the provider's native protocol. */
+  toolChoice?: LlmToolChoice;
+  /** Whether the caller allows independent tool calls in one model turn. */
+  parallelToolCalls?: boolean;
+}
+
+export interface LlmAssistantTurnResult {
+  ok: boolean;
+  message: LlmChatMessage;
+  finishReason: LlmChatCompletionFinishReason;
+  providerMode: LlmProviderMode;
+  realProviderCalled: boolean;
+  networkAccessed: boolean;
+  secretSafe: true;
+  rawPromptStored: false;
+  rawResponseStored: false;
+  devOnly: true;
+  productionReady: false;
+  error?: LlmSafeError;
+  warnings: readonly string[];
+  createdAt: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -153,10 +236,20 @@ export interface LlmProvider {
   readonly mode: LlmProviderMode;
   /** Human-readable label for UI display. */
   readonly label: string;
+  /** Provider capabilities. Missing means legacy chat-only provider. */
+  readonly capabilities?: LlmProviderCapabilities;
 
   /**
    * Generate a chat completion. Never returns raw provider responses.
    * Errors are always sanitized via LlmSafeError.
    */
   generate(request: LlmChatRequest): Promise<LlmChatResult>;
+
+  /**
+   * Generate one assistant turn that may contain provider-neutral tool calls.
+   * Implementations must not persist raw prompts or raw provider payloads.
+   */
+  generateAssistantTurn?(
+    request: LlmChatRequest,
+  ): Promise<LlmAssistantTurnResult>;
 }

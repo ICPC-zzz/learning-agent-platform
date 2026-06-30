@@ -5,21 +5,22 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties, type Rea
 import {
   listAssistantMemoryOverviewAction,
 } from "../../lib/assistant/assistant-server-actions.ts";
-import type { AssistantChatMessage, AssistantMemoryRecord } from "../../lib/assistant/assistant-types.ts";
+import type { AssistantMemoryRecord } from "../../lib/assistant/assistant-types.ts";
+import {
+  isReadonlyLearningArtifactMemory,
+} from "../../lib/assistant/learning-artifact-classification.ts";
 import { useAssistantConversation } from "../_components/AssistantConversationStore.tsx";
 import { EmptyState, MetricPill } from "../_components/UserUiComponents.tsx";
 
-const MAX_MESSAGE_PREVIEW_LENGTH = 140;
 const MAX_LONG_TERM_ITEMS = 5;
-const MAX_SESSION_SUMMARY_ITEMS = 3;
-const MAX_WORKING_MESSAGES = 5;
 
 export function AssistantMemoryOverviewPanel({
   hasSession,
 }: {
   hasSession: boolean;
 }) {
-  const { conversationId, messages, draftQuestion, status, providerMode } = useAssistantConversation();
+  const { conversationId, messages, status, providerMode } = useAssistantConversation();
+  const [isMounted, setIsMounted] = useState(false);
   const [records, setRecords] = useState<AssistantMemoryRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,37 +39,34 @@ export function AssistantMemoryOverviewPanel({
   }, []);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     void refresh();
   }, [conversationId, messages.length, status, providerMode, refresh]);
-
-  const sessionSummaries = useMemo(
-    () =>
-      records
-        .filter((record) => record.memoryType === "SESSION_SUMMARY")
-        .sort(sortByUpdatedAtDesc)
-        .slice(0, MAX_SESSION_SUMMARY_ITEMS),
-    [records],
-  );
-
   const longTermMemories = useMemo(
     () =>
       records
-        .filter((record) => record.memoryType === "RETRIEVABLE")
+        .filter((record) =>
+          record.memoryType === "RETRIEVABLE"
+          && record.lifecycleStatus === "active"
+          && !isReadonlyLearningArtifactMemory(record)
+        )
         .sort(sortByUpdatedAtDesc)
         .slice(0, MAX_LONG_TERM_ITEMS),
     [records],
   );
 
   const enabledLongTermCount = useMemo(
-    () => records.filter((record) => record.memoryType === "RETRIEVABLE" && record.enabled).length,
+    () => records.filter((record) =>
+      record.memoryType === "RETRIEVABLE"
+      && record.enabled
+      && record.lifecycleStatus === "active"
+      && !isReadonlyLearningArtifactMemory(record),
+    ).length,
     [records],
   );
-
-  const workingMessages = useMemo(
-    () => messages.slice(-MAX_WORKING_MESSAGES),
-    [messages],
-  );
-
   return (
     <section
       className="lap-card"
@@ -85,16 +83,15 @@ export function AssistantMemoryOverviewPanel({
         <div>
           <p style={eyebrowStyle}>记忆面板</p>
           <h3 id="assistant-memory-overview-title" style={titleStyle}>
-            工作记忆、会话摘要和长期记忆
+            长期记忆概览
           </h3>
           <p style={noteStyle}>
-            工作记忆来自当前聊天窗口的消息缓存；会话摘要和长期记忆来自服务端记忆层。
+            这里只展示用户可管理的长期记忆；Agent 运行证据会在任务结果中单独展示。
           </p>
         </div>
 
         <div style={badgeClusterStyle}>
           <MetricPill label="消息" value={messages.length} status="info" />
-          <MetricPill label="摘要" value={sessionSummaries.length} status="success" />
           <MetricPill label="长期" value={longTermMemories.length} status="warning" />
         </div>
       </div>
@@ -102,7 +99,9 @@ export function AssistantMemoryOverviewPanel({
       <div style={toolbarStyle}>
         <div style={metaStackStyle}>
           <span style={metaLabelStyle}>Conversation</span>
-          <code style={codeStyle}>{shortConversationId(conversationId)}</code>
+          <code style={codeStyle} suppressHydrationWarning>
+            {isMounted ? shortConversationId(conversationId) : shortConversationId(null)}
+          </code>
         </div>
         <div style={badgeClusterStyle}>
           <MetricPill label="启用长期" value={enabledLongTermCount} status="success" />
@@ -120,60 +119,14 @@ export function AssistantMemoryOverviewPanel({
 
       {!hasSession ? (
         <div style={noticeStyle}>
-          当前未登录，仍可查看本地工作记忆，但服务端会话摘要和长期记忆会显示为空。
+          当前未登录，服务端长期记忆会显示为空。
         </div>
       ) : null}
 
       <div style={gridStyle}>
         <MemoryCard
-          title="工作记忆"
-          subtitle="当前输入框草稿与最近消息"
-        >
-          <div style={stackStyle}>
-            <InfoRow label="草稿" value={draftQuestion.trim().length > 0 ? draftQuestion : "未输入"} />
-            <InfoRow label="最近消息" value={`${messages.length} 条`} />
-            <div style={timelineStyle}>
-              {workingMessages.length === 0 ? (
-                <EmptyState
-                  title="暂无聊天记录"
-                  description="在悬浮球或 /ai 页面发送一次消息后，这里会显示当前工作记忆。"
-                />
-              ) : (
-                workingMessages.map((message) => (
-                  <WorkingMessageItem key={message.id} message={message} />
-                ))
-              )}
-            </div>
-          </div>
-        </MemoryCard>
-
-        <MemoryCard
-          title="会话摘要"
-          subtitle="自动压缩后的 session summary"
-        >
-          <div style={stackStyle}>
-            <InfoRow
-              label="状态"
-              value={sessionSummaries.length > 0 ? "已生成" : "暂无摘要"}
-            />
-            <div style={timelineStyle}>
-              {sessionSummaries.length === 0 ? (
-                <EmptyState
-                  title="没有会话摘要"
-                  description="完成一轮问答后，助手会自动生成并更新当前会话摘要。"
-                />
-              ) : (
-                sessionSummaries.map((record) => (
-                  <MemoryRecordItem key={record.id} record={record} kind="summary" />
-                ))
-              )}
-            </div>
-          </div>
-        </MemoryCard>
-
-        <MemoryCard
           title="长期记忆"
-          subtitle="自动抽取的可检索记忆"
+          subtitle="用户确认或对话来源的长期记忆"
         >
           <div style={stackStyle}>
             <InfoRow label="可检索" value={`${longTermMemories.length} 条`} />
@@ -181,11 +134,11 @@ export function AssistantMemoryOverviewPanel({
               {longTermMemories.length === 0 ? (
                 <EmptyState
                   title="没有长期记忆"
-                  description="助手在识别到稳定偏好、目标、学习进度或项目上下文后，会自动写入长期记忆。"
+                  description="只有用户明确确认或对话中产生并关联来源的长期记忆会出现在这里。"
                 />
               ) : (
                 longTermMemories.map((record) => (
-                  <MemoryRecordItem key={record.id} record={record} kind="long-term" />
+                  <MemoryRecordItem key={record.id} record={record} />
                 ))
               )}
             </div>
@@ -196,32 +149,12 @@ export function AssistantMemoryOverviewPanel({
   );
 }
 
-function WorkingMessageItem({ message }: { message: AssistantChatMessage }) {
+function MemoryRecordItem({ record }: { record: AssistantMemoryRecord }) {
   return (
     <article style={messageItemStyle}>
       <div style={messageTopStyle}>
-        <span style={rolePillStyle(message.role === "user" ? "user" : "assistant")}>
-          {message.role === "user" ? "你" : "AI"}
-        </span>
-        <span style={timestampStyle}>{formatTimestamp(message.createdAt)}</span>
-      </div>
-      <p style={messageTextStyle}>{truncate(message.content, MAX_MESSAGE_PREVIEW_LENGTH)}</p>
-    </article>
-  );
-}
-
-function MemoryRecordItem({
-  record,
-  kind,
-}: {
-  record: AssistantMemoryRecord;
-  kind: "summary" | "long-term";
-}) {
-  return (
-    <article style={messageItemStyle}>
-      <div style={messageTopStyle}>
-        <span style={kind === "summary" ? summaryBadgeStyle : longTermBadgeStyle}>
-          {kind === "summary" ? "摘要" : "长期"}
+        <span style={longTermBadgeStyle}>
+          长期
         </span>
         <span style={timestampStyle}>{formatTimestamp(record.updatedAt)}</span>
       </div>
@@ -239,17 +172,8 @@ function MemoryRecordItem({
         <MetaRow label="会话" value={shortConversationId(record.sessionId ?? null)} />
         <MetaRow label="来源消息" value={shortId(record.sourceMessageId)} />
         <MetaRow label="类型" value={record.memoryType ?? "RETRIEVABLE"} />
-        {kind === "summary" ? (
-          <>
-            <MetaRow label="问题" value={metadataText(record, "question")} />
-            <MetaRow label="路由" value={metadataText(record, "route")} />
-          </>
-        ) : (
-          <>
-            <MetaRow label="记忆种类" value={metadataText(record, "memoryKind")} />
-            <MetaRow label="摘录" value={metadataText(record, "sourceExcerpt")} />
-          </>
-        )}
+        <MetaRow label="记忆种类" value={metadataText(record, "memoryKind")} />
+        <MetaRow label="摘录" value={metadataText(record, "sourceExcerpt")} />
       </dl>
     </article>
   );
@@ -602,30 +526,6 @@ const miniTagStyle: CSSProperties = {
   color: "var(--lap-accent-primary)",
   fontSize: "0.7rem",
   fontWeight: 700,
-};
-
-function rolePillStyle(role: "user" | "assistant"): CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    padding: "3px 8px",
-    borderRadius: "999px",
-    background: role === "user" ? "rgba(99, 102, 241, 0.10)" : "rgba(79, 111, 82, 0.10)",
-    color: role === "user" ? "var(--lap-accent-primary)" : "#2f5135",
-    fontSize: "0.7rem",
-    fontWeight: 800,
-  };
-}
-
-const summaryBadgeStyle: CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  padding: "3px 8px",
-  borderRadius: "999px",
-  background: "#eef5ef",
-  color: "#243b27",
-  fontSize: "0.7rem",
-  fontWeight: 800,
 };
 
 const longTermBadgeStyle: CSSProperties = {

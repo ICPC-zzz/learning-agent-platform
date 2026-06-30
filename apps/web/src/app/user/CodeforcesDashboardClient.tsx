@@ -48,17 +48,12 @@ const VERDICT_COLORS: Record<string, string> = {
 // localStorage cache keys
 const CACHE_LEARNING_ANALYSIS = "cf_learning_analysis_cache";
 const CACHE_WRONGBOOK_REVIEW = "cf_wrongbook_review_cache";
-const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function loadCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
     const cached = JSON.parse(raw) as { data: T; savedAt: number };
-    if (Date.now() - cached.savedAt > CACHE_MAX_AGE_MS) {
-      localStorage.removeItem(key);
-      return null;
-    }
     return cached.data;
   } catch { return null; }
 }
@@ -85,27 +80,22 @@ export function CodeforcesDashboardClient({ data: initialData }: CodeforcesDashb
 
   // Learning analysis state — loaded from cache if available
   const [analysisRunning, setAnalysisRunning] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<CfLearningAgentActionOutput | null>(() => {
-    if (typeof window !== "undefined") return loadCache<CfLearningAgentActionOutput>(CACHE_LEARNING_ANALYSIS);
-    return null;
-  });
+  const [analysisResult, setAnalysisResult] = useState<CfLearningAgentActionOutput | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   // Wrong book review state — loaded from cache if available
   const [wrongBookReviewRunning, setWrongBookReviewRunning] = useState(false);
-  const [wrongBookReviewResult, setWrongBookReviewResult] = useState<CfWrongBookReviewActionOutput | null>(() => {
-    if (typeof window !== "undefined") return loadCache<CfWrongBookReviewActionOutput>(CACHE_WRONGBOOK_REVIEW);
-    return null;
-  });
+  const [wrongBookReviewResult, setWrongBookReviewResult] = useState<CfWrongBookReviewActionOutput | null>(null);
   const [wrongBookReviewError, setWrongBookReviewError] = useState<string | null>(null);
 
   // Target rating — persisted in localStorage
-  const [targetRating, setTargetRating] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem(TARGET_RATING_KEY) ?? "";
-    }
-    return "";
-  });
+  const [targetRating, setTargetRating] = useState<string>("");
+
+  useEffect(() => {
+    setAnalysisResult(loadCache<CfLearningAgentActionOutput>(CACHE_LEARNING_ANALYSIS));
+    setWrongBookReviewResult(loadCache<CfWrongBookReviewActionOutput>(CACHE_WRONGBOOK_REVIEW));
+    setTargetRating(localStorage.getItem(TARGET_RATING_KEY) ?? "");
+  }, []);
 
   const saveTargetRating = useCallback((value: string) => {
     setTargetRating(value);
@@ -810,10 +800,10 @@ function computeTopTags(stats: Array<{ tags: string[]; accepted: boolean; attemp
 
 const S = {
   section: {
-    background: "#fff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "16px",
-    padding: "20px",
+    background: "var(--lap-bg-card)",
+    border: "1px solid var(--lap-border-default)",
+    borderRadius: "8px",
+    padding: "22px",
     marginBottom: "16px",
   } as React.CSSProperties,
   header: {
@@ -827,29 +817,29 @@ const S = {
   sectionTitle: {
     fontSize: "18px",
     fontWeight: 700,
-    color: "#0f172a",
+    color: "#152234",
     margin: 0,
   } as React.CSSProperties,
   bindCard: {
-    background: "#f8fafc",
-    border: "1px solid #e2e8f0",
-    borderRadius: "12px",
+    background: "#f7faf7",
+    border: "1px solid #dfe7dc",
+    borderRadius: "8px",
     padding: "24px 20px",
     textAlign: "center" as const,
   } as React.CSSProperties,
   input: {
     background: "#fff",
-    border: "1px solid #cbd5e1",
-    borderRadius: "10px",
-    color: "#0f172a",
+    border: "1px solid var(--lap-border-default)",
+    borderRadius: "8px",
+    color: "#152234",
     fontSize: "14px",
     padding: "10px 14px",
     width: "260px",
   } as React.CSSProperties,
   btn: {
-    background: "#6366f1",
+    background: "var(--lap-accent-primary)",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "8px",
     color: "#fff",
     cursor: "pointer",
     fontSize: "14px",
@@ -857,7 +847,7 @@ const S = {
     padding: "10px 22px",
   } as React.CSSProperties,
   miniBtn: {
-    background: "#6366f1",
+    background: "var(--lap-accent-primary)",
     border: "none",
     borderRadius: "6px",
     color: "#fff",
@@ -885,16 +875,16 @@ const S = {
     fontSize: "13px",
   } as React.CSSProperties,
   analysisLoading: {
-    background: "#f0f4ff",
-    border: "1px solid #c7d2fe",
-    borderRadius: "10px",
+    background: "#eef8f0",
+    border: "1px solid #cfe0ce",
+    borderRadius: "8px",
     padding: "16px",
     marginTop: "16px",
   } as React.CSSProperties,
   analysisError: {
     background: "#fef2f2",
     border: "1px solid #fecaca",
-    borderRadius: "10px",
+    borderRadius: "8px",
     padding: "16px",
     marginTop: "16px",
   } as React.CSSProperties,

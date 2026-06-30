@@ -34,6 +34,7 @@ import type {
 // Auto-save analysis results to history
 import { saveAnalysisResult } from "./analysis-history-actions.ts";
 import { setAnalysisProgress, clearAnalysisProgress } from "./analysis-progress-actions.ts";
+import { persistCodeAnalysisHistoryMemory } from "../../lib/assistant/learning-artifact-memory.ts";
 
 // Rate limiting
 const cooldownMap = new Map<string, number>();
@@ -113,6 +114,16 @@ export async function runCodeAnalysisAction(
       personalized: false,
       modelName: result.modelInfo?.modelDisplayName ?? "未知",
       fullReport: result.success ? result.report : null,
+    }).catch(function() {});
+    persistCodeAnalysisHistoryMemory({
+      userId: session.userId,
+      runId: runId,
+      summary: input.problemStatement.slice(0, 50) + (input.problemStatement.length > 50 ? "..." : "") + " - base analysis",
+      problemRating: null,
+      userRating: null,
+      findingCount: result.success && result.report ? result.report.findings.length : 0,
+      personalized: false,
+      modelName: result.modelInfo?.modelDisplayName ?? "unknown",
     }).catch(function() {});
     return result;
   }
@@ -243,6 +254,16 @@ export async function runCodeAnalysisAction(
       personalized: true,
       modelName: result.modelInfo?.modelDisplayName ?? "未知",
       fullResult: result,
+    }).catch(function() {});
+    persistCodeAnalysisHistoryMemory({
+      userId: session.userId,
+      runId: runId,
+      summary: input.problemStatement.slice(0, 50) + (input.problemStatement.length > 50 ? "..." : "") + (result.success ? " - completed" : " - failed"),
+      problemRating: input.userProvidedRating ?? ((result as any).report?.problemProfile?.rating?.value ?? null),
+      userRating: (result as any).report?.learnerProfile?.estimatedRating ?? null,
+      findingCount: result.success && (result as any).report?.baseReport ? (result as any).report.baseReport.findings.length : 0,
+      personalized: true,
+      modelName: result.modelInfo?.modelDisplayName ?? "unknown",
     }).catch(function() {});
 
     return result;

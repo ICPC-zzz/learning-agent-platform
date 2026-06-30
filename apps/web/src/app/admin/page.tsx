@@ -6,7 +6,7 @@
  * no env values exposed, no secrets leaked.
  *
  * Categories:
- * - AI Assistant (LLM/Floating AI)
+ * - AI Assistant (LLM)
  * - External APIs (Book/Problem)
  * - Database
  * - Imports

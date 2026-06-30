@@ -1,12 +1,43 @@
-// Agent Runtime v1 -- Tool Executor (Safety Skeleton)
+// Agent Runtime v1 -- Tool Executor Adapter
+import {
+  InMemoryToolRegistry,
+  InMemoryToolRuntime,
+  ToolCallErrorCode,
+  ToolExecutionStatus as CanonicalToolExecutionStatus,
+  ToolPermissionDecision as CanonicalToolPermissionDecision,
+  ToolRiskCategory,
+  ToolRiskLevel,
+  type JsonValue,
+  type ToolDefinition,
+  type ToolExecutionResult as CanonicalToolExecutionResult,
+  type ToolPermissionEvaluator,
+  type ToolRegistration,
+} from "../../tools/index.ts";
 import type { AgentId, RunId } from "../core/agent-types.ts";
 import type { AgentEvent } from "../core/agent-events.ts";
-import { createToolRequestedEvent, createToolStartedEvent, createToolCompletedEvent, createToolRejectedEvent, createToolFailedEvent } from "../core/agent-events.ts";
-import type { AgentTool, ToolExecutionContext, ToolExecutionResult, ToolExecutionStatus } from "./tool-types.ts";
-import { ToolExecutionStatus as S, ToolPermissionDecision as D } from "./tool-types.ts";
+import {
+  createToolCompletedEvent,
+  createToolFailedEvent,
+  createToolRejectedEvent,
+  createToolRequestedEvent,
+  createToolStartedEvent,
+} from "../core/agent-events.ts";
+import type {
+  AgentTool,
+  ToolExecutionContext,
+  ToolExecutionResult,
+  ToolExecutionStatus,
+} from "./tool-types.ts";
+import {
+  ToolExecutionStatus as S,
+} from "./tool-types.ts";
 import type { AgentToolRegistry } from "./tool-registry.ts";
 import type { AgentToolPermissionEvaluator } from "./tool-permission.ts";
-import { DefaultAgentToolPermissionEvaluator, isDenied, requiresConfirmation } from "./tool-permission.ts";
+import {
+  DefaultAgentToolPermissionEvaluator,
+  isDenied,
+  requiresConfirmation,
+} from "./tool-permission.ts";
 
 export interface ToolExecutorConfig {
   readonly defaultTimeoutMs: number;
@@ -34,7 +65,7 @@ export interface AgentToolExecutor {
 export class ToolInputValidationError extends Error {
   public readonly toolName: string;
   constructor(toolName: string, message: string) {
-    super('Input validation failed for "' + toolName + '": ' + message);
+    super(`Input validation failed for "${toolName}": ${message}`);
     this.name = "ToolInputValidationError";
     this.toolName = toolName;
   }
@@ -46,14 +77,15 @@ export class SkeletonAgentToolExecutor implements AgentToolExecutor {
   private readonly registry: AgentToolRegistry;
   private readonly permission: AgentToolPermissionEvaluator;
   private readonly config: ToolExecutorConfig;
-  private readonly executedCallIds = new Set<string>();
 
   constructor(params?: {
     readonly registry?: AgentToolRegistry;
     readonly permission?: AgentToolPermissionEvaluator;
     readonly config?: Partial<ToolExecutorConfig>;
   }) {
-    this.registry = params?.registry ?? (function() { throw new Error("ToolRegistry required"); })() as unknown as AgentToolRegistry;
+    this.registry = params?.registry ?? (function() {
+      throw new Error("ToolRegistry required");
+    })() as unknown as AgentToolRegistry;
     this.permission = params?.permission ?? new DefaultAgentToolPermissionEvaluator();
     this.config = { ...DEFAULT_TOOL_EXECUTOR_CONFIG, ...params?.config };
   }
@@ -68,97 +100,251 @@ export class SkeletonAgentToolExecutor implements AgentToolExecutor {
     readonly isAuthenticated: boolean;
     readonly isUserAuthorized: boolean;
   }): Promise<ExecReturn> {
-    const events: AgentEvent[] = [];
-    const toolCallId = "tcall_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-    const startedAt = new Date().toISOString();
-
-    if (this.executedCallIds.has(toolCallId)) {
-      return this.errorResult(toolCallId, toolName, S.Failed, "DUPLICATE_TOOL_CALL", "Tool call already executed", startedAt, events);
-    }
-    this.executedCallIds.add(toolCallId);
-
-    events.push(createToolRequestedEvent(context.runId, context.agentId, { toolName, inputSummary: this.summarizeInput(input) }));
+    const events: AgentEvent[] = [
+      createToolRequestedEvent(context.runId, context.agentId, {
+        toolName,
+        inputSummary: this.summarizeInput(input),
+      }),
+    ];
 
     const tool = this.registry.get(toolName);
     if (!tool) {
-      return this.deniedResult(toolCallId, toolName, "Tool not registered", startedAt, events);
+      const result = this.toLegacyAgentResult({
+        toolCallId: createAgentToolCallId(),
+        toolName,
+        status: CanonicalToolExecutionStatus.PermissionDenied,
+        safeSummary: "当前没有可用于完成此任务的工具。",
+        errorCode: ToolCallErrorCode.ToolNotFound,
+        retryable: false,
+        sourceRefs: [],
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        durationMs: 0,
+      });
+      events.push(createToolRejectedEvent(context.runId, context.agentId, {
+        toolCallId: result.toolCallId,
+        toolName,
+        reason: result.safeSummary,
+      }));
+      return { result, events };
     }
 
-    let validatedInput: unknown;
-    try { validatedInput = tool.inputSchema.validate(input); }
-    catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      return this.errorResult(toolCallId, toolName, S.Failed, "INPUT_VALIDATION_FAILED", msg, startedAt, events);
+    const canonicalRegistry = new InMemoryToolRegistry([
+      this.toCanonicalRegistration(tool, context),
+    ]);
+    const runtime = new InMemoryToolRuntime(canonicalRegistry, {
+      defaultTimeoutMs: this.config.defaultTimeoutMs,
+      permissionEvaluator: this.createCanonicalPermissionEvaluator(context),
+    });
+
+    const canonical = await runtime.executeTool({
+      toolName: tool.metadata.name,
+      input: toJsonInput(input),
+      context: {
+        userId: context.userId,
+        conversationId: context.conversationId,
+        taskId: context.taskId,
+        agentId: context.agentId,
+        requestId: context.runId,
+        enabledTools: this.registry.isEnabled(tool.metadata.name)
+          ? [tool.metadata.name]
+          : [],
+        signal: context.signal,
+      },
+    });
+
+    events.push(createToolStartedEvent(context.runId, context.agentId, {
+      toolCallId: canonical.toolCallId,
+      toolName: tool.metadata.name,
+    }));
+
+    const result = this.toLegacyAgentResult(canonical);
+    if (result.status === S.Success) {
+      events.push(createToolCompletedEvent(context.runId, context.agentId, {
+        toolCallId: result.toolCallId,
+        toolName: tool.metadata.name,
+        status: result.status,
+        safeSummary: result.safeSummary,
+        durationMs: result.durationMs,
+      }));
+    } else if (result.status === S.Rejected) {
+      events.push(createToolRejectedEvent(context.runId, context.agentId, {
+        toolCallId: result.toolCallId,
+        toolName: tool.metadata.name,
+        reason: result.safeSummary,
+      }));
+    } else {
+      events.push(createToolFailedEvent(context.runId, context.agentId, {
+        toolCallId: result.toolCallId,
+        toolName: tool.metadata.name,
+        errorCode: result.errorCode ?? "TOOL_FAILED",
+        errorMessage: result.safeSummary,
+      }));
     }
 
-    const execCtx: ToolExecutionContext = {
-      agentId: context.agentId,
-      runId: context.runId,
-      userId: context.userId,
-      conversationId: context.conversationId,
-      taskId: context.taskId,
-      signal: context.signal,
-      isAuthenticated: context.isAuthenticated,
-      isUserAuthorized: context.isUserAuthorized,
-      runMode: this.config.mode,
+    return { result, events };
+  }
+
+  private toCanonicalRegistration(
+    tool: AgentTool,
+    executionContext: {
+      readonly agentId: AgentId;
+      readonly runId: RunId;
+      readonly userId?: string;
+      readonly conversationId?: string;
+      readonly taskId?: string;
+      readonly signal?: AbortSignal;
+      readonly isAuthenticated: boolean;
+      readonly isUserAuthorized: boolean;
+    },
+  ): ToolRegistration {
+    const definition: ToolDefinition = {
+      name: tool.metadata.name,
+      displayName: tool.metadata.description,
+      description: tool.metadata.description,
+      riskLevel: mapSensitivityToRiskLevel(tool.metadata.sensitivity),
+      riskCategory: tool.metadata.readOnly
+        ? ToolRiskCategory.ReadOnly
+        : tool.metadata.requiresConfirmation
+          ? ToolRiskCategory.WriteWithConfirmation
+          : ToolRiskCategory.Forbidden,
+      requiresConfirmation: tool.metadata.requiresConfirmation,
+      enabled: this.registry.isEnabled(tool.metadata.name),
+      disabledByDefault: !this.registry.isEnabled(tool.metadata.name),
+      readOnly: tool.metadata.readOnly,
+      sideEffect: tool.metadata.sideEffect,
+      concurrencySafe: tool.metadata.parallelSafe,
+      allowedAgents: tool.metadata.allowedAgents,
+      timeoutMs: tool.metadata.timeoutMs,
+      sourceLabel: tool.metadata.category,
+      inputSchema: toCanonicalToolSchema(tool.inputSchema.schema),
+      metadata: {
+        adapter: "agent-runtime",
+        version: tool.metadata.version,
+      },
     };
 
-    const perm = this.permission.evaluate(tool.metadata, execCtx);
-    if (isDenied(perm)) {
-      return this.deniedResult(toolCallId, toolName, perm.reason, startedAt, events);
-    }
-    if (requiresConfirmation(perm)) {
-      if (this.config.mode === "test") {
-        return this.deniedResult(toolCallId, toolName, "Confirmation not available in test mode: " + perm.reason, startedAt, events);
+    return {
+      definition,
+      validateInput: (rawInput) => {
+        try {
+          tool.inputSchema.validate(rawInput);
+          return { valid: true };
+        } catch {
+          return {
+            valid: false,
+            safeSummary: "工具参数不完整，暂时无法执行。",
+            errorCode: ToolCallErrorCode.InvalidToolInput,
+          };
+        }
+      },
+      handler: async (request) => {
+        const validatedInput = tool.inputSchema.validate(request.input);
+        const result = await tool.execute(validatedInput, {
+          agentId: executionContext.agentId,
+          runId: executionContext.runId,
+          userId: executionContext.userId,
+          conversationId: executionContext.conversationId,
+          taskId: executionContext.taskId,
+          signal: request.context?.signal,
+          isAuthenticated: executionContext.isAuthenticated,
+          isUserAuthorized: executionContext.isUserAuthorized,
+          runMode: this.config.mode,
+        } satisfies ToolExecutionContext);
+
+        return this.toCanonicalExecutionResult(tool, request.callId ?? createAgentToolCallId(), result);
+      },
+    };
+  }
+
+  private createCanonicalPermissionEvaluator(context: {
+    readonly agentId: AgentId;
+    readonly runId: RunId;
+    readonly userId?: string;
+    readonly conversationId?: string;
+    readonly taskId?: string;
+    readonly signal?: AbortSignal;
+    readonly isAuthenticated: boolean;
+    readonly isUserAuthorized: boolean;
+  }): ToolPermissionEvaluator {
+    return (definition) => {
+      const tool = this.registry.get(definition.name);
+      if (!tool || !this.registry.isEnabled(definition.name)) {
+        return {
+          decision: CanonicalToolPermissionDecision.Deny,
+          reason: "tool_disabled_by_default",
+        };
       }
+      const permission = this.permission.evaluate(tool.metadata, {
+        agentId: context.agentId,
+        runId: context.runId,
+        userId: context.userId,
+        conversationId: context.conversationId,
+        taskId: context.taskId,
+        signal: context.signal,
+        isAuthenticated: context.isAuthenticated,
+        isUserAuthorized: context.isUserAuthorized,
+        runMode: this.config.mode,
+      });
+
+      if (isDenied(permission)) {
+        return {
+          decision: CanonicalToolPermissionDecision.Deny,
+          reason: permission.reason,
+        };
+      }
+
+      if (requiresConfirmation(permission)) {
+        return {
+          decision: CanonicalToolPermissionDecision.RequireConfirmation,
+          reason: permission.reason,
+        };
+      }
+
       return {
-        result: {
-          toolCallId, status: S.Rejected,
-          safeSummary: perm.requiredConfirmationMessage ?? "Confirmation required.",
-          errorCode: "CONFIRMATION_REQUIRED", retryable: true,
-          startedAt, completedAt: new Date().toISOString(), durationMs: Date.now() - new Date(startedAt).getTime(),
-        },
-        events: [...events, createToolRejectedEvent(context.runId, context.agentId, { toolCallId, toolName, reason: perm.reason })],
+        decision: CanonicalToolPermissionDecision.Allow,
+        reason: permission.reason,
       };
-    }
-
-    const timeoutMs = tool.metadata.timeoutMs;
-    const ac = new AbortController();
-    const tid = setTimeout(function() { ac.abort(new Error("Tool execution timed out.")); }, timeoutMs);
-    if (context.signal) {
-      if (context.signal.aborted) { clearTimeout(tid); return this.cancelledResult(toolCallId, toolName, startedAt, events); }
-      context.signal.addEventListener("abort", function() { ac.abort(context.signal!.reason); }, { once: true });
-    }
-
-    events.push(createToolStartedEvent(context.runId, context.agentId, { toolCallId, toolName }));
-
-    try {
-      const execResult = await tool.execute(validatedInput as any, { ...execCtx, signal: ac.signal });
-      clearTimeout(tid);
-      const safe = this.trimResult(execResult);
-      events.push(createToolCompletedEvent(context.runId, context.agentId, { toolCallId, toolName, status: safe.status, safeSummary: safe.safeSummary, durationMs: safe.durationMs }));
-      return { result: safe, events };
-    } catch (err: unknown) {
-      clearTimeout(tid);
-      if (ac.signal.aborted) {
-        const msg = (err as Error)?.message ?? "";
-        return msg.indexOf("timed out") >= 0 ? this.timeoutResult(toolCallId, toolName, timeoutMs, startedAt, events) : this.cancelledResult(toolCallId, toolName, startedAt, events);
-      }
-      return this.errorResult(toolCallId, toolName, S.Failed, "EXECUTION_FAILED", err instanceof Error ? err.message : String(err), startedAt, events);
-    }
+    };
   }
 
-  private trimResult(r: ToolExecutionResult): ToolExecutionResult {
-    const safe = this.sanitizeSafeSummary(r.safeSummary);
-    return { ...r, safeSummary: safe, data: this.config.mode === "test" ? undefined : r.data };
+  private toCanonicalExecutionResult(
+    tool: AgentTool,
+    toolCallId: string,
+    result: ToolExecutionResult,
+  ): CanonicalToolExecutionResult {
+    const status = mapAgentStatusToCanonical(result.status);
+    return {
+      toolCallId,
+      toolName: tool.metadata.name,
+      status,
+      output: result.data,
+      safeSummary: sanitizeAgentSafeSummary(result.safeSummary),
+      errorCode: result.errorCode,
+      retryable: result.retryable,
+      sourceRefs: [],
+      startedAt: result.startedAt,
+      completedAt: result.completedAt,
+      durationMs: result.durationMs,
+      metadata: {
+        adapter: "agent-runtime",
+        displayName: tool.metadata.description,
+      },
+    };
   }
 
-  private sanitizeSafeSummary(summary: string): string {
-    var patterns = [/api[_-]?key/i, /secret/i, /token/i, /password/i, /credential/i];
-    for (var i = 0; i < patterns.length; i++) {
-      if (patterns[i].test(summary)) return "[Summary redacted -- may contain sensitive data]";
-    }
-    return summary;
+  private toLegacyAgentResult(result: CanonicalToolExecutionResult): ToolExecutionResult {
+    return {
+      toolCallId: result.toolCallId,
+      status: mapCanonicalStatusToAgent(result.status),
+      data: this.config.mode === "test" ? undefined : result.output,
+      safeSummary: sanitizeAgentSafeSummary(result.safeSummary),
+      errorCode: result.errorCode,
+      retryable: result.retryable,
+      startedAt: result.startedAt,
+      completedAt: result.completedAt,
+      durationMs: result.durationMs,
+    };
   }
 
   private summarizeInput(input: unknown): string {
@@ -166,39 +352,82 @@ export class SkeletonAgentToolExecutor implements AgentToolExecutor {
     if (input === null || input === undefined) return "<empty>";
     return JSON.stringify(input).slice(0, 200);
   }
+}
 
-  private makeResult(toolCallId: string, toolName: string, status: ToolExecutionStatus, opts: {
-    readonly errorCode?: string;
-    readonly errorMessage?: string;
-    readonly safeSummary: string;
-    readonly retryable: boolean;
-    readonly data?: unknown;
-    readonly startedAt: string;
-    readonly extraEvents?: AgentEvent[];
-  }): ExecReturn {
-    var completedAt = new Date().toISOString();
-    var durationMs = Date.now() - new Date(opts.startedAt).getTime();
-    return {
-      result: { toolCallId, status, safeSummary: opts.safeSummary, errorCode: opts.errorCode, retryable: opts.retryable, startedAt: opts.startedAt, completedAt, durationMs, data: opts.data },
-      events: opts.extraEvents ?? [],
-    };
+function mapAgentStatusToCanonical(status: ToolExecutionStatus): CanonicalToolExecutionStatus {
+  switch (status) {
+    case S.Success:
+      return CanonicalToolExecutionStatus.Succeeded;
+    case S.Rejected:
+      return CanonicalToolExecutionStatus.PermissionDenied;
+    case S.Timeout:
+      return CanonicalToolExecutionStatus.TimedOut;
+    case S.Cancelled:
+      return CanonicalToolExecutionStatus.Cancelled;
+    case S.Failed:
+      return CanonicalToolExecutionStatus.Failed;
   }
+}
 
-  private deniedResult(toolCallId: string, toolName: string, reason: string, startedAt: string, events: AgentEvent[]): ExecReturn {
-    events.push(createToolRejectedEvent(events[0]?.runId ?? "unknown", events[0]?.agentId ?? "unknown", { toolCallId, toolName, reason }));
-    return this.makeResult(toolCallId, toolName, S.Rejected, { errorCode: "PERMISSION_DENIED", errorMessage: reason, safeSummary: "Tool denied: " + reason, retryable: false, startedAt, extraEvents: events });
+function mapCanonicalStatusToAgent(status: CanonicalToolExecutionStatus): ToolExecutionStatus {
+  switch (status) {
+    case CanonicalToolExecutionStatus.Succeeded:
+      return S.Success;
+    case CanonicalToolExecutionStatus.Empty:
+      return S.Failed;
+    case CanonicalToolExecutionStatus.InvalidInput:
+    case CanonicalToolExecutionStatus.PermissionDenied:
+      return S.Rejected;
+    case CanonicalToolExecutionStatus.TimedOut:
+      return S.Timeout;
+    case CanonicalToolExecutionStatus.Cancelled:
+      return S.Cancelled;
+    case CanonicalToolExecutionStatus.Failed:
+      return S.Failed;
   }
+}
 
-  private errorResult(toolCallId: string, toolName: string, status: ToolExecutionStatus, errorCode: string, message: string, startedAt: string, events: AgentEvent[]): ExecReturn {
-    events.push(createToolFailedEvent(events[0]?.runId ?? "unknown", events[0]?.agentId ?? "unknown", { toolCallId, toolName, errorCode, errorMessage: message }));
-    return this.makeResult(toolCallId, toolName, status, { errorCode, errorMessage: message, safeSummary: "Tool failed: " + message, retryable: errorCode === "EXECUTION_FAILED", startedAt, extraEvents: events });
+function mapSensitivityToRiskLevel(sensitivity: string): ToolRiskLevel {
+  switch (sensitivity) {
+    case "none":
+    case "low":
+      return ToolRiskLevel.Low;
+    case "medium":
+      return ToolRiskLevel.Medium;
+    case "high":
+      return ToolRiskLevel.High;
+    case "critical":
+      return ToolRiskLevel.Critical;
+    default:
+      return ToolRiskLevel.Medium;
   }
+}
 
-  private timeoutResult(toolCallId: string, toolName: string, timeoutMs: number, startedAt: string, events: AgentEvent[]): ExecReturn {
-    return this.errorResult(toolCallId, toolName, S.Timeout, "TIMEOUT", "Tool execution exceeded timeout of " + timeoutMs + "ms.", startedAt, events);
+function toJsonInput(input: unknown): JsonValue | undefined {
+  if (input === undefined) {
+    return undefined;
   }
+  return JSON.parse(JSON.stringify(input)) as JsonValue;
+}
 
-  private cancelledResult(toolCallId: string, toolName: string, startedAt: string, events: AgentEvent[]): ExecReturn {
-    return this.errorResult(toolCallId, toolName, S.Cancelled, "CANCELLED", "Tool execution was cancelled.", startedAt, events);
+function toCanonicalToolSchema(value: unknown): ToolDefinition["inputSchema"] {
+  const normalized = JSON.parse(JSON.stringify(value)) as JsonValue;
+  if (normalized === null || typeof normalized !== "object" || Array.isArray(normalized)) {
+    return undefined;
   }
+  return normalized as ToolDefinition["inputSchema"];
+}
+
+function createAgentToolCallId(): string {
+  return `tcall_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function sanitizeAgentSafeSummary(summary: string): string {
+  if (/(api[_-]?key|secret|token|password|credential)/i.test(summary)) {
+    return "[Summary redacted -- may contain sensitive data]";
+  }
+  if (/(invalid prisma|foreign key constraint|econnrefused|fetch failed|stack trace|failed with empty|tool_result)/i.test(summary)) {
+    return "工具执行失败，请稍后重试。";
+  }
+  return summary;
 }

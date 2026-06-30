@@ -24,6 +24,7 @@ export interface RecentArticleReadingEntry {
 
 const FAVORITE_ARTICLES_KEY = "lap.web.user.favoriteArticles";
 const RECENT_ARTICLE_READING_KEY = "lap.web.user.recentArticleReading";
+export const RECENT_ARTICLE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 
 const SENSITIVE_PATTERNS: RegExp[] = [
   /\bDATABASE_URL\b/i,
@@ -141,7 +142,7 @@ export function addRecentArticleReading(
   entries: readonly RecentArticleReadingEntry[],
   entry: RecentArticleReadingEntry,
 ): RecentArticleReadingEntry[] {
-  const filtered = entries.filter((item) => item.articleId !== entry.articleId);
+  const filtered = pruneRecentArticleReadings(entries).filter((item) => item.articleId !== entry.articleId);
   return [entry, ...filtered];
 }
 
@@ -156,7 +157,7 @@ export function getRecentArticleReadings(
   entries: readonly RecentArticleReadingEntry[],
   limit: number = 15,
 ): RecentArticleReadingEntry[] {
-  return entries.slice(0, limit);
+  return pruneRecentArticleReadings(entries).slice(0, limit);
 }
 
 export function loadRecentArticleReadings(): RecentArticleReadingEntry[] {
@@ -173,13 +174,17 @@ export function loadRecentArticleReadings(): RecentArticleReadingEntry[] {
     safeRemoveItem(RECENT_ARTICLE_READING_KEY);
     return [];
   }
-  return parsed.filter(isValidRecentArticleReadingEntry);
+  const fresh = parsed.filter(isValidRecentArticleReadingEntry).filter(isRecentArticleReadingFresh);
+  if (fresh.length !== parsed.length) {
+    persistRecentArticleReadings(fresh);
+  }
+  return fresh;
 }
 
 export function persistRecentArticleReadings(
   entries: readonly RecentArticleReadingEntry[],
 ): boolean {
-  const safe = entries.filter(isValidRecentArticleReadingEntry);
+  const safe = pruneRecentArticleReadings(entries);
   return safeSetItem(RECENT_ARTICLE_READING_KEY, JSON.stringify(safe));
 }
 
@@ -196,4 +201,18 @@ export function isValidRecentArticleReadingEntry(
   if (typeof value.lastReadAt !== "string") return false;
   if (hasSensitiveFields(entry)) return false;
   return true;
+}
+
+function pruneRecentArticleReadings(
+  entries: readonly RecentArticleReadingEntry[],
+): RecentArticleReadingEntry[] {
+  return entries
+    .filter(isValidRecentArticleReadingEntry)
+    .filter(isRecentArticleReadingFresh);
+}
+
+function isRecentArticleReadingFresh(entry: RecentArticleReadingEntry): boolean {
+  const at = Date.parse(entry.lastReadAt);
+  if (!Number.isFinite(at)) return false;
+  return Date.now() - at <= RECENT_ARTICLE_RETENTION_MS;
 }

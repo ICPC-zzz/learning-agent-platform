@@ -4,7 +4,7 @@ import type {
   MemoryImportanceScore,
   MemoryItem,
   MemoryMetadata,
-} from "./types";
+} from "./types.ts";
 
 export const DEFAULT_MEMORY_IMPORTANCE: MemoryImportanceScore = 0.5;
 

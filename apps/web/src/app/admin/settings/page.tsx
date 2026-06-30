@@ -100,7 +100,6 @@ export default function AdminSettingsPage() {
 function mapCategory(category: string): string {
   switch (category) {
     case "llm": return "AI Assistant";
-    case "floating-ai": return "AI Assistant";
     case "book-api": return "External APIs";
     case "problem-api": return "External APIs";
     case "db": return "Database";

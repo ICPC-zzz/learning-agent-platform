@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import {
@@ -10,6 +9,7 @@ import {
   doRecordArticleReading,
   type ArticleRecentReadingDbActionResult,
 } from "./article-recent-reading-db-actions";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 
 export async function recordArticleReadingDbAction(
   articleId: string,
@@ -18,16 +18,9 @@ export async function recordArticleReadingDbAction(
   sourceName: string,
   originalUrl: string,
 ): Promise<ArticleRecentReadingDbActionResult> {
-  let cookieValue: string | undefined;
-  try {
-    const cookieStore = await cookies();
-    cookieValue = cookieStore.get("lap-web-dev-session")?.value;
-  } catch {
-    cookieValue = undefined;
-  }
-
-  const guard = evaluateArticleLibraryDbGuard(cookieValue);
-  if (!guard.enabled || guard.sessionPayload === null) {
+  const session = await getCurrentAuthSession();
+  const guard = evaluateArticleLibraryDbGuard(undefined);
+  if (!session.hasSession) {
     return {
       success: false,
       devOnly: true,
@@ -48,10 +41,10 @@ export async function recordArticleReadingDbAction(
       sourcePlatform,
       sourceName,
       originalUrl,
-      ownerId: guard.sessionPayload.userIdPreview,
+      ownerId: session.userId,
       lastReadAt: new Date(),
     },
-    guard,
+    { ...guard, enabled: true, callsRepository: true, sessionPayload: null },
   );
 
   if (result.success) {

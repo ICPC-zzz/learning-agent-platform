@@ -4,6 +4,7 @@ import type {
   CreateUserInput,
   FindUserInput,
   UpdateUserInput,
+  UserRole,
   UserRecord,
   UserRepository,
 } from "../types.js";
@@ -16,12 +17,15 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async createUser(input: CreateUserInput): Promise<UserRecord> {
-    const data: Prisma.UserCreateInput = {
+    const data: Prisma.UserCreateInput & Record<string, unknown> = {
       authProvider: normalizeOptionalText(input.authProvider),
       authProviderId: normalizeOptionalText(input.authProviderId),
       email: normalizeOptionalEmail(input.email),
       name: normalizeOptionalText(input.name),
     };
+    const role = normalizeRole(input.role);
+    if (role !== null) data.role = role;
+    if (input.emailVerifiedAt !== undefined) data.emailVerifiedAt = normalizeOptionalDate(input.emailVerifiedAt);
 
     return this.prisma.user.create({ data });
   }
@@ -53,7 +57,7 @@ export class PrismaUserRepository implements UserRepository {
       userId,
       "User id is required.",
     );
-    const data: Prisma.UserUpdateInput = {};
+    const data: Prisma.UserUpdateInput & Record<string, unknown> = {};
 
     if (input.email !== undefined) {
       data.email = normalizeOptionalEmail(input.email);
@@ -61,6 +65,18 @@ export class PrismaUserRepository implements UserRepository {
 
     if (input.name !== undefined) {
       data.name = normalizeOptionalText(input.name);
+    }
+
+    if (input.role !== undefined) {
+      data.role = normalizeRole(input.role) ?? "USER";
+    }
+
+    if (input.disabledAt !== undefined) {
+      data.disabledAt = normalizeOptionalDate(input.disabledAt);
+    }
+
+    if (input.emailVerifiedAt !== undefined) {
+      data.emailVerifiedAt = normalizeOptionalDate(input.emailVerifiedAt);
     }
 
     return this.prisma.user.update({
@@ -154,4 +170,15 @@ function normalizeOptionalEmail(value: string | null | undefined): string | null
   const normalizedEmail = value.trim().toLowerCase();
 
   return normalizedEmail.length === 0 ? null : normalizedEmail;
+}
+
+function normalizeRole(value: UserRole | null | undefined): UserRole | null {
+  if (value === "ADMIN" || value === "USER") return value;
+  return null;
+}
+
+function normalizeOptionalDate(value: Date | null | undefined): Date | null {
+  if (value === undefined || value === null) return null;
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) return null;
+  return value;
 }

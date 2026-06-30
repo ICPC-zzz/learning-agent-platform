@@ -265,12 +265,56 @@ def persist_articles(result: IngestionResult, output_path: Path = DEFAULT_OUTPUT
     if not result.deduped_articles:
         return False
 
+    existing_articles = load_existing_articles(output_path)
+    merged_articles = merge_articles_preserving_existing(existing_articles, result.deduped_articles)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temp_path = output_path.with_suffix(output_path.suffix + ".tmp")
-    payload = json.dumps(result.deduped_articles, ensure_ascii=False, indent=2)
+    payload = json.dumps(merged_articles, ensure_ascii=False, indent=2)
     temp_path.write_text(payload + "\n", encoding="utf-8")
     temp_path.replace(output_path)
     return True
+
+
+def load_existing_articles(output_path: Path) -> list[dict[str, object]]:
+    try:
+        raw = json.loads(output_path.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+    if not isinstance(raw, list):
+        return []
+
+    articles: list[dict[str, object]] = []
+    for item in raw:
+        if isinstance(item, dict):
+            articles.append(item)
+    return articles
+
+
+def merge_articles_preserving_existing(
+    existing_articles: Iterable[dict[str, object]],
+    new_articles: Iterable[dict[str, object]],
+) -> list[dict[str, object]]:
+    seen: set[str] = set()
+    merged: list[dict[str, object]] = []
+
+    for article in existing_articles:
+        key = dedupe_key(article)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(article)
+
+    for article in new_articles:
+        key = dedupe_key(article)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(article)
+
+    merged.sort(key=lambda article: str(article.get("publishedAt") or ""), reverse=True)
+    return merged
 
 
 def safe_error_message(error: Exception) -> str:

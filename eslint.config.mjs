@@ -8,6 +8,8 @@ export default tseslint.config(
       "**/build/**",
       "**/coverage/**",
       "**/dist/**",
+      "**/*.test.mjs",
+      "apps/web/src/scripts/**",
       "**/next-env.d.ts",
       "**/node_modules/**"
     ]

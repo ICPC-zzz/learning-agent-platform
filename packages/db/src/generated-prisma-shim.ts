@@ -470,6 +470,7 @@ interface EmailOtpCodeDelegate {
   create(args: { data: Record<string, unknown> }): Promise<EmailOtpCodeDelegateRecord>;
   findFirst(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord | null>;
   update(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord>;
+  updateMany(args: Record<string, unknown>): Promise<{ count: number }>;
   deleteMany(args: Record<string, unknown>): Promise<{ count: number }>;
   findUnique(args: Record<string, unknown>): Promise<EmailOtpCodeDelegateRecord | null>;
 }

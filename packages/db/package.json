@@ -9,11 +9,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./repositories/model-provider-repository": {
+      "types": "./dist/repositories/model-provider-repository.d.ts",
+      "import": "./dist/repositories/model-provider-repository.js",
+      "default": "./dist/repositories/model-provider-repository.js"
     }
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json --outDir dist --declaration --declarationMap false --noEmit false",
+    "build": "prisma generate --schema prisma/schema.prisma && tsc -p tsconfig.json --outDir dist --declaration --declarationMap false --noEmit false",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "prisma:validate": "prisma validate --schema prisma/schema.prisma",

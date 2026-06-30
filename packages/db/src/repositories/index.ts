@@ -1,11 +1,17 @@
 export { PrismaAgentTaskRepository } from "./agent-task-repository.js";
 export { PrismaAgentPermissionRepository } from "./agent-permission-repository.js";
 export { PrismaAgentRuntimeRepository } from "./agent-runtime-repository.js";
+export { PrismaArticleRepository } from "./article-repository.js";
+export { PrismaAuthAuditRepository } from "./auth-audit-repository.js";
 export { PrismaBookRepository } from "./book-repository.js";
 export { PrismaChapterQaFeedbackRepository } from "./chapter-qa-feedback-repository.js";
 export { PrismaChapterQaHistoryRepository } from "./chapter-qa-history-repository.js";
+export { PrismaCodeforcesAccountRepository } from "./codeforces-account-repository.js";
+export { PrismaDailyContentRepository } from "./daily-content-repository.js";
+export { PrismaEmailOtpRepository } from "./email-otp-repository.js";
 export { PrismaFavoriteRepository } from "./favorite-repository.js";
 export { PrismaLearningRepository } from "./learning-repository.js";
+export { PrismaModelProviderRepository } from "./model-provider-repository.js";
 export { PrismaProblemAttemptRepository } from "./problem-attempt-repository.js";
 export { PrismaProblemFavoriteRepository } from "./problem-favorite-repository.js";
 export { PrismaProblemPracticeRepository } from "./problem-practice-repository.js";
@@ -33,6 +39,7 @@ export { PrismaMemoryRepository } from "./memory-repository.js";
 export { PrismaReadingSessionRepository } from "./reading-session-repository.js";
 export { PrismaReadingProgressRepository } from "./reading-progress-repository.js";
 export { PrismaUserRepository } from "./user-repository.js";
+export { PrismaWebSessionRepository } from "./web-session-repository.js";
 export {
   createBookRepositoryInputFromImportedBook,
   mapImportedBookSourceType,
@@ -118,6 +125,37 @@ export type {
   ListAgentTasksByUserOptions,
   ListRecentPreviewTasksOptions,
 } from "./agent-task-repository.js";
+export type {
+  CodeforcesAccountCreateInput,
+  CodeforcesAccountRecord,
+  CodeforcesAccountRepository,
+  CodeforcesAccountStats,
+  CodeforcesAccountUpdateSyncInput,
+  CodeforcesRatingChangeRecord,
+  CodeforcesRecentSubmissionInput,
+  CodeforcesUserProblemStatRecord,
+  CodeforcesUserProblemStatUpsertInput,
+} from "./codeforces-account-repository.js";
+export type {
+  DailyContentKind,
+  DailyContentRecord,
+  DailyContentRepository,
+  DailyContentSyncName,
+  DailyContentSyncStateRecord,
+  DailyContentSyncStatus,
+  DailyContentUpsertInput,
+} from "./daily-content-repository.js";
+export type {
+  CreateModelCredentialInput,
+  CreateModelProfileInput,
+  CreateModelProviderInput,
+  ModelProfileRecord,
+  ModelProviderRecord,
+  ModelProviderRepository,
+  ModelProviderWithRelations,
+  UpdateModelProfileInput,
+  UpdateModelProviderInput,
+} from "./model-provider-repository.js";
 export type {
   CreateProblemAttemptInput,
   ListProblemAttemptsByUserOptions,

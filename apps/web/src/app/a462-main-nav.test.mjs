@@ -50,13 +50,9 @@ describe("A462 AppSidebar", function () {
   });
 });
 
-describe("A462 FloatingAiAssistant retained", function () {
+describe("A511 FloatingAiAssistant removed", function () {
   const layout = readFileSync(ROOT + "/apps/web/src/app/layout.tsx", "utf-8");
-  it("layout imports FloatingAiAssistant", function () { assert.ok(layout.includes("FloatingAiAssistant")); });
-  it("layout renders FloatingAiAssistant", function () { assert.ok(layout.includes("<FloatingAiAssistant")); });
-  it("file exists", function () { assert.ok(existsSync(ROOT + "/apps/web/src/app/_components/FloatingAiAssistant.tsx")); });
-  it("hides on admin", function () {
-    const assistant = readFileSync(ROOT + "/apps/web/src/app/_components/FloatingAiAssistant.tsx", "utf-8");
-    assert.ok(assistant.includes("/admin") && assistant.includes("return null"));
-  });
+  it("layout does not import FloatingAiAssistant", function () { assert.equal(layout.includes("FloatingAiAssistant"), false); });
+  it("layout does not render FloatingAiAssistant", function () { assert.equal(layout.includes("<FloatingAiAssistant"), false); });
+  it("component file is removed", function () { assert.equal(existsSync(ROOT + "/apps/web/src/app/_components/FloatingAiAssistant.tsx"), false); });
 });

@@ -52,9 +52,14 @@ export interface DailyContentPageData {
   hotspots: DailyHotspotItem[];
   githubRepos: GitHubDailyItem[];
   selectedDate: string;
+  hotspotDate: string;
+  githubDate: string;
   availableDates: string[];
   hotspotCount: number;
   githubCount: number;
+  generatedAt: string | null;
+  hotspotGeneratedAt: string | null;
+  githubGeneratedAt: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -79,29 +84,55 @@ export async function loadDailyContent(
 ): Promise<DailyContentPageData> {
   const dateKey = date.toISOString().slice(0, 10);
 
-  // Load hotspots
-  const hotspotRecords = await repository.getByDate(date, "TECH_HOTSPOT");
+  // Load requested day first, then fall back to the latest successful snapshot.
+  let hotspotDate = date;
+  let hotspotRecords = await repository.getByDate(date, "TECH_HOTSPOT");
+  if (hotspotRecords.length === 0) {
+    const latest = await repository.getLatestDate("TECH_HOTSPOT");
+    if (latest) {
+      hotspotDate = latest;
+      hotspotRecords = await repository.getByDate(latest, "TECH_HOTSPOT");
+    }
+  }
   const hotspots = hotspotRecords.map(mapHotspotRecord);
 
-  // Load GitHub repos
-  const githubRecords = await repository.getByDate(date, "GITHUB_REPOSITORY");
+  let githubDate = date;
+  let githubRecords = await repository.getByDate(date, "GITHUB_REPOSITORY");
+  if (githubRecords.length === 0) {
+    const latest = await repository.getLatestDate("GITHUB_REPOSITORY");
+    if (latest) {
+      githubDate = latest;
+      githubRecords = await repository.getByDate(latest, "GITHUB_REPOSITORY");
+    }
+  }
   const githubRepos = githubRecords.map(mapGitHubRecord);
+  const hotspotGeneratedAt = latestUpdatedAt(hotspotRecords);
+  const githubGeneratedAt = latestUpdatedAt(githubRecords);
 
   // Build available dates (last 7 days)
-  const availableDates: string[] = [];
+  const availableDates = new Set<string>([
+    dateKey,
+    hotspotDate.toISOString().slice(0, 10),
+    githubDate.toISOString().slice(0, 10),
+  ]);
   for (let i = 0; i < 7; i += 1) {
     const d = new Date(date);
     d.setDate(d.getDate() - i);
-    availableDates.push(d.toISOString().slice(0, 10));
+    availableDates.add(d.toISOString().slice(0, 10));
   }
 
   return {
     hotspots,
     githubRepos,
     selectedDate: dateKey,
-    availableDates,
+    hotspotDate: hotspotDate.toISOString().slice(0, 10),
+    githubDate: githubDate.toISOString().slice(0, 10),
+    availableDates: [...availableDates],
     hotspotCount: hotspots.length,
     githubCount: githubRepos.length,
+    generatedAt: latestIso([hotspotGeneratedAt, githubGeneratedAt]),
+    hotspotGeneratedAt,
+    githubGeneratedAt,
   };
 }
 
@@ -164,4 +195,23 @@ function mapGitHubRecord(record: DailyContentRecord): GitHubDailyItem {
     isFirstDay: Boolean(meta.isFirstDay),
     reasons: Array.isArray(meta.reasons) ? (meta.reasons as string[]) : [],
   };
+}
+
+function latestUpdatedAt(records: readonly DailyContentRecord[]): string | null {
+  let latest = 0;
+  for (const record of records) {
+    const time = record.updatedAt instanceof Date ? record.updatedAt.getTime() : 0;
+    if (Number.isFinite(time) && time > latest) latest = time;
+  }
+  return latest > 0 ? new Date(latest).toISOString() : null;
+}
+
+function latestIso(values: readonly (string | null)[]): string | null {
+  let latest = 0;
+  for (const value of values) {
+    if (!value) continue;
+    const time = new Date(value).getTime();
+    if (Number.isFinite(time) && time > latest) latest = time;
+  }
+  return latest > 0 ? new Date(latest).toISOString() : null;
 }

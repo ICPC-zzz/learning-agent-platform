@@ -133,35 +133,64 @@ function resolveBaseUrl(env: Record<string, string | undefined>): string {
   return config.codeforces.baseUrl || "https://codeforces.com/api";
 }
 
-async function safeFetch(url: string, timeoutMs = 15_000): Promise<unknown> {
+async function safeFetch(
+  url: string,
+  timeoutMs = 15_000,
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<unknown> {
+  if (!isAllowedCodeforcesApiUrl(url)) {
+    throw new Error("CF_HOST_BLOCKED");
+  }
+
   const controller = new AbortController();
+  const relayAbort = () => controller.abort(signal?.reason ?? new Error("CF request cancelled"));
+  signal?.addEventListener("abort", relayAbort, { once: true });
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const r = await fetch(url, { method: "GET", headers: { Accept: "application/json" }, signal: controller.signal });
+    if (signal?.aborted) {
+      controller.abort(signal.reason ?? new Error("CF request cancelled"));
+    }
+    const r = await fetchImpl(url, { method: "GET", headers: { Accept: "application/json" }, signal: controller.signal });
     if (!r.ok) throw new Error(`CF_HTTP_${r.status}`);
     return await r.json();
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") throw new Error(`CF_TIMEOUT`);
     if (e instanceof Error && /^CF_/.test(e.message)) throw e;
     throw new Error(`CF_FETCH_ERROR`);
-  } finally { clearTimeout(timeoutId); }
+  } finally {
+    clearTimeout(timeoutId);
+    signal?.removeEventListener("abort", relayAbort);
+  }
 }
 
 export async function fetchCodeforcesContestList(
   env: Record<string, string | undefined> = createAssistantProviderEnvSnapshot(),
+  options: { customFetch?: typeof fetch; signal?: AbortSignal } = {},
 ): Promise<CfContestListResult> {
   const guard = evaluateCodeforcesGuard(env);
   if (!guard.allowed) return { success: false, data: null, error: guard.blockedReason ?? "Blocked", guardBlocked: true };
 
   try {
     const base = resolveBaseUrl(env);
-    const raw = await safeFetch(`${base}/contest.list?gym=false`);
+    const raw = await safeFetch(`${base}/contest.list?gym=false`, 15_000, options.customFetch ?? fetch, options.signal);
     if (!isRecord(raw) || raw.status !== "OK" || !Array.isArray(raw.result)) {
       return { success: false, data: null, error: "CF_API_ERROR", guardBlocked: false };
     }
     return { success: true, data: raw.result as CfContestEntry[], error: null, guardBlocked: false };
   } catch (e) {
     return { success: false, data: null, error: e instanceof Error ? e.message : String(e), guardBlocked: false };
+  }
+}
+
+function isAllowedCodeforcesApiUrl(rawUrl: string): boolean {
+  try {
+    const url = new URL(rawUrl);
+    const host = url.hostname.toLowerCase();
+    return (host === "codeforces.com" || host === "www.codeforces.com")
+      && url.pathname.startsWith("/api/");
+  } catch {
+    return false;
   }
 }
 

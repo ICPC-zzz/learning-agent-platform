@@ -9,8 +9,6 @@
  * @serverOnly
  */
 
-import { cookies } from "next/headers";
-import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
 import {
   getPrismaClient,
   PrismaCodeforcesAccountRepository,
@@ -23,29 +21,15 @@ import {
   syncCodeforcesUserData,
 } from "../../lib/codeforces-sync-service";
 import { revalidatePath } from "next/cache";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 
 function getRepository(): PrismaCodeforcesAccountRepository {
   return new PrismaCodeforcesAccountRepository(getPrismaClient());
 }
 
-function getUserId(): string | null {
-  try {
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 async function resolveUserId(): Promise<string | null> {
-  try {
-    const cookieStore = await cookies();
-    const raw = cookieStore.get("lap-web-dev-session")?.value;
-    const payload = deserializeDevSession(raw);
-    const summary = getSafeSessionSummary(payload);
-    return summary.user?.userIdPreview ?? null;
-  } catch {
-    return null;
-  }
+  const session = await getCurrentAuthSession();
+  return session.hasSession ? session.userId : null;
 }
 
 // ---------------------------------------------------------------------------

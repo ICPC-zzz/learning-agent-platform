@@ -1,10 +1,10 @@
-import { ToolRegistryError } from "./errors";
+import { ToolRegistryError } from "./errors.ts";
 import {
   ToolCallErrorCode,
   type ToolDefinition,
   type ToolRegistration,
-} from "./types";
-import { cloneToolDefinition, normalizeToolName, validateToolDefinition } from "./utils";
+} from "./types.ts";
+import { cloneToolDefinition, normalizeToolName, validateToolDefinition } from "./utils.ts";
 
 export class InMemoryToolRegistry {
   private readonly registrations = new Map<string, ToolRegistration>();

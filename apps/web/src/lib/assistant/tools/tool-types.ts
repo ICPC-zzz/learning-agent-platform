@@ -4,7 +4,10 @@ export type AssistantToolName =
   | "search_technical_articles"
   | "get_hot_technical_articles"
   | "search_codeforces_problems"
-  | "recommend_codeforces_problems";
+  | "recommend_codeforces_problems"
+  | "resolveLearnerTrainingProfile"
+  | "getPersonalizedCodeforcesCandidates"
+  | "getUpcomingCodeforcesContests";
 
 export interface AssistantToolSchema {
   type: "object";
@@ -26,7 +29,10 @@ export interface AssistantToolExecutionContext {
   question: string;
   pageContext: SafeAssistantPageContext;
   learningContext: AssistantLearningContextSummary;
+  guardEnv?: Record<string, string | undefined>;
   customFetch?: typeof fetch;
+  signal?: AbortSignal;
+  forcePermissionDenied?: boolean;
 }
 
 export interface AssistantToolExecutionResult<TItem = unknown> {
@@ -38,7 +44,7 @@ export interface AssistantToolExecutionResult<TItem = unknown> {
   warnings: string[];
   errorCode?: string;
   errorMessage?: string;
-  timedOut: false;
+  timedOut: boolean;
   rawResponseStored: false;
 }
 
@@ -85,8 +91,8 @@ export function eraseAssistantToolDefinition<I, O>(
       context: AssistantToolExecutionContext,
     ): Promise<AssistantToolExecutionResult<unknown>> => {
       if (!definition.validateInput(input)) {
-        return createEmptyToolResult(definition.name, "Tool input validation failed.", [
-          "invalid tool input",
+        return createEmptyToolResult(definition.name, "工具输入校验失败。", [
+          "工具输入无效",
         ]);
       }
       return definition.execute(input, context);
@@ -112,4 +118,3 @@ export function createEmptyToolResult<TItem>(
     rawResponseStored: false,
   };
 }
-

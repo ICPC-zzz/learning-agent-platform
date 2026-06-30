@@ -48,6 +48,27 @@ export async function loadDbArticleFavorites(
   }
 }
 
+export async function loadDbArticleFavoritesForUser(
+  userId: string,
+  ownerLabel: string,
+  limit = 200,
+): Promise<DbArticleFavoritesLoadResult> {
+  try {
+    const prisma = getPrismaClient();
+    const repository = new PrismaArticleRepository(prisma);
+    const records = await repository.listFavoriteArticlesByOwner({
+      userId,
+      limit,
+    });
+    return buildDbArticleFavoritesLoadResult(records, ownerLabel);
+  } catch {
+    return createEmptyDbArticleFavoritesLoadResult(
+      true,
+      "DB 文章收藏读取失败。",
+    );
+  }
+}
+
 export function getArticleLibraryDbGuardEnabled(cookieValue: string | undefined): boolean {
   return evaluateArticleLibraryDbGuard(cookieValue).enabled;
 }

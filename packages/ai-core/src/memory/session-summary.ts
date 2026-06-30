@@ -1,6 +1,6 @@
-import { MemoryLayer } from "./types";
-import type { MemoryAddInput, MemorySessionSummaryInput } from "./types";
-import { cloneMemoryMetadata, normalizeMemoryText } from "./utils";
+import { MemoryLayer } from "./types.ts";
+import type { MemoryAddInput, MemorySessionSummaryInput } from "./types.ts";
+import { cloneMemoryMetadata, normalizeMemoryText } from "./utils.ts";
 
 export const SESSION_SUMMARY_MEMORY_TYPE = "SESSION_SUMMARY";
 export const DEFAULT_SESSION_SUMMARY_MAX_LENGTH = 1_000;

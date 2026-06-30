@@ -49,6 +49,8 @@ export interface DailyContentPageData {
   hotspots: DailyHotspotItem[];
   githubRepos: GitHubDailyItem[];
   selectedDate: string;
+  hotspotDate: string;
+  githubDate: string;
   availableDates: string[];
   hotspotCount: number;
   githubCount: number;
@@ -168,6 +170,8 @@ export function loadDailyContent(date?: Date): DailyContentPageData {
     hotspots,
     githubRepos,
     selectedDate: dateKey,
+    hotspotDate: typeof hotspotFile?.date === "string" ? hotspotFile.date : dateKey,
+    githubDate: typeof githubFile?.date === "string" ? githubFile.date : dateKey,
     availableDates,
     hotspotCount: hotspots.length,
     githubCount: githubRepos.length,

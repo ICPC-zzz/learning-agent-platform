@@ -13,37 +13,38 @@ import { verifyEmailOtpAction } from "./email-otp-verify-actions";
 import type { EmailOtpSendResult } from "./email-otp-actions";
 import type { EmailOtpVerifyResult } from "./email-otp-verify-actions";
 
-var INITIAL_SEND: EmailOtpSendResult = {
-  success: false, message: "", emailSent: false, devOnly: true, retryAfterSeconds: 0,
+const INITIAL_SEND: EmailOtpSendResult = {
+  success: false, message: "", emailSent: false, devOnly: false, productionReady: false, retryAfterSeconds: 0,
 };
 
-var INITIAL_VERIFY: EmailOtpVerifyResult = {
-  success: false, message: "", devOnly: true, sessionCreated: false,
+const INITIAL_VERIFY: EmailOtpVerifyResult = {
+  success: false, message: "", devOnly: false, productionReady: false, sessionCreated: false,
 };
 
 export default function LoginPage() {
-  var sendResult = useActionState(sendEmailOtpAction, INITIAL_SEND);
-  var sendState = sendResult[0];
-  var sendAction = sendResult[1];
-  var sendPending = sendResult[2];
+  const sendResult = useActionState(sendEmailOtpAction, INITIAL_SEND);
+  const sendState = sendResult[0];
+  const sendAction = sendResult[1];
+  const sendPending = sendResult[2];
 
-  var verifyResult = useActionState(verifyEmailOtpAction, INITIAL_VERIFY);
-  var verifyState = verifyResult[0];
-  var verifyAction = verifyResult[1];
-  var verifyPending = verifyResult[2];
+  const verifyResult = useActionState(verifyEmailOtpAction, INITIAL_VERIFY);
+  const verifyState = verifyResult[0];
+  const verifyAction = verifyResult[1];
+  const verifyPending = verifyResult[2];
 
-  var emailHook = useState("");
-  var email = emailHook[0];
-  var setEmail = emailHook[1];
+  const emailHook = useState("");
+  const email = emailHook[0];
+  const setEmail = emailHook[1];
 
-  var codeHook = useState("");
-  var code = codeHook[0];
-  var setCode = codeHook[1];
+  const codeHook = useState("");
+  const code = codeHook[0];
+  const setCode = codeHook[1];
 
   return (
-    <main style={{ maxWidth: "480px", margin: "48px auto", padding: "0 20px" }}>
+    <main className="page" style={{ maxWidth: "560px", paddingTop: "72px" }}>
       <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: "1.5rem", fontWeight: 700, color: "#0f172a" }}>登录 / 注册</h1>
+        <p className="eyebrow">Learning Agent Platform</p>
+        <h1 style={{ margin: "0 0 8px", fontSize: "2.25rem", fontWeight: 800, color: "#111827" }}>登录 / 注册</h1>
         <p style={{ margin: 0, fontSize: "0.875rem", color: "#64748b" }}>输入邮箱 → 发送验证码 → 完成登录。首次使用自动注册。</p>
       </div>
 
@@ -80,7 +81,7 @@ export default function LoginPage() {
               />
               <button type="submit" disabled={sendPending || !email}
                 style={{
-                  background: sendPending || !email ? "#e2e8f0" : "#0f172a",
+                  background: sendPending || !email ? "#e2e8f0" : "var(--lap-accent-primary)",
                   border: "none", borderRadius: "6px", color: sendPending || !email ? "#94a3b8" : "#fff",
                   cursor: sendPending || !email ? "not-allowed" : "pointer",
                   fontSize: "0.8125rem", fontWeight: 600, padding: "8px 16px", whiteSpace: "nowrap",
@@ -122,7 +123,7 @@ export default function LoginPage() {
                 />
                 <button type="submit" disabled={verifyPending || code.length !== 6}
                   style={{
-                    background: verifyPending || code.length !== 6 ? "#e2e8f0" : "#0f172a",
+                    background: verifyPending || code.length !== 6 ? "#e2e8f0" : "var(--lap-accent-primary)",
                     border: "none", borderRadius: "6px", color: verifyPending || code.length !== 6 ? "#94a3b8" : "#fff",
                     cursor: verifyPending || code.length !== 6 ? "not-allowed" : "pointer",
                     fontSize: "0.8125rem", fontWeight: 600, padding: "8px 16px", whiteSpace: "nowrap",

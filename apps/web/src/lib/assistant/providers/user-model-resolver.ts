@@ -11,8 +11,8 @@ import {
   type ExternalProviderFetch,
   type ExternalProviderConfig,
 } from "@learning-agent-platform/ai-core/llm/external-chat-completions-provider";
+import { decryptCredential, validateBaseUrl } from "@learning-agent-platform/ai-core/model-gateway";
 import { getPrismaClient, PrismaModelProviderRepository } from "@learning-agent-platform/db";
-import { decryptCredential } from "@learning-agent-platform/ai-core";
 
 export interface ResolvedUserProvider {
   provider: LlmProvider;
@@ -38,6 +38,10 @@ export async function resolveUserModelLlmProvider(options: {
     const provider = await repo.findById(defaultProfile.providerId, options.userId);
     if (!provider) return null;
     if (!provider.enabled) return null;
+    if (provider.authMode !== "BEARER") return null;
+
+    const ssrf = validateBaseUrl(provider.baseUrl);
+    if (!ssrf.allowed) return null;
 
     // Get credential
     const credRecord = await repo.getCredential(defaultProfile.providerId);
@@ -62,12 +66,14 @@ export async function resolveUserModelLlmProvider(options: {
 
     // Build provider config
     const providerConfig: ExternalProviderConfig = {
-      endpoint: provider.baseUrl,
+      endpoint: ssrf.normalizedUrl,
       apiKey: token,
       model: defaultProfile.modelId,
       timeoutMs: provider.requestTimeoutMs,
       configured: true,
       blockedReason: null,
+      supportsToolCalling: defaultProfile.supportsTools,
+      supportsParallelToolCalls: defaultProfile.supportsTools,
     };
 
     const llmProvider: LlmProvider = new ExternalChatCompletionsProvider(

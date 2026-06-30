@@ -11,11 +11,6 @@ import {
   filterAndSortArticles,
 } from "../article-library-filter.ts";
 import { FavoriteArticleButton } from "../../../components/articles/FavoriteArticleButton";
-import {
-  loadRecentArticleReadings,
-  markArticleRead,
-  persistRecentArticleReadings,
-} from "../../../lib/local-user-article-store";
 import { recordArticleReadingDbAction } from "../../user/article-recent-reading-db-server-action";
 
 interface ArticleLibraryClientProps {
@@ -133,7 +128,7 @@ export function ArticleLibraryClient({ articles }: ArticleLibraryClientProps) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
               gap: "var(--lap-space-4)",
             }}
           >
@@ -324,16 +319,6 @@ function ArticleCard({ article }: { article: AggregatedArticle }) {
     <article
       className="lap-card lap-card--hover"
       onClick={() => {
-        const current = loadRecentArticleReadings();
-        const next = markArticleRead(current, {
-          articleId: article.id,
-          title: article.title,
-          sourcePlatform: article.sourcePlatform,
-          sourceName: article.sourceName,
-          originalUrl: article.originalUrl,
-          lastReadAt: new Date().toISOString(),
-        });
-        persistRecentArticleReadings(next);
         recordArticleReadingDbAction(
           article.id,
           article.title,
@@ -341,13 +326,13 @@ function ArticleCard({ article }: { article: AggregatedArticle }) {
           article.sourceName,
           article.originalUrl,
         ).catch(() => {
-          // localStorage already updated; DB is best effort here.
+          // Best-effort analytics only; unauthenticated users are not given local fallback state.
         });
       }}
       style={{ padding: "var(--lap-space-4)", display: "flex", flexDirection: "column", gap: "var(--lap-space-3)", cursor: "pointer" }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--lap-space-3)", alignItems: "flex-start" }}>
-        <div style={{ flex: 1 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "var(--lap-space-3)", alignItems: "flex-start" }}>
+        <div style={{ flex: "1 1 220px", minWidth: 0 }}>
           <h3 style={{ margin: 0, fontSize: "1rem", lineHeight: 1.35, color: "var(--lap-text-primary)" }}>
             {article.title}
           </h3>
@@ -356,7 +341,7 @@ function ArticleCard({ article }: { article: AggregatedArticle }) {
             {article.sourceName ? <span style={badgeStyle("#eef2ff", "#3730a3")}>{article.sourceName}</span> : null}
           </div>
         </div>
-        <span className="lap-dev-badge" style={{ whiteSpace: "nowrap" }}>
+        <span className="lap-dev-badge" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
           {publishedAtLabel}
         </span>
       </div>
@@ -374,7 +359,7 @@ function ArticleCard({ article }: { article: AggregatedArticle }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", marginTop: "auto" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px", marginTop: "auto" }}>
         <span style={{ fontSize: "0.75rem", color: "var(--lap-text-subtle)" }}>
           来源：{ARTICLE_SOURCE_PLATFORM_LABELS[article.sourcePlatform]}
         </span>

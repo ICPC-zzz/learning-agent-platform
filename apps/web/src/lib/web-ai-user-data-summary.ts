@@ -1,6 +1,6 @@
 /**
  * Web AI User Data Summary — server-side read-only aggregator for safe user
- * learning data that the floating assistant can read. Returns only sanitized
+ * learning data that the /ai assistant can read. Returns only sanitized
  * counts and summaries; no secrets, tokens, or raw payloads.
  *
  * @module web-ai-user-data-summary

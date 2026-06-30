@@ -1,6 +1,5 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 
 /**
  * /learning — Learning Center page (A397).
@@ -72,17 +71,8 @@ const ENTRY_CARDS = [
 ];
 
 export default async function LearningCenterPage() {
-  let hasSession = false;
-
-  try {
-    const cookieStore = await cookies();
-    const raw = cookieStore.get("lap-web-dev-session")?.value;
-    const payload = deserializeDevSession(raw);
-    const summary = getSafeSessionSummary(payload);
-    hasSession = summary.hasSession;
-  } catch {
-    // Silently ignore — no session
-  }
+  const session = await getCurrentAuthSession();
+  const hasSession = session.hasSession;
 
   return (
     <main className="learningPage">

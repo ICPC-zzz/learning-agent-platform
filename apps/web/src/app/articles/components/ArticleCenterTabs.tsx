@@ -16,8 +16,10 @@ import type {
   DailyContentPageData,
   DailyHotspotItem,
   GitHubDailyItem,
-} from "../daily-content-json-loader";
+} from "../daily-content-loader";
 import { ArticleLibraryClient } from "./ArticleLibraryClient";
+import { FavoriteArticleButton } from "../../../components/articles/FavoriteArticleButton";
+import { recordArticleReadingDbAction } from "../../user/article-recent-reading-db-server-action";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -212,16 +214,24 @@ function HotspotTab({
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-        gap: "var(--lap-space-4)",
-      }}
-    >
-      {dailyContent.hotspots.map((item) => (
-        <HotspotCard key={item.id} item={item} />
-      ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--lap-space-3)" }}>
+      <SnapshotNotice
+        label="每日热点"
+        snapshotDate={dailyContent.hotspotDate}
+        selectedDate={dailyContent.selectedDate}
+        generatedAt={dailyContent.hotspotGeneratedAt}
+      />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
+          gap: "var(--lap-space-4)",
+        }}
+      >
+        {dailyContent.hotspots.map((item) => (
+          <HotspotCard key={item.id} item={item} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -230,6 +240,8 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
   const publishedLabel = item.publishedAt
     ? new Date(item.publishedAt).toLocaleDateString("zh-CN")
     : null;
+  const articleEntry = hotspotToArticleEntry(item);
+  const recordOpen = () => recordDailyArticleOpen(articleEntry);
 
   return (
     <article
@@ -244,6 +256,7 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           gap: "8px",
           alignItems: "flex-start",
@@ -255,7 +268,8 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
             fontSize: "1rem",
             lineHeight: 1.35,
             color: "var(--lap-text-primary)",
-            flex: 1,
+            flex: "1 1 220px",
+            minWidth: 0,
           }}
         >
           {item.title}
@@ -267,6 +281,15 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
           >
             {publishedLabel}
           </span>
+        ) : null}
+        {articleEntry.originalUrl ? (
+          <FavoriteArticleButton
+            articleId={articleEntry.articleId}
+            title={articleEntry.title}
+            sourcePlatform={articleEntry.sourcePlatform}
+            sourceName={articleEntry.sourceName}
+            originalUrl={articleEntry.originalUrl}
+          />
         ) : null}
       </div>
 
@@ -318,6 +341,7 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="secondaryLink"
+            onClick={recordOpen}
           >
             原文
           </a>
@@ -328,6 +352,7 @@ function HotspotCard({ item }: { item: DailyHotspotItem }) {
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="secondaryLink"
+            onClick={recordOpen}
           >
             HN 讨论
           </a>
@@ -397,21 +422,32 @@ function GitHubTab({
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-        gap: "var(--lap-space-4)",
-      }}
-    >
-      {dailyContent.githubRepos.map((repo) => (
-        <GitHubCard key={repo.id} repo={repo} />
-      ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--lap-space-3)" }}>
+      <SnapshotNotice
+        label="GitHub 日报"
+        snapshotDate={dailyContent.githubDate}
+        selectedDate={dailyContent.selectedDate}
+        generatedAt={dailyContent.githubGeneratedAt}
+      />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
+          gap: "var(--lap-space-4)",
+        }}
+      >
+        {dailyContent.githubRepos.map((repo) => (
+          <GitHubCard key={repo.id} repo={repo} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function GitHubCard({ repo }: { repo: GitHubDailyItem }) {
+  const articleEntry = githubToArticleEntry(repo);
+  const recordOpen = () => recordDailyArticleOpen(articleEntry);
+
   return (
     <article
       className="lap-card lap-card--hover"
@@ -425,6 +461,7 @@ function GitHubCard({ repo }: { repo: GitHubDailyItem }) {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           gap: "8px",
           alignItems: "flex-start",
@@ -436,12 +473,15 @@ function GitHubCard({ repo }: { repo: GitHubDailyItem }) {
             fontSize: "1rem",
             lineHeight: 1.35,
             wordBreak: "break-all",
+            flex: "1 1 220px",
+            minWidth: 0,
           }}
         >
           <a
             href={repo.htmlUrl}
             target="_blank"
             rel="noopener noreferrer nofollow"
+            onClick={recordOpen}
             style={{
               color: "var(--lap-text-primary)",
               textDecoration: "none",
@@ -450,6 +490,13 @@ function GitHubCard({ repo }: { repo: GitHubDailyItem }) {
             {repo.fullName}
           </a>
         </h3>
+        <FavoriteArticleButton
+          articleId={articleEntry.articleId}
+          title={articleEntry.title}
+          sourcePlatform={articleEntry.sourcePlatform}
+          sourceName={articleEntry.sourceName}
+          originalUrl={articleEntry.originalUrl}
+        />
         <span
           className="lap-dev-badge"
           style={{ whiteSpace: "nowrap", flexShrink: 0 }}
@@ -538,6 +585,7 @@ function GitHubCard({ repo }: { repo: GitHubDailyItem }) {
           href={`${repo.htmlUrl}/releases`}
           target="_blank"
           rel="noopener noreferrer nofollow"
+          onClick={recordOpen}
           style={{
             fontSize: "0.8rem",
             color: "var(--lap-accent-primary)",
@@ -567,4 +615,85 @@ function badgeStyle(background: string, color: string): CSSProperties {
     fontWeight: 600,
     whiteSpace: "nowrap",
   };
+}
+
+function SnapshotNotice({
+  label,
+  snapshotDate,
+  selectedDate,
+  generatedAt,
+}: {
+  label: string;
+  snapshotDate: string;
+  selectedDate: string;
+  generatedAt: string | null;
+}) {
+  const isFallback = snapshotDate !== selectedDate;
+  return (
+    <div
+      style={{
+        padding: "10px 12px",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        background: isFallback ? "#fff7ed" : "#f8fafc",
+        color: isFallback ? "#9a3412" : "var(--lap-text-muted)",
+        fontSize: "0.75rem",
+        lineHeight: 1.5,
+      }}
+    >
+      {label}快照日期：{snapshotDate}
+      {generatedAt ? ` · 最近同步：${formatDateTime(generatedAt)}` : ""}
+      {isFallback ? " · 今日同步失败或暂无新数据，当前展示最近一次成功快照。" : ""}
+    </div>
+  );
+}
+
+function formatDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("zh-CN");
+}
+
+interface DailyArticleOpenEntry {
+  articleId: string;
+  title: string;
+  sourcePlatform: string;
+  sourceName: string;
+  originalUrl: string;
+}
+
+function hotspotToArticleEntry(item: DailyHotspotItem): DailyArticleOpenEntry {
+  return {
+    articleId: item.id,
+    title: item.title,
+    sourcePlatform: "daily-hotspot",
+    sourceName: item.sourceLabel || item.source || "Daily Hotspot",
+    originalUrl: item.originalUrl || item.discussionUrl || "",
+  };
+}
+
+function githubToArticleEntry(repo: GitHubDailyItem): DailyArticleOpenEntry {
+  return {
+    articleId: repo.id,
+    title: repo.fullName,
+    sourcePlatform: "github-daily",
+    sourceName: "GitHub Daily",
+    originalUrl: repo.htmlUrl,
+  };
+}
+
+function recordDailyArticleOpen(entry: DailyArticleOpenEntry): void {
+  if (!entry.originalUrl) {
+    return;
+  }
+
+  void recordArticleReadingDbAction(
+    entry.articleId,
+    entry.title,
+    entry.sourcePlatform,
+    entry.sourceName,
+    entry.originalUrl,
+  ).catch(() => {
+    // Best-effort only; no local business-data fallback for unauthenticated users.
+  });
 }

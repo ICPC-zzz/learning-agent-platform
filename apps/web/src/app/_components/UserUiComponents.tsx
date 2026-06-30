@@ -244,7 +244,7 @@ export function PageHero({ eyebrow, title, subtitle, children }: PageHeroProps) 
         <h1>{title}</h1>
         {subtitle ? <p className="status">{subtitle}</p> : null}
       </div>
-      {children ? <div className="homeActions">{children}</div> : null}
+      {children ? <div className="learningHeroActions">{children}</div> : null}
     </header>
   );
 }
@@ -555,6 +555,7 @@ export function MetricPill({ label, value, status = "muted" }: MetricPillProps) 
   const c = statusColors[status];
   return (
     <span
+      className="lap-metric-pill"
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -566,7 +567,6 @@ export function MetricPill({ label, value, status = "muted" }: MetricPillProps) 
         fontSize: "0.6875rem",
         fontWeight: 600,
         border: `1px solid ${c.text}20`,
-        whiteSpace: "nowrap",
       }}
     >
       {label}: {value}

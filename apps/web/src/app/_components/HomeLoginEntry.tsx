@@ -6,7 +6,6 @@
  * A471: Email OTP is the primary (and only) login flow.
  * User enters email -> gets verification code -> verifies -> auto-login/register.
  *
- * @previewOnly - dev-only Auth
  */
 
 import { useActionState, useState } from "react";
@@ -20,14 +19,16 @@ const INITIAL_SEND_STATE: EmailOtpSendResult = {
   success: false,
   message: "",
   emailSent: false,
-  devOnly: true,
+  devOnly: false,
+  productionReady: false,
   retryAfterSeconds: 0,
 };
 
 const INITIAL_VERIFY_STATE: EmailOtpVerifyResult = {
   success: false,
   message: "",
-  devOnly: true,
+  devOnly: false,
+  productionReady: false,
   sessionCreated: false,
 };
 
@@ -39,26 +40,21 @@ export function HomeLoginEntry() {
   const [code, setCode] = useState("");
 
   return (
-    <main className="page" style={{ maxWidth: "440px", paddingTop: "60px" }}>
+    <main className="page" style={{ maxWidth: "520px", paddingTop: "72px" }}>
       <div style={{ textAlign: "center", marginBottom: "var(--lap-space-6)" }}>
-        <div
+        <img
+          src="/a519/learning-agent-logo.png"
+          alt=""
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
             width: "56px",
             height: "56px",
-            borderRadius: "var(--lap-radius-xl)",
-            background: "linear-gradient(135deg, var(--lap-accent-purple) 0%, #8b5cf6 100%)",
-            color: "#fff",
-            fontSize: "1.5rem",
-            fontWeight: 800,
+            borderRadius: "10px",
+            objectFit: "cover",
+            boxShadow: "0 14px 30px rgba(15, 107, 72, 0.16)",
             marginBottom: "var(--lap-space-4)",
           }}
-        >
-          L
-        </div>
-        <h1 style={{ fontSize: "1.75rem", margin: "0 0 8px", fontWeight: 700 }}>
+        />
+        <h1 style={{ fontSize: "2rem", margin: "0 0 8px", fontWeight: 800 }}>
           Learning Agent Platform
         </h1>
         <p style={{ fontSize: "0.875rem", color: "var(--lap-text-muted)", margin: 0 }}>
@@ -89,7 +85,7 @@ export function HomeLoginEntry() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                background: "#0f172a",
+                background: "var(--lap-accent-primary)",
                 borderRadius: "var(--lap-radius-sm)",
                 color: "#f8fafc",
                 fontSize: "0.8125rem",
@@ -158,7 +154,7 @@ export function HomeLoginEntry() {
                 type="submit"
                 disabled={sendPending || !email}
                 style={{
-                  background: sendPending || !email ? "#e2e8f0" : "#0f172a",
+                  background: sendPending || !email ? "#e2e8f0" : "var(--lap-accent-primary)",
                   border: "none",
                   borderRadius: "var(--lap-radius-sm)",
                   color: sendPending || !email ? "#94a3b8" : "#f8fafc",
@@ -236,7 +232,7 @@ export function HomeLoginEntry() {
                   type="submit"
                   disabled={verifyPending || code.length !== 6}
                   style={{
-                    background: verifyPending || code.length !== 6 ? "#e2e8f0" : "#0f172a",
+                    background: verifyPending || code.length !== 6 ? "#e2e8f0" : "var(--lap-accent-primary)",
                     border: "none",
                     borderRadius: "var(--lap-radius-sm)",
                     color: verifyPending || code.length !== 6 ? "#94a3b8" : "#f8fafc",
@@ -286,7 +282,7 @@ export function HomeLoginEntry() {
           color: "var(--lap-text-subtle)",
         }}
       >
-        dev-only 路 开发预览 路 非生产 Auth
+        邮箱验证码登录 · 数据库会话 · HttpOnly Cookie
       </div>
     </main>
   );

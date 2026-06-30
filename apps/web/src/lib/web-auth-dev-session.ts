@@ -27,6 +27,8 @@ export interface DevSessionRole {
 export interface DevSessionUser {
   /** Safe preview of user identity (never a real DB primary key). */
   userIdPreview: string;
+  /** Optional trusted email set only by server-side email OTP login. */
+  email?: string;
   /** Display name for UI. */
   displayName: string;
   /** Role label (e.g., "开发用户"). */
@@ -59,6 +61,7 @@ export interface DevSessionSafeSummary {
 /** What gets serialized into the cookie. */
 export interface DevSessionCookiePayload {
   userIdPreview: string;
+  email?: string;
   displayName: string;
   role: string;
   sessionMode: DevSessionMode;
@@ -105,9 +108,11 @@ export function createDevSessionData(
   userIdPreview: string,
   displayName: string,
   role: string,
+  email?: string,
 ): DevSessionData {
   return {
     userIdPreview,
+    ...(email ? { email: normalizeEmail(email) } : {}),
     displayName,
     role,
     sessionMode: "dev-only",
@@ -140,6 +145,7 @@ export function isValidDevSessionPayload(
   const p = payload as Record<string, unknown>;
 
   if (typeof p.userIdPreview !== "string" || p.userIdPreview.length === 0) return false;
+  if (p.email !== undefined && !isValidEmail(p.email)) return false;
   if (typeof p.displayName !== "string" || p.displayName.length === 0) return false;
   if (typeof p.role !== "string" || p.role.length === 0) return false;
   if (p.sessionMode !== "dev-only") return false;
@@ -150,12 +156,16 @@ export function isValidDevSessionPayload(
 
   // Must have exactly the expected keys (no extras)
   const allowedKeys = [
-    "userIdPreview", "displayName", "role", "sessionMode", "createdAt",
+    "userIdPreview", "email", "displayName", "role", "sessionMode", "createdAt",
   ];
   const actualKeys = Object.keys(p);
-  if (actualKeys.length !== allowedKeys.length) return false;
   for (const key of actualKeys) {
     if (!allowedKeys.includes(key)) return false;
+  }
+
+  const requiredKeys = ["userIdPreview", "displayName", "role", "sessionMode", "createdAt"];
+  for (const key of requiredKeys) {
+    if (!actualKeys.includes(key)) return false;
   }
 
   return true;
@@ -167,6 +177,7 @@ export function payloadToSessionData(
 ): DevSessionData {
   return {
     userIdPreview: payload.userIdPreview,
+    ...(payload.email ? { email: payload.email } : {}),
     displayName: payload.displayName,
     role: payload.role,
     sessionMode: payload.sessionMode,
@@ -259,6 +270,7 @@ export function serializeDevSession(
 ): string {
   const payload: DevSessionCookiePayload = {
     userIdPreview: session.userIdPreview,
+    ...(session.email ? { email: normalizeEmail(session.email) } : {}),
     displayName: session.displayName,
     role: session.role,
     sessionMode: session.sessionMode,
@@ -301,4 +313,14 @@ export function getDevUserPresets(): Array<{ key: string; label: string }> {
 
 export function getDevUserByKey(key: string): DevSessionUser | null {
   return DEFAULT_DEV_USERS[key] ?? null;
+}
+
+function isValidEmail(value: unknown): value is string {
+  return typeof value === "string"
+    && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+    && value.trim().length <= 254;
+}
+
+function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
 }

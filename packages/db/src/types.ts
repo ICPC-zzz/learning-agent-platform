@@ -9,7 +9,6 @@ import type {
   ProblemDifficulty as PrismaProblemDifficulty,
   RecommendationStatus as PrismaRecommendationStatus,
   ReadingProgress,
-  User,
   UserAbilityProfile,
 } from "@prisma/client";
 
@@ -32,16 +31,21 @@ export type BookChapterRecord = BookChapter;
 
 export type ContentChunkRecord = ContentChunk;
 
-export type UserRecord = Pick<
-  User,
-  | "id"
-  | "authProvider"
-  | "authProviderId"
-  | "email"
-  | "name"
-  | "createdAt"
-  | "updatedAt"
->;
+export type UserRole = "USER" | "ADMIN";
+
+export interface UserRecord {
+  id: string;
+  authProvider: string | null;
+  authProviderId: string | null;
+  email: string | null;
+  emailVerifiedAt?: Date | null;
+  name: string | null;
+  avatarUrl?: string | null;
+  role?: UserRole;
+  disabledAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export type ReadingProgressRecord = Pick<
   ReadingProgress,
@@ -307,11 +311,16 @@ export interface CreateUserInput {
   name?: string | null;
   authProvider?: string | null;
   authProviderId?: string | null;
+  role?: UserRole;
+  emailVerifiedAt?: Date | null;
 }
 
 export interface UpdateUserInput {
   email?: string | null;
   name?: string | null;
+  role?: UserRole;
+  disabledAt?: Date | null;
+  emailVerifiedAt?: Date | null;
 }
 
 export interface FindUserInput {
@@ -331,6 +340,72 @@ export interface UserRepository {
   updateUser(userId: string, input: UpdateUserInput): Promise<UserRecord>;
 
   findOrCreateUser(input: CreateUserInput): Promise<UserRecord>;
+}
+
+export interface CreateWebSessionInput {
+  userId: string;
+  tokenHash: string;
+  expiresAt: Date;
+  userAgentHash?: string | null;
+  ipHash?: string | null;
+}
+
+export interface WebSessionUserRecord {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: UserRole;
+  disabledAt: Date | null;
+}
+
+export interface WebSessionRecord {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  createdAt: Date;
+  expiresAt: Date;
+  lastSeenAt: Date;
+  revokedAt: Date | null;
+  userAgentHash: string | null;
+  ipHash: string | null;
+  user?: WebSessionUserRecord;
+}
+
+export interface WebSessionRepository {
+  createSession(input: CreateWebSessionInput): Promise<WebSessionRecord>;
+  findActiveSessionByTokenHash(tokenHash: string, now?: Date): Promise<WebSessionRecord | null>;
+  touchSession(sessionId: string, lastSeenAt?: Date): Promise<WebSessionRecord | null>;
+  revokeSession(sessionId: string, revokedAt?: Date): Promise<WebSessionRecord | null>;
+  revokeSessionByTokenHash(tokenHash: string, revokedAt?: Date): Promise<WebSessionRecord | null>;
+}
+
+export type AuthAuditEventType =
+  | "auth_otp_requested"
+  | "auth_otp_verified"
+  | "auth_otp_failed"
+  | "auth_session_created"
+  | "auth_session_expired"
+  | "auth_session_revoked"
+  | "auth_logout"
+  | "auth_access_denied"
+  | "auth_admin_access_denied"
+  | "auth_role_changed";
+
+export interface CreateAuthAuditEventInput {
+  userId?: string | null;
+  eventType: AuthAuditEventType;
+  sourceSummary?: string | null;
+  result: "success" | "failure" | "blocked";
+  errorCode?: string | null;
+}
+
+export interface AuthAuditEventRecord extends CreateAuthAuditEventInput {
+  id: string;
+  createdAt: Date;
+}
+
+export interface AuthAuditRepository {
+  recordEvent(input: CreateAuthAuditEventInput): Promise<AuthAuditEventRecord>;
 }
 
 export interface UpsertReadingProgressInput {
@@ -1132,6 +1207,7 @@ export interface EmailOtpRecordSafe {
 export interface EmailOtpRepository {
   createEmailOtp(input: CreateEmailOtpInput): Promise<EmailOtpRecordSafe>;
   findLatestActiveEmailOtp(email: string, purpose: EmailOtpPurpose): Promise<EmailOtpRecordSafe | null>;
+  consumeActiveEmailOtps(email: string, purpose: EmailOtpPurpose): Promise<number>;
   markEmailOtpConsumed(id: string): Promise<EmailOtpRecordSafe | null>;
   incrementEmailOtpAttempts(id: string): Promise<EmailOtpRecordSafe | null>;
   deleteExpiredEmailOtps(): Promise<number>;
@@ -1190,6 +1266,7 @@ export interface RecordArticleReadingInput extends AddFavoriteArticleInput {
 export interface ListArticleReadingsByOwnerInput {
   userId: string;
   limit?: number;
+  since?: Date;
 }
 
 export interface ArticleRepository {
@@ -1255,6 +1332,27 @@ export interface DeleteMemoryInput {
   memoryId: string;
 }
 
+export type MemoryLifecycleStatus = "active" | "historical" | "archived" | "superseded" | "deleted";
+
+export interface UpdateMemoryMetadataInput {
+  userId: string;
+  memoryId: string;
+  enabled?: boolean;
+  content?: string;
+  metadata?: PrismaTypes.InputJsonValue | null;
+}
+
+export interface UpdateConversationMemoryLifecycleInput {
+  userId: string;
+  conversationId: string;
+  lifecycleStatus: MemoryLifecycleStatus;
+}
+
+export interface DeleteConversationMemoriesInput {
+  userId: string;
+  conversationId: string;
+}
+
 export interface ListMemoriesByOwnerInput {
   userId: string;
   limit?: number;
@@ -1266,4 +1364,13 @@ export interface MemoryRepository {
   addMemory(input: AddMemoryInput): Promise<MemoryRecord>;
   toggleMemoryEnabled(input: ToggleMemoryEnabledInput): Promise<MemoryRecord | null>;
   deleteMemory(input: DeleteMemoryInput): Promise<boolean>;
+  updateMemoryMetadata?(
+    input: UpdateMemoryMetadataInput,
+  ): Promise<MemoryRecord | null>;
+  updateConversationMemoryLifecycle?(
+    input: UpdateConversationMemoryLifecycleInput,
+  ): Promise<MemoryRecord[]>;
+  deleteConversationMemories?(
+    input: DeleteConversationMemoriesInput,
+  ): Promise<number>;
 }

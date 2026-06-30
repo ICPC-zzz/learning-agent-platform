@@ -5,7 +5,7 @@
  * No env values, tokens, secrets, or DATABASE_URL values are ever exposed.
  *
  * Categories:
- * - LLM / Floating AI
+ * - LLM / AI Assistant
  * - Book API
  * - Problem API
  * - Phone Auth / SMS OTP
@@ -13,7 +13,6 @@
  * - DB Readiness
  * - Agent / MCP / GitHub (preview-only)
  * - Import Readiness
- * - Floating AI Readiness
  *
  * @previewOnly — productionReady=false
  * @safeToExposeToClient — no env values, only variable names and boolean states
@@ -50,7 +49,6 @@ export type StatusCategory =
   | "db"
   | "agent-mcp"
   | "import"
-  | "floating-ai"
   | "ui-shell";
 
 export type StatusValue =
@@ -934,7 +932,7 @@ export function getAdminStatusSnapshot(): AdminStatusSnapshot {
   const summary = computeSummary(items);
 
   const groups: StatusGroup[] = [
-    { label: "AI Assistant", items: items.filter((i) => i.category === "llm" || i.category === "floating-ai") },
+    { label: "AI Assistant", items: items.filter((i) => i.category === "llm") },
     { label: "External APIs", items: items.filter((i) => i.category === "book-api" || i.category === "problem-api" || i.category === "phone-auth" || i.category === "email-auth") },
     { label: "Database", items: items.filter((i) => i.category === "db") },
     { label: "Imports", items: items.filter((i) => i.category === "import") },

@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
 import { AdminShell } from "../_components/AdminShell";
+import { isCurrentUserAdmin } from "../../lib/admin/admin-auth";
 
 /**
  * Admin layout — wraps all /admin/* pages in AdminShell.
@@ -9,7 +11,7 @@ import { AdminShell } from "../_components/AdminShell";
  * - Left sidebar with admin-only nav
  * - No user main nav
  * - No learning workflow
- * - Floating AI assistant hidden on admin pages (handled by FloatingAiAssistant)
+ * - Floating assistant removed; admin pages do not mount assistant overlays
  */
 
 export const metadata = {
@@ -17,6 +19,11 @@ export const metadata = {
   description: "后台管理 — 开发预览",
 };
 
-export default function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function AdminLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const adminStatus = await isCurrentUserAdmin();
+  if (!adminStatus.ok) {
+    notFound();
+  }
+
   return <AdminShell>{children}</AdminShell>;
 }

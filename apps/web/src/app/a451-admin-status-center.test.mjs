@@ -39,7 +39,7 @@ test("[1] admin-status-center.ts exists and exports", function() {
   ok(src.includes('"unavailable"'));
 });
 
-test("[2] admin-status-center.ts collects all categories", function() {
+test("[2] admin-status-center.ts collects active categories and omits floating assistant", function() {
   var src = readFile(resolve(LIB_DIR, "admin-status-center.ts"));
   ok(src.includes("collectLlmStatus"));
   ok(src.includes("collectBookApiStatus"));
@@ -47,8 +47,9 @@ test("[2] admin-status-center.ts collects all categories", function() {
   ok(src.includes("collectDbStatus"));
   ok(src.includes("collectAgentMcpStatus"));
   ok(src.includes("collectImportStatus"));
-  ok(src.includes("collectFloatingAiStatus"));
   ok(src.includes("collectUiShellStatus"));
+  ok(!src.includes("collectFloatingAiStatus"));
+  ok(!src.includes('"floating-ai"'));
 });
 
 test("[3] no hardcoded env values in admin-status-center.ts", function() {
@@ -139,15 +140,14 @@ test("[12] USER_NAV_ITEMS does not contain /admin", function() {
   ok(!userSection.includes('href: "/admin"'), "USER_NAV_ITEMS: no /admin");
 });
 
-test("[13] FloatingAiAssistant hides on admin pages", function() {
-  var src = readFile(resolve(COMPONENTS_DIR, "FloatingAiAssistant.tsx"));
-  ok(src.includes("isAdmin") && src.includes("return null"));
+test("[13] FloatingAiAssistant source file is removed", function() {
+  ok(!existsSync(resolve(COMPONENTS_DIR, "FloatingAiAssistant.tsx")));
 });
 
-test("[14] FloatingAiAssistant shows LLM guard status", function() {
-  var src = readFile(resolve(COMPONENTS_DIR, "FloatingAiAssistant.tsx"));
-  ok(src.includes("LLM Guard"));
-  ok(src.includes("web-ai-qa-guard"));
+test("[14] Root layout does not mount FloatingAiAssistant", function() {
+  var src = readFile(resolve(SRC_DIR, "layout.tsx"));
+  ok(!src.includes("FloatingAiAssistant"));
+  ok(!src.includes("<FloatingAiAssistant"));
 });
 
 test("[15] home page has status badges import", function() {
@@ -172,7 +172,6 @@ test("[18] books page has status badges import", function() {
 
 test("[19] globals.css preserves design tokens", function() {
   var src = readFile(resolve(SRC_DIR, "globals.css"));
-  ok(src.includes("--lap-z-floating-ai"));
   ok(src.includes("--lap-status-dev-bg"));
   ok(src.includes("--lap-card-bg"));
 });

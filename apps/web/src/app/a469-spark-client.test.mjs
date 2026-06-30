@@ -125,10 +125,10 @@ test("provider: successful chat completion returns answer", async () => {
 });
 
 // ---------------------------------------------------------------------------
-// Test: provider — Bearer auth uses apiKey
+// Test: provider — generic Bearer auth uses apiKey
 // ---------------------------------------------------------------------------
 
-test("provider: Bearer auth uses apiKey (not apiPassword when both set)", async () => {
+test("provider: generic Bearer auth uses apiKey (not apiPassword when both set)", async () => {
   let capturedAuthHeader = "";
   const mockFetch = makeMockFetch((req) => {
     capturedAuthHeader = req.headers?.Authorization || "";
@@ -138,7 +138,7 @@ test("provider: Bearer auth uses apiKey (not apiPassword when both set)", async 
   });
 
   const config = mod.loadExternalProviderConfig({
-    endpoint: "https://spark-api-open.xf-yun.com/v1/chat/completions",
+    endpoint: "https://example.com/v1/chat/completions",
     apiKey: "sk-main-key",
     apiPassword: "secondary-pw",
     model: "test-model",
@@ -153,6 +153,38 @@ test("provider: Bearer auth uses apiKey (not apiPassword when both set)", async 
 
   assert.ok(capturedAuthHeader.includes("sk-main-key"), "Bearer should use apiKey");
   assert.ok(!capturedAuthHeader.includes("secondary-pw"), "Bearer should NOT use apiPassword when apiKey is set");
+  assert.equal(result.ok, true);
+});
+
+// ---------------------------------------------------------------------------
+// Test: provider — Spark Bearer auth uses APIPassword
+// ---------------------------------------------------------------------------
+
+test("provider: Spark Bearer auth uses apiPassword when both set", async () => {
+  let capturedAuthHeader = "";
+  const mockFetch = makeMockFetch((req) => {
+    capturedAuthHeader = req.headers?.Authorization || "";
+    return makeJsonResponse({
+      choices: [{ message: { content: "OK" } }],
+    });
+  });
+
+  const config = mod.loadExternalProviderConfig({
+    endpoint: "https://spark-api-open.xf-yun.com/v1/chat/completions",
+    apiKey: "spark-key",
+    apiPassword: "spark-secret",
+    model: "test-model",
+  });
+
+  const provider = new mod.ExternalChatCompletionsProvider(config, mockFetch);
+  const result = await provider.generate({
+    messages: [{ role: "user", content: "test" }],
+    maxOutputChars: 50,
+    purposeSummary: "test",
+  });
+
+  assert.ok(capturedAuthHeader.includes("spark-secret"), "Spark Bearer should use apiPassword");
+  assert.ok(!capturedAuthHeader.includes("spark-key:"), "Spark Bearer should not use apiKey:apiPassword");
   assert.equal(result.ok, true);
 });
 

@@ -21,9 +21,11 @@
 
 import {
   evaluateExternalApiDevGuard,
-  PROBLEM_API_CONTRACT,
   type ExternalApiDevGuardResult,
-} from "@learning-agent-platform/shared";
+} from "../../../../packages/shared/src/external-api-dev-guard.ts";
+import {
+  PROBLEM_API_CONTRACT,
+} from "../../../../packages/shared/src/third-party-api-config.ts";
 import {
   createAssistantProviderEnvSnapshot,
   loadAssistantProviderConfig,

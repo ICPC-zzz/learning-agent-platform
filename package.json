@@ -8,8 +8,15 @@
   ],
   "scripts": {
     "dev": "npm -w @learning-agent-platform/web run dev",
+    "build": "pnpm --filter @learning-agent-platform/db build && pnpm --filter @learning-agent-platform/web build",
     "typecheck": "bash scripts/vm-typecheck.sh",
     "lint": "bash scripts/vm-lint.sh",
+    "content:sync:hot": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts --hot",
+    "content:sync:github-daily": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts --github",
+    "content:sync:articles": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts --articles",
+    "content:sync:all": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts",
+    "auth:bootstrap-admin": "pnpm --filter @learning-agent-platform/db build && tsx scripts/auth-bootstrap-admin.ts",
+    "test:db:memory-integration": "node --test tests/a514-prisma-memory-integration.test.mjs",
     "desktop:test:gui": "node --test apps/desktop/desktop-gui-regression.test.mjs",
     "desktop:test:gui:ci": "node apps/desktop/run-desktop-gui-ci.mjs"
   },

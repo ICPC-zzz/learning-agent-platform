@@ -19,15 +19,15 @@ export function AssistantWorkspaceClient({
       <PageSection
         eyebrow="AI 助手"
         title="Web 端真实助手核心"
-        note="共享同一套安全上下文、学习摘要、记忆管理和站内导航校验。"
+        note="共享同一套安全边界、长期记忆管理和站内导航校验。"
       >
         <DataStatePanel
           variant={hasSession ? "info" : "empty"}
           message={hasSession ? `当前会话：${displayName ?? "已登录"}` : "未登录会话"}
           description={
             hasSession
-              ? "可以基于当前页面、学习摘要和可管理记忆进行问答。"
-              : "未登录时仍可使用当前页面上下文，但不会读取服务端记忆。"
+              ? "可以结合当前页面和可管理记忆进行问答。"
+              : "未登录时仍可提问，但不会读取服务端记忆。"
           }
         />
       </PageSection>
@@ -35,7 +35,7 @@ export function AssistantWorkspaceClient({
       <PageSection
         eyebrow="工作区"
         title="聊天与记忆概览"
-        note="左侧是会话输入和回答，右侧是工作记忆、会话摘要与长期记忆的实时可视化。"
+        note="左侧是会话输入和回答，右侧是长期记忆概览。"
       >
         <div style={workspaceGridStyle}>
           <section style={chatShellStyle} aria-label="assistant chat shell">
@@ -56,11 +56,11 @@ export function AssistantWorkspaceClient({
       <PreviewNotice
         identifiers={[
           "real-orchestrator",
-          "page-context",
-          "learning-context",
+          "page-aware-chat",
+          "long-term-memory",
           "memory-management",
           "internal-navigation",
-          "no-raw-prompt",
+          "no-raw-model-data",
           "no-raw-response",
         ]}
         message="AI 助手核心"

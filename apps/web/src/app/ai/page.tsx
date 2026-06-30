@@ -1,45 +1,28 @@
-import { cookies } from "next/headers";
-import {
-  deserializeDevSession,
-  getSafeSessionSummary,
-} from "../../lib/web-auth-dev-session.ts";
 import { AssistantConversationProvider } from "../_components/AssistantConversationStore";
+import { MetricPill, PageHero } from "../_components/UserUiComponents";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 import { AiAssistantTabs } from "./AiAssistantTabs";
 
 export default async function AiAssistantPage() {
-  let hasSession = false;
-  let displayName: string | null = null;
-
-  try {
-    const cookieStore = await cookies();
-    const raw = cookieStore.get("lap-web-dev-session")?.value;
-    const payload = deserializeDevSession(raw);
-    const summary = getSafeSessionSummary(payload);
-    hasSession = summary.hasSession;
-    displayName = summary.user?.displayName ?? null;
-  } catch {
-    hasSession = false;
-  }
+  const session = await getCurrentAuthSession();
+  const hasSession = session.hasSession;
+  const displayName = session.hasSession ? session.displayName : null;
 
   return (
     <main className="learningPage">
-      <div style={{ padding: "24px 16px", maxWidth: 1080, margin: "0 auto" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <p style={{ fontSize: "12px", color: "#6b7280", margin: 0, letterSpacing: "0.5px", textTransform: "uppercase" }}>
-            AI 助手
-          </p>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, margin: "4px 0", color: "#111827" }}>
-            {hasSession ? (displayName ? `${displayName} 的 AI 助手` : "AI 助手") : "AI 助手"}
-          </h2>
-          <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>
-            对话、模型配置与记忆管理
-          </p>
-        </div>
+      <PageHero
+        eyebrow="AI 学习教练"
+        title={hasSession ? (displayName ? `${displayName} 的 AI 助手` : "AI 助手") : "AI 助手"}
+        subtitle="最终回答是主体；会话、模型、长期记忆和执行过程都收束为辅助入口，避免把学习体验做成调试控制台。"
+      >
+        <MetricPill label="回答主体" value="优先" status="success" />
+        <MetricPill label="执行链" value="折叠" status="muted" />
+        <MetricPill label="长期记忆" value={hasSession ? "可管理" : "需登录"} status={hasSession ? "info" : "warning"} />
+      </PageHero>
 
-        <AssistantConversationProvider>
-          <AiAssistantTabs hasSession={hasSession} displayName={displayName} />
-        </AssistantConversationProvider>
-      </div>
+      <AssistantConversationProvider>
+        <AiAssistantTabs hasSession={hasSession} displayName={displayName} />
+      </AssistantConversationProvider>
     </main>
   );
 }

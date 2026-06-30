@@ -10,36 +10,42 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback } from "react";
 import { USER_NAV_ITEMS, NavLink } from "./AppNav";
+import { logoutAction } from "../auth/logout/actions";
 
 export interface AppHeaderProps {
   /** Called when the mobile hamburger is clicked. */
   onToggleMobileSidebar?: () => void;
   hasSession?: boolean;
+  canAccessAdmin?: boolean;
 }
 
-export function AppHeader({ onToggleMobileSidebar, hasSession = false }: AppHeaderProps) {
+export function AppHeader({
+  onToggleMobileSidebar,
+  hasSession = false,
+  canAccessAdmin = false,
+}: AppHeaderProps) {
   return (
     <header
       style={{
         position: "sticky",
         top: 0,
         zIndex: "var(--lap-z-sticky)",
-        background: "var(--lap-bg-card)",
-        borderBottom: "var(--lap-border-light)",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+        background: "rgba(255, 255, 252, 0.86)",
+        borderBottom: "1px solid rgba(217, 225, 215, 0.9)",
+        boxShadow: "0 1px 0 rgba(33, 55, 47, 0.04)",
+        backdropFilter: "blur(16px)",
       }}
     >
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          maxWidth: "var(--lap-layout-width-wide)",
-          margin: "0 auto",
-          padding: "0 var(--lap-space-4)",
-          minHeight: "56px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            maxWidth: "var(--lap-layout-width-wide)",
+            margin: "0 auto",
+            padding: "0 28px",
+            minHeight: "64px",
         }}
       >
         {/* Logo & brand */}
@@ -56,23 +62,18 @@ export function AppHeader({ onToggleMobileSidebar, hasSession = false }: AppHead
             flexShrink: 0,
           }}
         >
-          <span
+          <img
+            src="/a519/learning-agent-logo.png"
+            alt=""
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "32px",
-              height: "32px",
-              borderRadius: "var(--lap-radius-md)",
-              background: "linear-gradient(135deg, var(--lap-accent-purple) 0%, #8b5cf6 100%)",
-              color: "#fff",
-              fontSize: "1rem",
-              fontWeight: 800,
+              width: "34px",
+              height: "34px",
+              borderRadius: "9px",
+              objectFit: "cover",
+              boxShadow: "0 6px 18px rgba(15, 107, 72, 0.16)",
             }}
-          >
-            L
-          </span>
-          <span className="lap-hide-mobile">Learning Platform</span>
+          />
+          <span className="lap-hide-mobile">Learning Agent Platform</span>
         </Link>
 
         {/* Desktop nav */}
@@ -109,24 +110,32 @@ export function AppHeader({ onToggleMobileSidebar, hasSession = false }: AppHead
                 注册
               </Link>
             </div>
+          ) : (
+            <form action={logoutAction}>
+              <button type="submit" style={logoutButtonStyle} title="退出登录">
+                退出
+              </button>
+            </form>
+          )}
+          <span className="lap-dev-badge lap-hide-mobile">studio-preview</span>
+          {canAccessAdmin ? (
+            <Link
+              href="/admin"
+              className="lap-hide-mobile"
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--lap-text-subtle)",
+                textDecoration: "none",
+                padding: "4px 8px",
+                borderRadius: "var(--lap-radius-sm)",
+                border: "1px solid #e2e8f0",
+                transition: "color var(--lap-transition-fast)",
+              }}
+              title="后台管理（开发预览）"
+            >
+              后台
+            </Link>
           ) : null}
-          <span className="lap-dev-badge lap-hide-mobile">dev-preview</span>
-          <Link
-            href="/admin"
-            className="lap-hide-mobile"
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--lap-text-subtle)",
-              textDecoration: "none",
-              padding: "4px 8px",
-              borderRadius: "var(--lap-radius-sm)",
-              border: "1px solid #e2e8f0",
-              transition: "color var(--lap-transition-fast)",
-            }}
-            title="后台管理（开发预览）"
-          >
-            后台
-          </Link>
           {/* Mobile hamburger */}
           <button
             className="lap-show-mobile"
@@ -179,5 +188,21 @@ const guestActionLinkStyleSecondary: React.CSSProperties = {
   fontSize: "0.75rem",
   fontWeight: 700,
   textDecoration: "none",
+  whiteSpace: "nowrap",
+};
+
+const logoutButtonStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minWidth: "56px",
+  padding: "8px 12px",
+  borderRadius: "999px",
+  border: "1px solid var(--lap-border-default)",
+  background: "#fff",
+  color: "var(--lap-text-primary)",
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  cursor: "pointer",
   whiteSpace: "nowrap",
 };

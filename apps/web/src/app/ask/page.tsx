@@ -67,8 +67,7 @@ export default function AskPage() {
           </Link>
         </div>
         <p className="panelNote" style={{ marginTop: 8, color: "#6366f1", fontSize: "12px" }}>
-          全站页面均可使用右下角悬浮 AI 助手，支持更多页面上下文与学习数据摘要。
-          本页为独立测试入口，复用同一 guard 与 provider 管线。
+          本页为独立测试入口；完整 AI 助手请使用 /ai 主页面，复用同一 guard 与 provider 管线。
         </p>
       </header>
 

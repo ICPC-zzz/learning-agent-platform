@@ -4,6 +4,7 @@ export * from "./llm";
 export * from "./embeddings";
 export * from "./memory";
 export * from "./tools";
+export type { JsonPrimitive, JsonValue } from "./memory";
 export * from "./skills";
 export * from "./autonomy";
 export * from "./agent";

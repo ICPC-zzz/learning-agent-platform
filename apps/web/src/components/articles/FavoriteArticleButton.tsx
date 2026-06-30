@@ -3,14 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-  addFavoriteArticle,
-  isFavoriteArticle,
-  loadFavoriteArticles,
-  persistFavoriteArticles,
-  removeFavoriteArticle,
-  type FavoriteArticleEntry,
-} from "../../lib/local-user-article-store";
-import {
   checkArticleFavoriteDbAction,
   toggleArticleFavoriteDbAction,
 } from "../../app/user/article-favorites-db-server-action";
@@ -33,58 +25,29 @@ export function FavoriteArticleButton({
   const [mounted, setMounted] = useState(false);
   const [favorited, setFavorited] = useState(false);
   const [pending, setPending] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const favorites = loadFavoriteArticles();
-    setFavorited(isFavoriteArticle(favorites, articleId));
     setMounted(true);
 
     checkArticleFavoriteDbAction(articleId)
       .then((result) => {
-        if (result.success && result.isFavorite) {
-          setFavorited(true);
-          if (!isFavoriteArticle(favorites, articleId)) {
-            const entry: FavoriteArticleEntry = {
-              articleId,
-              title,
-              sourcePlatform,
-              sourceName,
-              originalUrl,
-              updatedAt: new Date().toISOString(),
-            };
-            persistFavoriteArticles(addFavoriteArticle(favorites, entry));
-          }
+        if (result.success) {
+          setFavorited(result.isFavorite);
         }
       })
       .catch(() => {
-        // Best effort only.
+        setStatusMessage("收藏状态读取失败，请稍后刷新。");
       });
-  }, [articleId, originalUrl, sourceName, sourcePlatform, title]);
+  }, [articleId]);
 
   const toggle = useCallback(async () => {
     if (pending) return;
 
-    const nextIsFavorite = !favorited;
-    const favorites = loadFavoriteArticles();
-
-    if (nextIsFavorite) {
-      const entry: FavoriteArticleEntry = {
-        articleId,
-        title,
-        sourcePlatform,
-        sourceName,
-        originalUrl,
-        updatedAt: new Date().toISOString(),
-      };
-      persistFavoriteArticles(addFavoriteArticle(favorites, entry));
-    } else {
-      persistFavoriteArticles(removeFavoriteArticle(favorites, articleId));
-    }
-
-    setFavorited(nextIsFavorite);
     setPending(true);
+    setStatusMessage(null);
     try {
-      await toggleArticleFavoriteDbAction(
+      const result = await toggleArticleFavoriteDbAction(
         articleId,
         title,
         sourcePlatform,
@@ -92,8 +55,14 @@ export function FavoriteArticleButton({
         originalUrl,
         favorited,
       );
+      if (result.success) {
+        setFavorited(result.isFavorite);
+        setStatusMessage(result.uiMessage);
+      } else {
+        setStatusMessage(result.uiMessage || "请先登录后再收藏文章。");
+      }
     } catch {
-      // localStorage already updated; DB is best effort here.
+      setStatusMessage("收藏操作失败，请稍后再试。");
     } finally {
       setPending(false);
     }
@@ -104,33 +73,42 @@ export function FavoriteArticleButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={(event) => {
-        event.stopPropagation();
-        void toggle();
-      }}
-      aria-pressed={favorited}
-      aria-label={favorited ? `取消收藏 ${title}` : `收藏 ${title}`}
-      title={favorited ? "已收藏文章，点击取消" : "收藏文章"}
-      disabled={pending}
-      style={{
-        alignItems: "center",
-        background: favorited ? "#fef3c7" : "#fff",
-        border: favorited ? "1px solid #f59e0b" : "1px solid #cbd5e1",
-        borderRadius: "999px",
-        color: favorited ? "#92400e" : "#475569",
-        cursor: pending ? "wait" : "pointer",
-        display: "inline-flex",
-        font: "inherit",
-        fontSize: "12px",
-        fontWeight: 700,
-        gap: "4px",
-        padding: "6px 12px",
-      }}
-    >
-      <span aria-hidden="true">{favorited ? "★" : "☆"}</span>
-      {favorited ? "已收藏" : "收藏文章"}
-    </button>
+    <span style={{ display: "inline-flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
+      <button
+        className="lap-favorite-article-button"
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          void toggle();
+        }}
+        aria-pressed={favorited}
+        aria-label={favorited ? `取消收藏 ${title}` : `收藏 ${title}`}
+        title={favorited ? "已收藏文章，点击取消" : "收藏文章"}
+        disabled={pending}
+        style={{
+          alignItems: "center",
+          background: favorited ? "#fef3c7" : "#fff",
+          border: favorited ? "1px solid #f59e0b" : "1px solid #cbd5e1",
+          borderRadius: "999px",
+          color: favorited ? "#92400e" : "#475569",
+          cursor: pending ? "wait" : "pointer",
+          display: "inline-flex",
+          flexShrink: 0,
+          font: "inherit",
+          fontSize: "12px",
+          fontWeight: 700,
+          gap: "4px",
+          padding: "6px 12px",
+        }}
+      >
+        <span aria-hidden="true">{favorited ? "★" : "☆"}</span>
+        {favorited ? "已收藏" : "收藏文章"}
+      </button>
+      {statusMessage ? (
+        <span style={{ maxWidth: "180px", color: "#64748b", fontSize: "11px", lineHeight: 1.35 }} role="status">
+          {statusMessage}
+        </span>
+      ) : null}
+    </span>
   );
 }

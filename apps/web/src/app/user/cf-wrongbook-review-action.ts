@@ -12,6 +12,7 @@ import { cookies } from "next/headers";
 import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
 import { getPrismaClient, PrismaCodeforcesAccountRepository } from "@learning-agent-platform/db";
 import type { ReviewReportData } from "./CfWrongBookReviewReport";
+import { persistCfReviewPlanMemory } from "../../lib/assistant/learning-artifact-memory.ts";
 
 function isFeatureEnabled(): boolean {
   return process.env.ENABLE_CF_WRONGBOOK_AGENT === "true" || process.env.ENABLE_CF_LEARNING_AGENT === "true";
@@ -105,6 +106,7 @@ export async function generateCfWrongBookReview(): Promise<CfWrongBookReviewActi
     const report = buildReviewReport({ estimatedRating: estimate.estimatedRating, estimationMethod: estimate.modelType, zones, allStats: cfProblemStats, focusTags, recommendations: plan.recommendations, reviewAdvice: plan.reviewAdvice, hasCfBinding: true, additionalWarnings: plan.warnings });
 
     emit("run.completed", "复习计划生成完成");
+    await persistCfReviewPlanMemory({ userId, report: report as unknown as Record<string, unknown>, runId }).catch(() => undefined);
     return { success: true, runId, safeEvents: events, report };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

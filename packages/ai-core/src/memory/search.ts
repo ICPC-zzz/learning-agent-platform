@@ -3,13 +3,13 @@ import type {
   MemorySearchFilters,
   MemorySearchQuery,
   MemorySearchResult,
-} from "./types";
+} from "./types.ts";
 import {
   cloneMemoryItem,
   memoryMetadataMatches,
   normalizeMemoryLimit,
   normalizeMemoryText,
-} from "./utils";
+} from "./utils.ts";
 
 export function normalizeSearchText(text: string): string {
   return normalizeMemoryText(text);

@@ -3,7 +3,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -13,6 +12,8 @@ import {
 
 import type {
   AssistantChatMessage,
+  AssistantContextCompressionView,
+  AssistantMultiAgentTaskView,
   AssistantResponse,
 } from "../../lib/assistant/assistant-types.ts";
 
@@ -26,6 +27,8 @@ interface AssistantConversationSnapshot {
   status: AssistantResponse["state"] | null;
   providerMode: AssistantResponse["providerMode"] | null;
   error: string | null;
+  contextCompression: AssistantContextCompressionView | null;
+  tasks: AssistantMultiAgentTaskView[];
 }
 
 interface AssistantConversationContextValue extends AssistantConversationSnapshot {
@@ -35,17 +38,16 @@ interface AssistantConversationContextValue extends AssistantConversationSnapsho
   setStatus: Dispatch<SetStateAction<AssistantResponse["state"] | null>>;
   setProviderMode: Dispatch<SetStateAction<AssistantResponse["providerMode"] | null>>;
   setError: Dispatch<SetStateAction<string | null>>;
+  setContextCompression: Dispatch<SetStateAction<AssistantContextCompressionView | null>>;
+  setTasks: Dispatch<SetStateAction<AssistantMultiAgentTaskView[]>>;
   setConversationId: Dispatch<SetStateAction<string>>;
   resetConversation: () => void;
 }
 
-const STORAGE_KEY = "lap-web-assistant-conversation-v1";
-const MAX_STORED_MESSAGES = 20;
-
 const AssistantConversationContext = createContext<AssistantConversationContextValue | null>(null);
 
 export function AssistantConversationProvider({ children }: { children: ReactNode }) {
-  const initialSnapshot = loadSnapshot();
+  const initialSnapshot = emptySnapshot();
 
   const [conversationId, setConversationId] = useState(() => initialSnapshot.conversationId);
   const [messages, setMessages] = useState<AssistantChatMessage[]>(() => initialSnapshot.messages);
@@ -54,10 +56,8 @@ export function AssistantConversationProvider({ children }: { children: ReactNod
   const [status, setStatus] = useState<AssistantResponse["state"] | null>(() => initialSnapshot.status);
   const [providerMode, setProviderMode] = useState<AssistantResponse["providerMode"] | null>(() => initialSnapshot.providerMode);
   const [error, setError] = useState<string | null>(() => initialSnapshot.error);
-
-  useEffect(() => {
-    saveSnapshot({ conversationId, messages, draftQuestion, isSubmitting, status, providerMode, error });
-  }, [conversationId, messages, draftQuestion, isSubmitting, status, providerMode, error]);
+  const [contextCompression, setContextCompression] = useState<AssistantContextCompressionView | null>(() => initialSnapshot.contextCompression);
+  const [tasks, setTasks] = useState<AssistantMultiAgentTaskView[]>(() => initialSnapshot.tasks);
 
   const value = useMemo<AssistantConversationContextValue>(() => ({
     conversationId,
@@ -67,6 +67,8 @@ export function AssistantConversationProvider({ children }: { children: ReactNod
     status,
     providerMode,
     error,
+    contextCompression,
+    tasks,
     setConversationId,
     setMessages,
     setDraftQuestion,
@@ -74,6 +76,8 @@ export function AssistantConversationProvider({ children }: { children: ReactNod
     setStatus,
     setProviderMode,
     setError,
+    setContextCompression,
+    setTasks,
     resetConversation: () => {
       setMessages([]);
       setDraftQuestion("");
@@ -81,9 +85,11 @@ export function AssistantConversationProvider({ children }: { children: ReactNod
       setStatus(null);
       setProviderMode(null);
       setError(null);
+      setContextCompression(null);
+      setTasks([]);
       setConversationId(createConversationId());
     },
-  }), [conversationId, draftQuestion, error, isSubmitting, messages, providerMode, status]);
+  }), [contextCompression, conversationId, draftQuestion, error, isSubmitting, messages, providerMode, status, tasks]);
 
   return (
     <AssistantConversationContext.Provider value={value}>
@@ -100,60 +106,6 @@ export function useAssistantConversation(): AssistantConversationContextValue {
   return context;
 }
 
-function loadSnapshot(): AssistantConversationSnapshot {
-  if (typeof window === "undefined") {
-    return emptySnapshot();
-  }
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return emptySnapshot();
-    }
-
-    const parsed = JSON.parse(raw) as Partial<AssistantConversationSnapshot> | null;
-    if (!parsed || typeof parsed !== "object") {
-      return emptySnapshot();
-    }
-
-    return {
-      conversationId: typeof parsed.conversationId === "string" && parsed.conversationId.trim().length > 0
-        ? parsed.conversationId
-        : createConversationId(),
-      messages: Array.isArray(parsed.messages)
-        ? parsed.messages.filter(isAssistantChatMessage).slice(0, MAX_STORED_MESSAGES)
-        : [],
-      draftQuestion: typeof parsed.draftQuestion === "string" ? parsed.draftQuestion : "",
-      isSubmitting: typeof parsed.isSubmitting === "boolean" ? parsed.isSubmitting : false,
-      status: isAssistantResponseState(parsed.status) ? parsed.status : null,
-      providerMode: isAssistantProviderMode(parsed.providerMode) ? parsed.providerMode : null,
-      error: typeof parsed.error === "string" && parsed.error.trim().length > 0 ? parsed.error : null,
-    };
-  } catch {
-    return emptySnapshot();
-  }
-}
-
-function saveSnapshot(snapshot: AssistantConversationSnapshot): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      conversationId: snapshot.conversationId,
-      messages: snapshot.messages.slice(0, MAX_STORED_MESSAGES),
-      draftQuestion: snapshot.draftQuestion,
-      isSubmitting: snapshot.isSubmitting,
-      status: snapshot.status,
-      providerMode: snapshot.providerMode,
-      error: snapshot.error,
-    }));
-  } catch {
-    // Ignore storage failures.
-  }
-}
-
 function emptySnapshot(): AssistantConversationSnapshot {
   return {
     conversationId: createConversationId(),
@@ -163,6 +115,8 @@ function emptySnapshot(): AssistantConversationSnapshot {
     status: null,
     providerMode: null,
     error: null,
+    contextCompression: null,
+    tasks: [],
   };
 }
 
@@ -172,24 +126,4 @@ function createConversationId(): string {
   }
 
   return `assistant-conv-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
-}
-
-function isAssistantChatMessage(value: unknown): value is AssistantChatMessage {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return false;
-  }
-
-  const record = value as Record<string, unknown>;
-  return typeof record.id === "string"
-    && (record.role === "user" || record.role === "assistant")
-    && typeof record.content === "string"
-    && typeof record.createdAt === "string";
-}
-
-function isAssistantResponseState(value: unknown): value is AssistantConversationSnapshot["status"] {
-  return value === "ok" || value === "blocked" || value === "unavailable" || value === "error" || value === null;
-}
-
-function isAssistantProviderMode(value: unknown): value is AssistantConversationSnapshot["providerMode"] {
-  return value === "real" || value === "blocked" || value === "unavailable" || value === "error" || value === null;
 }

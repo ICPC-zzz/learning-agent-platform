@@ -1,7 +1,7 @@
 /**
  * AdminSidebar — Admin left sidebar navigation.
  *
- * Provides admin-specific nav items: 概览、书籍管理、题目管理、导入管理、系统设置.
+ * Provides admin-specific nav items for active admin capabilities.
  * Completely separate from user-side AppSidebar.
  *
  * @previewOnly — admin UI shell, no data access
@@ -55,7 +55,7 @@ export function AdminSidebar() {
                 borderRadius: "var(--lap-radius-md)",
                 fontSize: "0.8125rem",
                 fontWeight: isActive ? 600 : 400,
-                color: isActive ? "#f1f5f9" : "#94a3b8",
+                color: isActive ? "#f8fafc" : "#cbd5e1",
                 background: isActive ? "#1e293b" : "transparent",
                 textDecoration: "none",
                 transition: "background var(--lap-transition-fast)",
@@ -76,7 +76,7 @@ export function AdminSidebar() {
             borderRadius: "var(--lap-radius-md)",
             background: "#1e293b",
             fontSize: "0.6875rem",
-            color: "#64748b",
+            color: "#cbd5e1",
             lineHeight: 1.5,
           }}
         >
@@ -84,7 +84,7 @@ export function AdminSidebar() {
             ⚠ 安全提示
           </p>
           <p style={{ margin: 0 }}>
-            只读/预览管理 · 不执行写操作 · 不修改数据库
+            后台操作受服务端管理员权限保护
           </p>
         </div>
       </div>

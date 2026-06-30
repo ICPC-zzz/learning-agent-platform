@@ -40,8 +40,12 @@ links = {
 for name, src in links.items():
     dst = os.path.join(NM_DST, name)
     if src and os.path.exists(src):
-        os.symlink(src, dst)
-        print(f"  linked {name} -> {src}")
+        try:
+            os.symlink(src, dst)
+            print(f"  linked {name} -> {src}")
+        except OSError as e:
+            shutil.copytree(src, dst)
+            print(f"  copied {name} -> {dst} (symlink unavailable: {e})")
     else:
         print(f"  WARNING: could not resolve {name}")
 

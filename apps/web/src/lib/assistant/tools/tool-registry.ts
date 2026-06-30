@@ -3,8 +3,11 @@ import {
   createSearchTechnicalArticlesDefinition,
 } from "./article-tools.ts";
 import {
+  createPersonalizedCodeforcesCandidatesDefinition,
   createRecommendCodeforcesProblemsDefinition,
+  createResolveLearnerTrainingProfileDefinition,
   createSearchCodeforcesProblemsDefinition,
+  createUpcomingCodeforcesContestsDefinition,
 } from "./codeforces-tools.ts";
 import {
   eraseAssistantToolDefinition,
@@ -18,6 +21,9 @@ export function getAssistantToolRegistry(): readonly AnyAssistantToolDefinition[
     eraseAssistantToolDefinition(createHotTechnicalArticlesDefinition()),
     eraseAssistantToolDefinition(createSearchCodeforcesProblemsDefinition()),
     eraseAssistantToolDefinition(createRecommendCodeforcesProblemsDefinition()),
+    eraseAssistantToolDefinition(createResolveLearnerTrainingProfileDefinition()),
+    eraseAssistantToolDefinition(createPersonalizedCodeforcesCandidatesDefinition()),
+    eraseAssistantToolDefinition(createUpcomingCodeforcesContestsDefinition()),
   ];
 }
 
@@ -26,4 +32,3 @@ export function getAssistantToolDefinition(
 ): AnyAssistantToolDefinition | null {
   return getAssistantToolRegistry().find((definition) => definition.name === name) ?? null;
 }
-

@@ -11,3 +11,5 @@ export * from "./events/index.ts";
 export * from "./memory/index.ts";
 export * from "./usage/index.ts";
 export * from "./orchestration/index.ts";
+export * from "./reliable-agent-loop.ts";
+export * from "./tool-result-context.ts";

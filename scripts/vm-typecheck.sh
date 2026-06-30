@@ -3,6 +3,17 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 NODE="$(which node)"
+PYTHON=""
+for PYTHON_CANDIDATE in python3 python py; do
+  if command -v "$PYTHON_CANDIDATE" >/dev/null 2>&1 && "$PYTHON_CANDIDATE" --version >/dev/null 2>&1; then
+    PYTHON="$PYTHON_CANDIDATE"
+    break
+  fi
+done
+if [ -z "$PYTHON" ]; then
+  echo "ERROR: Python is required for scripts/vm-typecheck-helper.py" >&2
+  exit 1
+fi
 TSC="$PROJECT_DIR/scripts/vm-deps/typescript/bin/tsc"
 NM_SRC="$PROJECT_DIR/node_modules/.pnpm"
 NM_DST="/tmp/vm-node-modules"
@@ -20,8 +31,18 @@ if [ -f "$ROUTES_CLEAN" ]; then
   cp "$ROUTES_CLEAN" "$ROUTES_FILE"
 fi
 
-# Python helper outputs the actual NM_DST it used
-ACTUAL_NM_DST=$(python3 "$PROJECT_DIR/scripts/vm-typecheck-helper.py" "$NM_SRC" "$NM_DST" "$PROJECT_DIR" 2>&1 | tee /dev/stderr | grep "^NM_DST=" | cut -d= -f2)
+# Python helper outputs the actual NM_DST it used. Keep a temp log instead of
+# using /dev/stderr because some Windows bash environments do not provide it.
+HELPER_LOG="${TMPDIR:-/tmp}/lap-vm-typecheck-helper-$$.log"
+"$PYTHON" "$PROJECT_DIR/scripts/vm-typecheck-helper.py" "$NM_SRC" "$NM_DST" "$PROJECT_DIR" >"$HELPER_LOG" 2>&1 || {
+  HELPER_STATUS=$?
+  cat "$HELPER_LOG" >&2
+  rm -f "$HELPER_LOG"
+  exit "$HELPER_STATUS"
+}
+cat "$HELPER_LOG" >&2
+ACTUAL_NM_DST=$(grep "^NM_DST=" "$HELPER_LOG" | tail -n 1 | cut -d= -f2)
+rm -f "$HELPER_LOG"
 if [ -n "$ACTUAL_NM_DST" ]; then
   NM_DST="$ACTUAL_NM_DST"
 fi

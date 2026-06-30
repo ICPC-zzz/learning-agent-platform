@@ -106,13 +106,50 @@ enum ChapterQaFeedbackRating {
   NEUTRAL
 }
 
+enum ModelProviderType {
+  OPENAI_COMPATIBLE
+  SERVER_MANAGED
+}
+
+enum ModelAuthMode {
+  BEARER
+  API_KEY_HEADER
+  BASIC_AUTH
+  CUSTOM_HEADERS
+  NONE
+}
+
+enum ModelConnectionStatus {
+  UNTESTED
+  SUCCESS
+  FAILED
+}
+
+enum ModelUsageType {
+  CHAT
+  PLANNING
+  CODE_ANALYSIS
+  SUMMARIZATION
+  MEMORY_EXTRACTION
+  EMBEDDING
+  FALLBACK
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id             String  @id @default(cuid())
   authProvider   String?
   authProviderId String?
   email          String? @unique
+  emailVerifiedAt DateTime?
   name           String?
   avatarUrl      String?
+  role           UserRole @default(USER)
+  disabledAt     DateTime?
 
   books                Book[]
   readingProgresses    ReadingProgress[]
@@ -125,12 +162,310 @@ model User {
   skills               Skill[]
   autonomySetting      AutonomySetting?
   chapterQaHistories   ChapterQaHistory[]
+  codeforcesAccount    CodeforcesAccount?
+  modelProviders       ModelProvider[]
+  webSessions          WebSession[]
+  authAuditEvents      AuthAuditEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([authProvider, authProviderId])
   @@index([authProvider, authProviderId])
+  @@index([role])
+  @@index([disabledAt])
+}
+
+model EmailOtpCode {
+  id           String    @id @default(cuid())
+  email        String
+  codeHash     String
+  purpose      String
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  attemptCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email, purpose, expiresAt])
+  @@index([expiresAt])
+  @@index([consumedAt])
+}
+
+model WebSession {
+  id            String    @id @default(cuid())
+  userId        String
+  tokenHash     String    @unique
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime
+  lastSeenAt    DateTime  @default(now())
+  revokedAt     DateTime?
+  userAgentHash String?
+  ipHash        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+model AuthAuditEvent {
+  id            String   @id @default(cuid())
+  userId        String?
+  eventType     String
+  sourceSummary String?
+  result        String
+  errorCode     String?
+  createdAt     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+  @@index([result])
+}
+
+/// Dev-only article favorites for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+model ArticleFavorite {
+  id             String   @id @default(cuid())
+  userId         String
+  articleId      String
+  articleTitle   String
+  sourcePlatform String
+  sourceName     String
+  originalUrl    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, articleId])
+  @@index([userId, updatedAt])
+  @@index([articleId])
+}
+
+/// Dev-only recent article readings for DB persistence.
+/// userId is NOT a FK to User — dev session users may not have real User records.
+model ArticleReading {
+  id             String   @id @default(cuid())
+  userId         String
+  articleId      String
+  articleTitle   String
+  sourcePlatform String
+  sourceName     String
+  originalUrl    String
+  lastReadAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, articleId])
+  @@index([userId, lastReadAt])
+  @@index([articleId])
+}
+
+model DailyContentItem {
+  id            String   @id @default(cuid())
+  kind          String
+  source        String
+  externalId    String
+  title         String
+  summary       String?
+  originalUrl   String?
+  discussionUrl String?
+  author        String?
+  publishedAt   DateTime?
+  dailyDate     DateTime
+  score         Int?
+  commentCount  Int?
+  metadataJson  Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([kind, source, externalId, dailyDate])
+  @@index([kind, dailyDate])
+  @@index([source])
+}
+
+model DailyContentSyncState {
+  name          String    @id
+  status        String    @default("idle")
+  lastAttemptAt DateTime?
+  lastSuccessAt DateTime?
+  errorCode     String?
+  safeSummary   String?
+  leaseOwner    String?
+  leaseExpiresAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, leaseExpiresAt])
+  @@index([lastSuccessAt])
+}
+
+model CodeforcesAccount {
+  id                     String    @id @default(cuid())
+  userId                 String    @unique
+  canonicalHandle        String
+  normalizedHandle       String
+  currentRating          Int?
+  maxRating              Int?
+  rank                   String?
+  maxRank                String?
+  contribution           Int?
+  friendOfCount          Int?
+  lastOnlineAt           DateTime?
+  registrationAt         DateTime?
+  lastSubmissionAt       DateTime?
+  lastSyncedAt           DateTime?
+  lastSyncedSubmissionId Int?
+  syncStatus             String    @default("idle")
+  syncErrorCode          String?
+  dataTruncated          Boolean   @default(false)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemStats      CodeforcesUserProblemStat[]
+  ratingChanges     CodeforcesRatingChange[]
+  recentSubmissions CodeforcesRecentSubmission[]
+
+  @@index([normalizedHandle])
+  @@index([syncStatus])
+}
+
+model CodeforcesUserProblemStat {
+  id                String    @id @default(cuid())
+  accountId         String
+  problemKey        String
+  contestId         Int
+  index             String
+  name              String
+  rating            Int?
+  tags              String[]  @default([])
+  attempts          Int       @default(1)
+  accepted          Boolean   @default(false)
+  firstSubmittedAt  DateTime?
+  firstAcceptedAt   DateTime?
+  lastSubmittedAt   DateTime?
+  lastVerdict       String?
+  lastSubmissionId  Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  account CodeforcesAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, problemKey])
+  @@index([accountId, accepted])
+  @@index([accountId, rating])
+  @@index([problemKey])
+}
+
+model CodeforcesRatingChange {
+  id             String   @id @default(cuid())
+  accountId      String
+  contestId      Int
+  contestName    String
+  rank           Int?
+  oldRating      Int
+  newRating      Int
+  ratingUpdateAt DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  account CodeforcesAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, contestId])
+  @@index([accountId, ratingUpdateAt])
+}
+
+model CodeforcesRecentSubmission {
+  id                  String   @id @default(cuid())
+  accountId           String
+  submissionId        Int
+  problemKey          String
+  contestId           Int?
+  index               String?
+  name                String?
+  verdict             String?
+  creationTimeSeconds Int
+  language            String?
+  passedTestCount     Int?
+  timeConsumedMillis  Int?
+  memoryConsumedBytes Int?
+  createdAt           DateTime @default(now())
+
+  account CodeforcesAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, submissionId])
+  @@index([accountId, creationTimeSeconds])
+  @@index([problemKey])
+}
+
+model ModelProvider {
+  id                String                 @id @default(cuid())
+  ownerId           String
+  name              String
+  providerType      ModelProviderType      @default(OPENAI_COMPATIBLE)
+  baseUrl           String
+  authMode          ModelAuthMode          @default(BEARER)
+  enabled           Boolean                @default(true)
+  requestTimeoutMs  Int                    @default(30000)
+  maxRetries        Int                    @default(1)
+  lastTestedAt      DateTime?
+  lastTestStatus    ModelConnectionStatus?
+  lastTestLatencyMs Int?
+  lastTestErrorCode String?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  owner      User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  credential UserModelCredential?
+  profiles   ModelProfile[]
+
+  @@unique([ownerId, name])
+  @@index([ownerId])
+  @@index([providerType])
+}
+
+model UserModelCredential {
+  id                 String   @id @default(cuid())
+  providerId         String   @unique
+  encryptionVersion  Int      @default(1)
+  encryptedPayload   String
+  iv                 String
+  authTag            String?
+  maskedHintsJson    String   @default("{}")
+  credentialDefJson  String   @default("{}")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  provider ModelProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+}
+
+model ModelProfile {
+  id                 String         @id @default(cuid())
+  providerId         String
+  displayName        String
+  modelId            String
+  contextWindow      Int            @default(4096)
+  maxOutputTokens    Int            @default(2048)
+  temperature        Float          @default(0.7)
+  supportsStreaming  Boolean        @default(false)
+  supportsTools      Boolean        @default(false)
+  supportsJsonSchema Boolean        @default(false)
+  supportsFiles      Boolean        @default(false)
+  enabled            Boolean        @default(true)
+  usageType          ModelUsageType @default(CHAT)
+  priority           Int            @default(0)
+  isDefault          Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  provider ModelProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, modelId, usageType])
+  @@index([providerId])
+  @@index([usageType])
 }
 
 model Book {

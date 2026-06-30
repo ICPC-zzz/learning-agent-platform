@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
+import {
+  getPrismaClient,
+  hasDatabaseUrl,
+  PrismaDailyContentRepository,
+} from "@learning-agent-platform/db";
 
 import { EmptyState, MetricPill, PageHero, PageSection } from "../_components/UserUiComponents.tsx";
 import { loadArticleLibrary } from "./article-library-loader";
-import { loadDailyContent } from "./daily-content-json-loader";
+import { loadDailyContent as loadDailyContentFromDb } from "./daily-content-loader";
+import { loadDailyContent as loadDailyContentFromJson } from "./daily-content-json-loader";
 import { ArticleCenterTabs } from "./components/ArticleCenterTabs";
 
 export const dynamic = "force-dynamic";
@@ -13,9 +19,9 @@ export const metadata: Metadata = {
     "每日技术热点、GitHub 日报、博客园和 CSDN 公开技术文章。保留原文链接，不做 AI 摘要。",
 };
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
   const articleResult = loadArticleLibrary();
-  const dailyContent = loadDailyContent();
+  const dailyContent = await loadArticleCenterDailyContent();
 
   let dailyError: string | undefined;
   if (dailyContent.hotspotCount === 0 && dailyContent.githubCount === 0) {
@@ -69,6 +75,24 @@ export default function ArticlesPage() {
       </PageSection>
     </main>
   );
+}
+
+async function loadArticleCenterDailyContent() {
+  if (hasDatabaseUrl()) {
+    try {
+      const repository = new PrismaDailyContentRepository(getPrismaClient());
+      const data = await loadDailyContentFromDb(new Date(), repository);
+      if (data.hotspotCount > 0 || data.githubCount > 0) {
+        return data;
+      }
+      const jsonData = loadDailyContentFromJson();
+      return jsonData.hotspotCount > 0 || jsonData.githubCount > 0 ? jsonData : data;
+    } catch {
+      return loadDailyContentFromJson();
+    }
+  }
+
+  return loadDailyContentFromJson();
 }
 
 function formatSyncTime(value: string): string {

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
+import { MetricPill, PageHero } from "../_components/UserUiComponents";
 import { ContestCountdown } from "./ContestCountdown";
+import { formatCodeforcesContestIndex } from "./codeforces-problem-metadata";
 import {
   loadProblemLibraryPageData,
   type CodeforcesProblemListItem,
   type ProblemLibrarySearchParamsInput,
 } from "./problem-library-page-data";
-import { formatCodeforcesContestIndex } from "./codeforces-problem-metadata";
 
 interface ProblemsPageProps {
   searchParams?: Promise<ProblemLibrarySearchParamsInput>;
@@ -19,61 +20,43 @@ export default async function ProblemsPage({ searchParams }: ProblemsPageProps) 
 
   return (
     <main className="learningPage">
-      <header className="learningHero">
-        <div>
-          <p className="eyebrow">Codeforces Problem Center</p>
-          <h1>题目中心</h1>
-          <p className="status">
-            本地 Codeforces 精选题池 · 只保存最小元数据 · 跳转原题练习 · 不提供本地判题
-          </p>
-        </div>
-        <div className="homeActions">
-          <Link className="secondaryLink" href="/">
-            返回首页
-          </Link>
-          <Link className="secondaryLink" href="/articles">
-            文章
-          </Link>
-          <Link className="secondaryLink" href="/ai">
-            AI助手
-          </Link>
-          <Link className="secondaryLink" href="/user">
-            个人
-          </Link>
-        </div>
-      </header>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-          gap: "16px",
-          alignItems: "start",
-        }}
+      <PageHero
+        eyebrow="Codeforces 训练"
+        title="题目中心"
+        subtitle="本地 Codeforces 精选题池，只保存最小元数据；按 Rating、标签和训练状态扫描后跳转原题练习。"
       >
+        <MetricPill label="题池总量" value={data.totalCount.toLocaleString("zh-CN")} status="info" />
+        <MetricPill label="当前页" value={`${data.page} / ${data.totalPages}`} status="muted" />
+        <MetricPill label="数据状态" value={data.dbLoaded ? "已读取" : "未读取"} status={data.dbLoaded ? "success" : "warning"} />
+      </PageHero>
+
+      <div style={pageGridStyle}>
+        <section className="learningPanel" aria-label="Codeforces 比赛">
+          <ContestCountdown />
+          <div style={noticeStyle("#f7faf7", "#d9e1d7", "#3c4a42")}>
+            <strong>数据边界</strong>
+            <p style={{ margin: "6px 0 0" }}>
+              这里不保存完整题面、样例或题解。点击原题链接后在 Codeforces 页面完成训练。
+            </p>
+          </div>
+        </section>
+
         <section className="learningPanel" aria-labelledby="problem-list-title">
           <div className="panelHeader">
-            <p className="eyebrow">Local Codeforces Pool</p>
-            <h2 id="problem-list-title">精选题池</h2>
+            <p className="eyebrow">训练题池</p>
+            <h2 id="problem-list-title">精选题目</h2>
             <p className="panelNote">{data.sourceNote}</p>
           </div>
 
           <ProblemFilterForm data={data} />
 
           {data.dbError ? (
-            <div style={noticeStyle("#fffbeb", "#fde68a", "#92400e")}>
+            <div style={noticeStyle("#fff8e6", "#f1dfaa", "#8a5a12")}>
               题库读取当前不可用：{data.dbError}。不会用示例题伪装为真实题池。
             </div>
           ) : null}
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-              gap: "10px",
-              margin: "14px 0",
-            }}
-          >
+          <div style={statGridStyle}>
             <StatCard label="题池总量" value={data.totalCount.toLocaleString("zh-CN")} />
             <StatCard label="当前页" value={`${data.page} / ${data.totalPages}`} />
             <StatCard label="每页数量" value={data.pageSize.toString()} />
@@ -81,7 +64,7 @@ export default async function ProblemsPage({ searchParams }: ProblemsPageProps) 
           </div>
 
           {data.problems.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ display: "grid", gap: "10px" }}>
               {data.problems.map((problem) => (
                 <ProblemCard key={problem.id} problem={problem} />
               ))}
@@ -97,16 +80,6 @@ export default async function ProblemsPage({ searchParams }: ProblemsPageProps) 
 
           <Pagination data={data} />
         </section>
-
-        <aside>
-          <ContestCountdown />
-          <div style={noticeStyle("#f8fafc", "#e2e8f0", "#475569")}>
-            <strong>数据边界</strong>
-            <p style={{ margin: "6px 0 0 0" }}>
-              这里不保存完整题面、样例或题解。点击原题链接后在 Codeforces 页面完成练习。
-            </p>
-          </div>
-        </aside>
       </div>
     </main>
   );
@@ -114,16 +87,7 @@ export default async function ProblemsPage({ searchParams }: ProblemsPageProps) 
 
 function ProblemFilterForm({ data }: { data: Awaited<ReturnType<typeof loadProblemLibraryPageData>> }) {
   return (
-    <form
-      action="/problems"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-        gap: "8px",
-        alignItems: "end",
-        marginTop: "14px",
-      }}
-    >
+    <form action="/problems" style={filterFormStyle}>
       <label style={labelStyle}>
         搜索
         <input name="q" defaultValue={data.query} placeholder="题名或标签" style={inputStyle} />
@@ -140,7 +104,7 @@ function ProblemFilterForm({ data }: { data: Awaited<ReturnType<typeof loadProbl
         最高
         <input name="maxRating" defaultValue={data.maxRating} placeholder="1600" inputMode="numeric" style={inputStyle} />
       </label>
-      <button type="submit" className="primaryLink" style={{ border: "none", height: "36px" }}>
+      <button type="submit" className="primaryLink" style={{ border: "none", height: 40 }}>
         筛选
       </button>
     </form>
@@ -149,51 +113,40 @@ function ProblemFilterForm({ data }: { data: Awaited<ReturnType<typeof loadProbl
 
 function ProblemCard({ problem }: { problem: CodeforcesProblemListItem }) {
   return (
-    <article
-      style={{
-        border: "1px solid #dbe4ee",
-        borderRadius: "8px",
-        padding: "14px 16px",
-        background: "#fff",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "16px", alignItems: "flex-start" }}>
-        <div style={{ minWidth: 0 }}>
-          <p className="eyebrow" style={{ margin: "0 0 4px 0" }}>
-            {formatCodeforcesContestIndex(problem.contestId, problem.index)}
-          </p>
-          <h3 style={{ fontSize: "16px", color: "#0f172a", margin: "0 0 8px 0" }}>
-            {problem.title}
-          </h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-            {problem.tags.slice(0, 8).map((tag) => (
-              <span key={tag} style={tagStyle}>
-                {tag}
-              </span>
-            ))}
-          </div>
+    <article className="lap-card" style={problemCardStyle}>
+      <div style={{ minWidth: 0 }}>
+        <p className="eyebrow" style={{ margin: "0 0 4px" }}>
+          {formatCodeforcesContestIndex(problem.contestId, problem.index)}
+        </p>
+        <h3 style={{ fontSize: "1rem", color: "#152234", margin: "0 0 8px" }}>
+          {problem.title}
+        </h3>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+          {problem.tags.slice(0, 8).map((tag) => (
+            <span key={tag} style={tagStyle}>
+              {tag}
+            </span>
+          ))}
         </div>
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "13px", color: "#475569", fontWeight: 700, marginBottom: "8px" }}>
-            Rating {problem.rating ?? "未知"}
-          </div>
-          {problem.originalUrl ? (
-            <a className="primaryLink" href={problem.originalUrl} target="_blank" rel="noopener noreferrer">
-              原题
-            </a>
-          ) : (
-            <span style={{ fontSize: "12px", color: "#94a3b8" }}>原题链接缺失</span>
-          )}
+      </div>
+      <div style={{ textAlign: "right", flexShrink: 0 }}>
+        <div style={{ fontSize: 13, color: "#526171", fontWeight: 800, marginBottom: 8 }}>
+          Rating {problem.rating ?? "未知"}
         </div>
+        {problem.originalUrl ? (
+          <a className="primaryLink" href={problem.originalUrl} target="_blank" rel="noopener noreferrer">
+            原题
+          </a>
+        ) : (
+          <span style={{ fontSize: 12, color: "#94a3b8" }}>原题链接缺失</span>
+        )}
       </div>
     </article>
   );
 }
 
 function Pagination({ data }: { data: Awaited<ReturnType<typeof loadProblemLibraryPageData>> }) {
-  if (data.totalPages <= 1) {
-    return null;
-  }
+  if (data.totalPages <= 1) return null;
 
   const base = new URLSearchParams();
   if (data.query) base.set("q", data.query);
@@ -209,7 +162,7 @@ function Pagination({ data }: { data: Awaited<ReturnType<typeof loadProblemLibra
   };
 
   return (
-    <nav style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginTop: "16px" }}>
+    <nav style={{ display: "flex", justifyContent: "space-between", gap: 10, marginTop: 16 }}>
       {data.page > 1 ? (
         <Link className="secondaryLink" href={makeHref(data.page - 1)}>
           上一页
@@ -230,9 +183,9 @@ function Pagination({ data }: { data: Awaited<ReturnType<typeof loadProblemLibra
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-      <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 700 }}>{label}</div>
-      <div style={{ fontSize: "18px", color: "#0f172a", fontWeight: 800, marginTop: "2px" }}>{value}</div>
+    <div style={{ background: "#f7faf7", border: "1px solid #dfe7dc", borderRadius: 8, padding: "10px 12px" }}>
+      <div style={{ fontSize: 11, color: "#75818e", fontWeight: 800 }}>{label}</div>
+      <div style={{ fontSize: 18, color: "#152234", fontWeight: 900, marginTop: 2 }}>{value}</div>
     </div>
   );
 }
@@ -241,36 +194,67 @@ function noticeStyle(background: string, border: string, color: string): CSSProp
   return {
     background,
     border: `1px solid ${border}`,
-    borderRadius: "8px",
+    borderRadius: 8,
     color,
-    fontSize: "12px",
-    lineHeight: 1.6,
-    padding: "10px 12px",
+    fontSize: 13,
+    lineHeight: 1.7,
+    padding: "12px 14px",
   };
 }
 
+const pageGridStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr",
+  gap: 16,
+  alignItems: "start",
+};
+
+const statGridStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))",
+  gap: 10,
+  margin: "14px 0",
+};
+
+const filterFormStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 128px), 1fr))",
+  gap: 8,
+  alignItems: "end",
+  marginTop: 14,
+};
+
+const problemCardStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "minmax(0, 1fr) auto",
+  gap: 16,
+  alignItems: "start",
+  padding: "14px 16px",
+};
+
 const labelStyle: CSSProperties = {
-  color: "#64748b",
+  color: "#647181",
   display: "flex",
   flexDirection: "column",
-  fontSize: "11px",
-  fontWeight: 700,
-  gap: "4px",
+  fontSize: 12,
+  fontWeight: 800,
+  gap: 4,
 };
 
 const inputStyle: CSSProperties = {
-  border: "1px solid #cbd5e1",
-  borderRadius: "6px",
-  color: "#0f172a",
-  fontSize: "13px",
-  height: "36px",
+  border: "1px solid var(--lap-border-default)",
+  borderRadius: 8,
+  color: "#152234",
+  fontSize: 13,
+  height: 40,
   padding: "0 10px",
+  background: "#fffefa",
 };
 
 const tagStyle: CSSProperties = {
-  background: "#eef2ff",
-  borderRadius: "4px",
-  color: "#4f46e5",
-  fontSize: "11px",
-  padding: "2px 7px",
+  background: "#eef3ed",
+  borderRadius: 999,
+  color: "#315c45",
+  fontSize: 11,
+  padding: "2px 8px",
 };

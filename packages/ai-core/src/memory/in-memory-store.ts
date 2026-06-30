@@ -1,8 +1,8 @@
-import { createSessionSummaryMemoryItem } from "./session-summary";
+import { createSessionSummaryMemoryItem } from "./session-summary.ts";
 import {
   matchesMemorySearchFilters,
   rankMemoryResults,
-} from "./search";
+} from "./search.ts";
 import type {
   MemoryAddInput,
   MemoryItem,
@@ -10,12 +10,12 @@ import type {
   MemorySearchResult,
   MemorySessionSummaryInput,
   MemoryStore,
-} from "./types";
+} from "./types.ts";
 import {
   cloneMemoryItem,
   completeMemoryItem,
   createMemoryId,
-} from "./utils";
+} from "./utils.ts";
 
 export class InMemoryMemoryStore implements MemoryStore {
   private readonly items: MemoryItem[] = [];

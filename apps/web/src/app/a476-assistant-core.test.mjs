@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const ROOT = process.cwd();
 
@@ -25,13 +25,10 @@ describe("A476 assistant core", function () {
     assert.ok(src.includes("resetConversation"));
   });
 
-  it("Floating assistant uses shared chat panel and browser safety hooks", function () {
-    const src = read("/apps/web/src/app/_components/FloatingAiAssistant.tsx");
+  it("Floating assistant is removed; /ai keeps the shared chat panel", function () {
+    assert.equal(existsSync(ROOT + "/apps/web/src/app/_components/FloatingAiAssistant.tsx"), false);
+    const src = read("/apps/web/src/app/ai/AssistantWorkspaceClient.tsx");
     assert.ok(src.includes("AssistantChatPanel"));
-    assert.ok(src.includes('startsWith("/admin")'));
-    assert.ok(src.includes("Escape"));
-    assert.ok(src.includes("mousedown"));
-    assert.ok(src.includes("clamp"));
   });
 
   it("/ai page wires workspace + safety sections", function () {

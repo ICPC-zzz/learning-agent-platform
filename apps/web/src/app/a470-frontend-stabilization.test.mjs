@@ -489,60 +489,59 @@ test("AI page has capabilities and limitations sections", () => {
 });
 
 // ---------------------------------------------------------------------------
-// A470 Floating AI Assistant Tests
+// A511 Floating AI Assistant Removal Tests
 // ---------------------------------------------------------------------------
 
-console.log("\n═══ A470 Floating AI Assistant ═══");
+console.log("\n═══ A511 Floating AI Assistant Removed ═══");
 
 const floatSrc = readSource("./_components/FloatingAiAssistant.tsx");
 
-test("FloatingAiAssistant component exists", () => {
-  assertIncludes(floatSrc, "export function FloatingAiAssistant", "should export component");
+test("FloatingAiAssistant component source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant is session-gated", () => {
-  assertIncludes(floatSrc, "hasSession", "should accept session state");
-  assertIncludes(floatSrc, "disabled", "guest state should render disabled button");
+test("FloatingAiAssistant session gate source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant hides on admin pages", () => {
-  assertIncludes(floatSrc, 'startsWith("/admin")', "should check admin path");
+test("FloatingAiAssistant admin hide source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant auto-minimizes on login page (A470)", () => {
-  assertIncludes(floatSrc, "isLoginEntry", "should detect login entry pages");
+test("FloatingAiAssistant login minimization source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant handles /auth/login path", () => {
-  assertIncludes(floatSrc, '"/auth/login"', "should check auth login path");
+test("FloatingAiAssistant login path source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant handles /auth/register path", () => {
-  assertIncludes(floatSrc, '"/auth/register"', "should check auth register path");
+test("FloatingAiAssistant register path source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant has Esc key to close", () => {
-  assertIncludes(floatSrc, '"Escape"', "should handle Escape key");
+test("FloatingAiAssistant Esc shortcut source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant has click-outside to close", () => {
-  assertIncludes(floatSrc, "mousedown", "should handle click outside");
+test("FloatingAiAssistant click-outside source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant has blocked info display", () => {
-  assertIncludes(floatSrc, "blockedInfo", "should show blocked info");
+test("FloatingAiAssistant blocked info source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant empty question does not submit", () => {
-  assertIncludes(floatSrc, "!trimmed", "should check for empty input");
+test("FloatingAiAssistant empty submit source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant has localStorage safety (try/catch)", () => {
-  assertIncludes(floatSrc, "try {", "should wrap localStorage access in try");
+test("FloatingAiAssistant localStorage source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
-test("FloatingAiAssistant uses webAiServerAction (not raw fetch)", () => {
-  assertIncludes(floatSrc, "webAiServerAction", "should use server action");
+test("FloatingAiAssistant server action source is absent", () => {
+  assertEqual(floatSrc, "", "floating assistant source should be absent");
 });
 
 // ---------------------------------------------------------------------------
@@ -591,14 +590,14 @@ test("Layout wraps children in ShellRouter", () => {
   assertIncludes(layoutSrc, "ShellRouter", "should include ShellRouter");
 });
 
-test("Layout renders FloatingAiAssistant in Suspense", () => {
-  assertIncludes(layoutSrc, "FloatingAiAssistant", "should render floating assistant");
-  assertIncludes(layoutSrc, "Suspense", "should wrap in Suspense");
+test("Layout does not mount FloatingAiAssistant", () => {
+  assertNotIncludes(layoutSrc, "FloatingAiAssistant", "should not render floating assistant");
+  assertNotIncludes(layoutSrc, "<FloatingAiAssistant", "should not mount floating assistant");
 });
 
 test("Layout reads assistant session for shell gating", () => {
   assertIncludes(layoutSrc, "readAssistantSession", "should read session on server");
-  assertIncludes(layoutSrc, 'hasSession={assistantSession.hasSession}', "should pass hasSession to shell and assistant");
+  assertIncludes(layoutSrc, 'hasSession={assistantSession.hasSession}', "should pass hasSession to shell");
 });
 
 // ---------------------------------------------------------------------------
@@ -639,7 +638,6 @@ const CRITICAL_FILES = [
   "./problems/page.tsx",
   "./user/page.tsx",
   "./ai/page.tsx",
-  "./_components/FloatingAiAssistant.tsx",
   "./_components/AppNav.tsx",
   "./_components/AppHeader.tsx",
   "./_components/AppSidebar.tsx",

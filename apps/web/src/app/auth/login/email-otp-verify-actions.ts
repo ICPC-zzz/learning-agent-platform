@@ -1,63 +1,146 @@
 "use server";
 
-/**
- * Email OTP Verify + Login/Register Action.
- *
- * Verifies the 6-digit OTP code, then:
- * - If user with that email exists → log them in
- * - If user does not exist → create a new email user and log them in
- *
- * Session uses real DB user.id via A461 dev session cookie mechanism.
- *
- * Security:
- * - OTP is hashed and verified with timing-safe comparison
- * - Failed attempts increment attemptCount
- * - Expired/consumed OTPs are rejected
- * - Username auto-generated for new email users (email prefix + random suffix)
- * - No passwordHash, codeHash, or raw response returned
- *
- * @module email-otp-verify-action
- * @devOnly — A471 v1
- */
-
 import { cookies } from "next/headers";
 import { getPrismaClient, PrismaEmailOtpRepository, PrismaUserRepository } from "@learning-agent-platform/db";
-import { verifyOtpCode } from "../../../lib/email-otp-code";
-import { getEmailOtpGuardStatus, emailOtpGuardStatusIsSafe } from "../../../lib/web-auth-email-otp-guard";
-import {
-  createDevSessionData,
-  serializeDevSession,
-  DEV_SESSION_COOKIE_NAME,
-} from "../../../lib/web-auth-dev-session";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+import { verifyOtpCode } from "../../../lib/email-otp-code";
+import {
+  createDatabaseSessionForUser,
+  recordAuthAuditEvent,
+  setWebSessionCookie,
+} from "../../../lib/session/web-auth-session";
+import { DEV_SESSION_COOKIE_NAME } from "../../../lib/web-auth-dev-session";
 
 export interface EmailOtpVerifyResult {
   success: boolean;
-  /** Human-readable message for UI. */
   message: string;
-  /** User info when login succeeds. */
   user?: {
     id: string;
     username: string;
     email: string;
     isNewUser: boolean;
   };
-  /** Dev-only marker. */
-  devOnly: true;
-  /** Whether a session was created. */
+  devOnly: boolean;
+  productionReady: boolean;
   sessionCreated: boolean;
 }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_REGEX = /^\d{6}$/;
 const MAX_ATTEMPTS = 5;
+
+export async function verifyEmailOtpAction(
+  _prevState: unknown,
+  formData: FormData,
+): Promise<EmailOtpVerifyResult> {
+  const rawEmail = formData.get("email");
+  const rawCode = formData.get("code");
+  if (!isValidEmail(rawEmail) || !isValidCode(rawCode)) {
+    await recordAuthAuditEvent({
+      eventType: "auth_otp_failed",
+      result: "failure",
+      errorCode: "invalid_input",
+    });
+    return failed("邮箱或验证码格式无效。");
+  }
+
+  const email = normalizeEmail(rawEmail as string);
+  const code = String(rawCode).trim();
+  let otpRecord: Awaited<ReturnType<PrismaEmailOtpRepository["findLatestActiveEmailOtp"]>>;
+
+  try {
+    const otpRepo = new PrismaEmailOtpRepository(getPrismaClient());
+    otpRecord = await otpRepo.findLatestActiveEmailOtp(email, "login");
+  } catch {
+    return failed("服务暂时不可用，请稍后再试。");
+  }
+
+  if (!otpRecord) {
+    await recordAuthAuditEvent({
+      eventType: "auth_otp_failed",
+      result: "failure",
+      errorCode: "otp_not_found",
+    });
+    return failed("验证码不存在或已过期。请重新发送验证码。");
+  }
+
+  if (otpRecord.attemptCount >= MAX_ATTEMPTS) {
+    await consumeOtp(otpRecord.id);
+    await recordAuthAuditEvent({
+      eventType: "auth_otp_failed",
+      result: "blocked",
+      errorCode: "too_many_attempts",
+    });
+    return failed("验证码尝试次数过多，请重新发送验证码。");
+  }
+
+  const storedCodeHash = await getOtpHash(otpRecord.id);
+  const codeValid = storedCodeHash ? await verifyOtpCode(code, storedCodeHash) : false;
+  if (!codeValid) {
+    await incrementOtpAttempts(otpRecord.id);
+    await recordAuthAuditEvent({
+      eventType: "auth_otp_failed",
+      result: "failure",
+      errorCode: "wrong_code",
+    });
+    return failed("验证码错误，请重试。");
+  }
+
+  await consumeOtp(otpRecord.id);
+
+  let userId: string;
+  let username: string;
+  let isNewUser = false;
+  try {
+    const userRepo = new PrismaUserRepository(getPrismaClient());
+    const existingUser = await userRepo.getUserByEmail(email);
+    if (existingUser) {
+      userId = existingUser.id;
+      username = existingUser.name ?? email;
+      await userRepo.updateUser(userId, { emailVerifiedAt: new Date() });
+    } else {
+      const newUser = await userRepo.createUser({
+        email,
+        name: email.split("@")[0] || "学习者",
+        emailVerifiedAt: new Date(),
+        role: "USER",
+      });
+      userId = newUser.id;
+      username = newUser.name ?? email;
+      isNewUser = true;
+    }
+  } catch {
+    return failed("用户登录失败，请稍后再试。");
+  }
+
+  try {
+    const { rawToken } = await createDatabaseSessionForUser(userId);
+    await setWebSessionCookie(rawToken);
+    await clearLegacyDevSessionCookie();
+  } catch {
+    return failed("会话创建失败，请稍后再试。");
+  }
+
+  await recordAuthAuditEvent({
+    userId,
+    eventType: "auth_otp_verified",
+    result: "success",
+  });
+
+  return {
+    success: true,
+    message: isNewUser ? `账号创建成功，欢迎 ${username}！` : `登录成功，欢迎回来 ${username}！`,
+    user: {
+      id: userId,
+      username,
+      email,
+      isNewUser,
+    },
+    devOnly: false,
+    productionReady: true,
+    sessionCreated: true,
+  };
+}
 
 function isValidEmail(email: unknown): email is string {
   return typeof email === "string" && EMAIL_REGEX.test(email.trim()) && email.trim().length <= 254;
@@ -71,244 +154,51 @@ function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-function normalizeCode(code: string): string {
-  return code.trim();
+async function getOtpHash(id: string): Promise<string | null> {
+  try {
+    return new PrismaEmailOtpRepository(getPrismaClient()).getCodeHashForVerification(id);
+  } catch {
+    return null;
+  }
 }
 
-/**
- * Generate a safe username from email for new email-registered users.
- * Format: email prefix + "-" + 4 random hex chars
- * Example: "test-example" → "testexample-a1b2"
- */
-function generateUsernameFromEmail(email: string): string {
-  const prefix = email.split("@")[0] ?? "user";
-  // Remove non-alphanumeric chars, lowercase
-  const sanitized = prefix.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 20) || "user";
-  // Add random suffix to avoid collisions
-  const suffix = Math.random().toString(16).slice(2, 6);
-  return `${sanitized}-${suffix}`;
+async function incrementOtpAttempts(id: string): Promise<void> {
+  try {
+    await new PrismaEmailOtpRepository(getPrismaClient()).incrementEmailOtpAttempts(id);
+  } catch {
+    // best effort
+  }
 }
 
-// ---------------------------------------------------------------------------
-// Verify action
-// ---------------------------------------------------------------------------
-
-/**
- * Verify an email OTP code and log in or register the user.
- *
- * @param _prevState - Unused previous state.
- * @param formData - FormData with "email" and "code" fields.
- */
-export async function verifyEmailOtpAction(
-  _prevState: unknown,
-  formData: FormData,
-): Promise<EmailOtpVerifyResult> {
-  const rawEmail = formData.get("email");
-  const rawCode = formData.get("code");
-
-  // 1. Validate input format
-  if (!isValidEmail(rawEmail)) {
-    return {
-      success: false,
-      message: "请提供有效的邮箱地址。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-  if (!isValidCode(rawCode)) {
-    return {
-      success: false,
-      message: "请提供6位数字验证码。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  const email = normalizeEmail(rawEmail as string);
-  const code = normalizeCode(rawCode as string);
-
-  // 2. Guard check
-  const guard = getEmailOtpGuardStatus();
-  if (!emailOtpGuardStatusIsSafe(guard)) {
-    return {
-      success: false,
-      message: "邮箱验证服务当前不可用。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-  if (!guard.otpStorageAllowed) {
-    return {
-      success: false,
-      message: "邮箱验证码存储功能未启用。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  // 3. Find latest active OTP
-  let otpRecord;
+async function consumeOtp(id: string): Promise<void> {
   try {
-    const prisma = getPrismaClient();
-    const otpRepo = new PrismaEmailOtpRepository(prisma);
-    otpRecord = await otpRepo.findLatestActiveEmailOtp(email, "login");
+    await new PrismaEmailOtpRepository(getPrismaClient()).markEmailOtpConsumed(id);
   } catch {
-    return {
-      success: false,
-      message: "服务暂时不可用，请稍后再试。",
-      devOnly: true,
-      sessionCreated: false,
-    };
+    // best effort
   }
+}
 
-  if (!otpRecord) {
-    return {
-      success: false,
-      message: "验证码不存在或已过期。请重新发送验证码。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  // 4. Check attempt count
-  if (otpRecord.attemptCount >= MAX_ATTEMPTS) {
-    // Mark as consumed to prevent brute force
-    try {
-      const prisma = getPrismaClient();
-      const otpRepo = new PrismaEmailOtpRepository(prisma);
-      await otpRepo.markEmailOtpConsumed(otpRecord.id);
-    } catch { /* best effort */ }
-    return {
-      success: false,
-      message: "验证码尝试次数过多，请重新发送验证码。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  // 5. Verify the code — use repository method to get codeHash safely
-  let storedCodeHash: string | null = null;
+async function clearLegacyDevSessionCookie(): Promise<void> {
   try {
-    const prisma = getPrismaClient();
-    const otpRepo = new PrismaEmailOtpRepository(prisma);
-    storedCodeHash = await otpRepo.getCodeHashForVerification(otpRecord.id);
-  } catch {
-    storedCodeHash = null;
-  }
-
-  if (!storedCodeHash) {
-    // Increment attempts
-    try {
-      const prisma = getPrismaClient();
-      const otpRepo = new PrismaEmailOtpRepository(prisma);
-      await otpRepo.incrementEmailOtpAttempts(otpRecord.id);
-    } catch { /* best effort */ }
-    return {
-      success: false,
-      message: "验证码验证失败，请重试。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  const codeValid = await verifyOtpCode(code, storedCodeHash);
-
-  if (!codeValid) {
-    // Increment attempts on failure
-    try {
-      const prisma = getPrismaClient();
-      const otpRepo = new PrismaEmailOtpRepository(prisma);
-      await otpRepo.incrementEmailOtpAttempts(otpRecord.id);
-    } catch { /* best effort */ }
-    return {
-      success: false,
-      message: "验证码错误，请重试。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  // 6. Mark OTP as consumed
-  try {
-    const prisma = getPrismaClient();
-    const otpRepo = new PrismaEmailOtpRepository(prisma);
-    await otpRepo.markEmailOtpConsumed(otpRecord.id);
-  } catch { /* best effort */ }
-
-  // 7. Find or create user
-  let userId: string;
-  let username: string;
-  let isNewUser = false;
-
-  try {
-    const prisma = getPrismaClient();
-    const userRepo = new PrismaUserRepository(prisma);
-
-    // Check if user with this email already exists
-    const existingUser = await userRepo.getUserByEmail(email);
-
-    if (existingUser) {
-      // Login existing user
-      userId = existingUser.id;
-      username = existingUser.name ?? email;
-      isNewUser = false;
-    } else {
-      // Create new user for this email
-      const newUser = await userRepo.createUser({
-        email,
-        name: email.split("@")[0],
-      });
-
-      userId = newUser.id;
-      username = newUser.name ?? email;
-      isNewUser = true;
-    }
-  } catch {
-    return {
-      success: false,
-      message: "用户登录失败，请稍后再试。",
-      devOnly: true,
-      sessionCreated: false,
-    };
-  }
-
-  // 8. Create dev session with real DB user.id
-  try {
-    const sessionData = createDevSessionData(
-      userId,
-      username,
-      "开发用户",
-    );
-
     const cookieStore = await cookies();
-    const serialized = serializeDevSession(sessionData);
-
-    cookieStore.set(DEV_SESSION_COOKIE_NAME, serialized, {
+    cookieStore.set(DEV_SESSION_COOKIE_NAME, "", {
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // dev-only, not production
+      secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 0,
     });
   } catch {
-    return {
-      success: false,
-      message: "会话创建失败，请稍后再试。",
-      devOnly: true,
-      sessionCreated: false,
-    };
+    // best effort
   }
+}
 
+function failed(message: string): EmailOtpVerifyResult {
   return {
-    success: true,
-    message: isNewUser ? `账号创建成功，欢迎 ${username}！` : `登录成功，欢迎回来 ${username}！`,
-    user: {
-      id: userId,
-      username,
-      email,
-      isNewUser,
-    },
-    devOnly: true,
-    sessionCreated: true,
+    success: false,
+    message,
+    devOnly: process.env.NODE_ENV !== "production",
+    productionReady: false,
+    sessionCreated: false,
   };
 }

@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   addAssistantMemoryAction,
   deleteAssistantMemoryAction,
-  listAssistantMemoriesAction,
+  listAssistantLongTermMemoriesAction,
+  restoreAssistantConversationAction,
   toggleAssistantMemoryEnabledAction,
 } from "../../lib/assistant/assistant-server-actions.ts";
 import type {
@@ -35,10 +36,19 @@ export function AssistantMemoryManager({
   const [category, setCategory] = useState<AssistantMemoryCategory>("other");
   const [importance, setImportance] = useState("0.4");
   const [isSaving, setIsSaving] = useState(false);
+  const [viewMode, setViewMode] = useState<"active" | "historical">("active");
 
   const enabledCount = useMemo(
     () => memories.filter((memory) => memory.enabled).length,
     [memories],
+  );
+  const visibleMemories = useMemo(
+    () => memories.filter((memory) =>
+      viewMode === "historical"
+        ? memory.lifecycleStatus === "historical"
+        : memory.lifecycleStatus === "active",
+    ),
+    [memories, viewMode],
   );
 
   useEffect(() => {
@@ -49,7 +59,7 @@ export function AssistantMemoryManager({
     setIsLoading(true);
     setError(null);
     try {
-      const list = await listAssistantMemoriesAction();
+      const list = await listAssistantLongTermMemoriesAction();
       setMemories(list);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "记忆列表加载失败。");
@@ -108,6 +118,27 @@ export function AssistantMemoryManager({
     }
   }
 
+  async function handleRestoreSourceConversation(memory: AssistantMemoryRecord) {
+    if (!memory.sourceConversationId) {
+      setError("这条历史记忆没有来源会话，不能单独恢复。");
+      return;
+    }
+
+    setError(null);
+    try {
+      const restored = await restoreAssistantConversationAction({
+        conversationId: memory.sourceConversationId,
+      });
+      if (!restored.ok) {
+        throw new Error(restored.error);
+      }
+      await refresh();
+      setViewMode("active");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "恢复来源会话失败。");
+    }
+  }
+
   if (!hasSession) {
     return (
       <div
@@ -148,13 +179,22 @@ export function AssistantMemoryManager({
           </p>
           <h3 style={{ margin: "4px 0 0" }}>可查看、添加、禁用、删除自己的记忆</h3>
           <p style={{ margin: "6px 0 0", fontSize: "0.85rem", color: "var(--lap-text-muted)" }}>
-            仅保存短文本记忆。content 上限 {MAX_CONTENT_LENGTH} 字符，总量上限 100 条。
+            仅保存长期短文本记忆。content 上限 {MAX_CONTENT_LENGTH} 字符，总量上限 100 条。
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <span style={pillStyle}>总数 {memories.length}</span>
           <span style={pillStyle}>启用 {enabledCount}</span>
         </div>
+      </div>
+
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <button type="button" onClick={() => setViewMode("active")} style={viewMode === "active" ? primaryMiniButtonStyle : secondaryMiniButtonStyle}>
+          当前长期记忆
+        </button>
+        <button type="button" onClick={() => setViewMode("historical")} style={viewMode === "historical" ? primaryMiniButtonStyle : secondaryMiniButtonStyle}>
+          历史长期记忆
+        </button>
       </div>
 
       {error ? (
@@ -196,7 +236,7 @@ export function AssistantMemoryManager({
 
           {isLoading ? (
             <div style={{ color: "var(--lap-text-muted)" }}>正在加载...</div>
-          ) : memories.length === 0 ? (
+          ) : visibleMemories.length === 0 ? (
             <div
               style={{
                 borderRadius: "12px",
@@ -206,11 +246,11 @@ export function AssistantMemoryManager({
                 lineHeight: 1.7,
               }}
             >
-              还没有记忆。可以先手动添加一条常用偏好、目标或学习摘要。
+              还没有长期记忆。可以先手动添加一条常用偏好、目标或学习摘要。
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {memories.map((memory) => (
+              {visibleMemories.map((memory) => (
                 <article
                   key={memory.id}
                   style={{
@@ -228,6 +268,8 @@ export function AssistantMemoryManager({
                       <span style={pillStyle}>{labelForCategory(memory.category)}</span>
                       <span style={pillStyle}>{memory.enabled ? "启用" : "禁用"}</span>
                       <span style={pillStyle}>{labelForSource(memory.source)}</span>
+                      {memory.memoryType ? <span style={pillStyle}>{memory.memoryType}</span> : null}
+                      <span style={pillStyle}>{memory.lifecycleStatus === "historical" ? "历史" : "当前"}</span>
                     </div>
                     <span style={{ fontSize: "0.78rem", color: "var(--lap-text-subtle)" }}>
                       重要度 {memory.importance.toFixed(2)}
@@ -237,14 +279,27 @@ export function AssistantMemoryManager({
                   <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
                     {memory.content}
                   </div>
+                  {memory.sourceConversationId ? (
+                    <div style={{ fontSize: "0.78rem", color: "var(--lap-text-muted)", overflowWrap: "anywhere" }}>
+                      来源会话：{memory.sourceConversationId}
+                    </div>
+                  ) : null}
 
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {memory.lifecycleStatus === "historical" ? (
+                      <button type="button" onClick={() => void handleRestoreSourceConversation(memory)} style={secondaryButtonStyle}>
+                        恢复来源会话
+                      </button>
+                    ) : (
                     <button type="button" onClick={() => void handleToggle(memory)} style={secondaryButtonStyle}>
                       {memory.enabled ? "禁用" : "启用"}
                     </button>
-                    <button type="button" onClick={() => void handleDelete(memory)} style={dangerButtonStyle}>
-                      删除
-                    </button>
+                    )}
+                    {memory.lifecycleStatus === "active" ? (
+                      <button type="button" onClick={() => void handleDelete(memory)} style={dangerButtonStyle}>
+                        删除
+                      </button>
+                    ) : null}
                   </div>
                 </article>
               ))}
@@ -374,6 +429,26 @@ const inputStyle: React.CSSProperties = {
   fontFamily: "inherit",
   fontSize: "0.92rem",
   background: "#fff",
+};
+
+const primaryMiniButtonStyle: React.CSSProperties = {
+  border: "1px solid var(--lap-accent-primary)",
+  borderRadius: "999px",
+  padding: "6px 12px",
+  background: "rgba(99, 102, 241, 0.10)",
+  color: "var(--lap-accent-primary)",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+const secondaryMiniButtonStyle: React.CSSProperties = {
+  border: "1px solid #dbe4ee",
+  borderRadius: "999px",
+  padding: "6px 12px",
+  background: "#fff",
+  color: "var(--lap-text-secondary)",
+  fontWeight: 700,
+  cursor: "pointer",
 };
 
 const primaryButtonStyle: React.CSSProperties = {

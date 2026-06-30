@@ -128,8 +128,8 @@ test("A469 LLM untouched", () => {
   assert.ok(s.includes("LLM_DEV_ENV"));
 });
 
-test("FloatingAiAssistant exists", () => {
-  assert.ok(existsSync(resolve(__dirname, "_components", "FloatingAiAssistant.tsx")));
+test("FloatingAiAssistant is removed", () => {
+  assert.equal(existsSync(resolve(__dirname, "_components", "FloatingAiAssistant.tsx")), false);
 });
 
 // Safety

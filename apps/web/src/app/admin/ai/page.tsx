@@ -1,5 +1,5 @@
 /**
- * Admin AI — read-only LLM guard and Floating AI status.
+ * Admin AI — read-only LLM guard and assistant entry status.
  *
  * @adminDev — preview only, no write operations
  */
@@ -11,7 +11,6 @@ export default function AdminAiPage() {
   const snapshot = getAdminStatusSnapshot();
 
   const llmItems = snapshot.items.filter((i) => i.category === "llm");
-  const floatingItems = snapshot.items.filter((i) => i.category === "floating-ai");
 
   return (
     <div>
@@ -35,19 +34,6 @@ export default function AdminAiPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--lap-space-3)" }}>
           {llmItems.map((item) => (
-            <ItemCard key={item.key} item={item} />
-          ))}
-        </div>
-      </section>
-
-      {/* Floating AI Status */}
-      <section style={{ marginBottom: "var(--lap-space-6)" }}>
-        <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "#e2e8f0", margin: "0 0 var(--lap-space-4)" }}>
-          悬浮球 / Floating AI 状态
-        </h2>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--lap-space-3)" }}>
-          {floatingItems.map((item) => (
             <ItemCard key={item.key} item={item} />
           ))}
         </div>
@@ -99,7 +85,7 @@ export default function AdminAiPage() {
           AI 助手安全边界
         </p>
         <p style={{ margin: "4px 0 0" }}>
-          悬浮球为受限网页助手，不执行 Agent 工具（shell/file/MCP/GitHub）。
+          /ai 主页面为受限网页助手入口，不执行 Agent 工具（shell/file/MCP/GitHub）。
           不保存 raw prompt/response。不泄露 API key/token。
           所有 LLM 调用受 WebAiQaGuard 控制，非开发环境自动 blocked。
         </p>

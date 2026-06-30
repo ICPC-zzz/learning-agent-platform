@@ -16,9 +16,11 @@ import type { ReactNode } from "react";
 export function ShellRouter({
   children,
   hasSession = false,
+  canAccessAdmin = false,
 }: {
   children: ReactNode;
   hasSession?: boolean;
+  canAccessAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
@@ -28,5 +30,5 @@ export function ShellRouter({
     return <>{children}</>;
   }
 
-  return <AppShell hasSession={hasSession}>{children}</AppShell>;
+  return <AppShell hasSession={hasSession} canAccessAdmin={canAccessAdmin}>{children}</AppShell>;
 }

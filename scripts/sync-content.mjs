@@ -11,10 +11,13 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolve(__dirname, "..", "..", "..");
+const PROJECT_ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(PROJECT_ROOT, "apps/web/src/data");
+const execFileAsync = promisify(execFile);
 
 // ---------------------------------------------------------------------------
 // API fetchers
@@ -206,12 +209,16 @@ async function syncHotspots() {
     console.error(`Hotspot sync failed: ${e.message}`);
   }
 
-  writeDailyJson("daily-hotspots.generated.json", {
-    generatedAt: new Date().toISOString(),
-    date: today,
-    count: hotspots.length,
-    hotspots,
-  });
+  if (hotspots.length > 0 || !generatedFileExists("daily-hotspots.generated.json")) {
+    writeDailyJson("daily-hotspots.generated.json", {
+      generatedAt: new Date().toISOString(),
+      date: today,
+      count: hotspots.length,
+      hotspots,
+    });
+  } else {
+    console.log("[Preserved] daily-hotspots.generated.json because this sync produced no items");
+  }
 
   console.log(`[Done] ${hotspots.length} hotspots in ${Date.now() - started}ms`);
   return hotspots.length;
@@ -229,16 +236,58 @@ async function syncGitHub() {
     console.error(`GitHub sync failed: ${e.message}`);
   }
 
-  writeDailyJson("daily-github.generated.json", {
-    generatedAt: new Date().toISOString(),
-    date: today,
-    count: repos.length,
-    isFirstDay: true,
-    repos,
-  });
+  if (repos.length > 0 || !generatedFileExists("daily-github.generated.json")) {
+    writeDailyJson("daily-github.generated.json", {
+      generatedAt: new Date().toISOString(),
+      date: today,
+      count: repos.length,
+      isFirstDay: true,
+      repos,
+    });
+  } else {
+    console.log("[Preserved] daily-github.generated.json because this sync produced no items");
+  }
 
   console.log(`[Done] ${repos.length} repos in ${Date.now() - started}ms`);
   return repos.length;
+}
+
+async function syncArticles() {
+  console.log("\n=== Syncing Technical Articles ===");
+  const started = Date.now();
+  const scriptPath = resolve(PROJECT_ROOT, "services/article-feed-ingestor/ingest.py");
+  const before = countGeneratedArticles();
+  const candidates = process.platform === "win32"
+    ? [
+        { command: "python", args: [scriptPath] },
+        { command: "py", args: ["-3", scriptPath] },
+      ]
+    : [
+        { command: "python3", args: [scriptPath] },
+        { command: "python", args: [scriptPath] },
+      ];
+
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      const { stdout, stderr } = await execFileAsync(candidate.command, candidate.args, {
+        cwd: PROJECT_ROOT,
+        timeout: 180000,
+        maxBuffer: 1024 * 1024,
+      });
+      if (stdout.trim()) console.log(stdout.trim());
+      if (stderr.trim()) console.warn(stderr.trim());
+      const after = countGeneratedArticles();
+      console.log(`[Done] ${after} articles, +${Math.max(0, after - before)} in ${Date.now() - started}ms`);
+      return after;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  console.error(`Article sync failed: ${lastError?.message || String(lastError)}`);
+  console.log(`[Preserved] ${before} existing articles`);
+  return before;
 }
 
 // ---------------------------------------------------------------------------
@@ -249,6 +298,21 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function countGeneratedArticles() {
+  try {
+    const filePath = resolve(DATA_DIR, "articles.generated.json");
+    if (!existsSync(filePath)) return 0;
+    const parsed = JSON.parse(readFileSync(filePath, "utf-8"));
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function generatedFileExists(filename) {
+  return existsSync(resolve(DATA_DIR, filename));
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -256,11 +320,12 @@ function sleep(ms) {
 const args = process.argv.slice(2);
 const doHotspots = args.includes("--hotspots") || args.length === 0;
 const doGitHub = args.includes("--github") || args.length === 0;
+const doArticles = args.includes("--articles") || args.length === 0;
 
 console.log(`A500 Content Sync — ${new Date().toISOString()}`);
 console.log(`Data dir: ${DATA_DIR}`);
 
-let results = { hotspots: 0, github: 0 };
+let results = { hotspots: 0, github: 0, articles: 0 };
 
 if (doHotspots) {
   results.hotspots = await syncHotspots();
@@ -268,7 +333,11 @@ if (doHotspots) {
 if (doGitHub) {
   results.github = await syncGitHub();
 }
+if (doArticles) {
+  results.articles = await syncArticles();
+}
 
 console.log("\n=== Sync Complete ===");
 console.log(`Hotspots: ${results.hotspots}`);
 console.log(`GitHub: ${results.github}`);
+console.log(`Articles: ${results.articles}`);

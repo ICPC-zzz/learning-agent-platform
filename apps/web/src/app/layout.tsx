@@ -1,12 +1,10 @@
 ﻿import type { ReactNode } from "react";
-import { Suspense } from "react";
 
 import "./globals.css";
 
-import { FloatingAiAssistant } from "./_components/FloatingAiAssistant";
-import { SessionRefresher } from "./_components/SessionRefresher";
 import { ShellRouter } from "./_components/ShellRouter";
 import { readAssistantSession } from "../lib/assistant/assistant-session";
+import { isCurrentUserAdmin } from "../lib/admin/admin-auth";
 
 export const metadata = {
   title: "Learning Agent Platform",
@@ -19,21 +17,15 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const assistantSession = await readAssistantSession();
+  const adminStatus = await isCurrentUserAdmin();
 
   return (
     <html lang="zh-CN">
       <body>
-        <SessionRefresher />
-
-        <ShellRouter hasSession={assistantSession.hasSession}>
+        <ShellRouter hasSession={assistantSession.hasSession} canAccessAdmin={adminStatus.ok}>
           {children}
         </ShellRouter>
 
-        <Suspense fallback={null}>
-          <FloatingAiAssistant
-            hasSession={assistantSession.hasSession}
-          />
-        </Suspense>
       </body>
     </html>
   );

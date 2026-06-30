@@ -1,6 +1,10 @@
 import type {
   AssistantLearningContextSummary,
 } from "./assistant-types.ts";
+import {
+  collectLearningArtifactSummaries,
+  summarizeAnalysisHistoryFromDisk,
+} from "./learning-artifact-memory.ts";
 
 export async function buildAssistantLearningContext(input: {
   userId: string | null;
@@ -25,6 +29,7 @@ export async function buildAssistantLearningContext(input: {
     const wrongBookRepo = new db.PrismaProblemWrongBookRepository(prisma);
     const articleRepo = new db.PrismaArticleRepository(prisma);
     const readingSessionRepo = new db.PrismaReadingSessionRepository(prisma);
+    const codeforcesRepo = new db.PrismaCodeforcesAccountRepository(prisma);
 
     const [
       profileResult,
@@ -33,6 +38,8 @@ export async function buildAssistantLearningContext(input: {
       articleReadingsResult,
       readingSessionsResult,
       readingSummaryResult,
+      codeforcesAccountResult,
+      artifactSummaryResult,
     ] = await Promise.allSettled([
       learningRepo.getAbilityProfile(input.userId),
       attemptRepo.listRecentProblemAttemptsByUser(input.userId, 8),
@@ -40,6 +47,8 @@ export async function buildAssistantLearningContext(input: {
       articleRepo.listArticleReadingsByOwner({ userId: input.userId, limit: 5 }),
       readingSessionRepo.listReadingSessionsByOwner({ userId: input.userId, limit: 4 }),
       readingSessionRepo.summarizeReadingSessionsByOwner(input.userId),
+      codeforcesRepo.getAccountByUserId(input.userId),
+      collectLearningArtifactSummaries(input.userId),
     ]);
 
     const profile = getSettledValue(profileResult, null);
@@ -52,11 +61,21 @@ export async function buildAssistantLearningContext(input: {
       totalDurationSeconds: 0,
       totalDurationMinutes: 0,
     });
+    const codeforcesAccount = getSettledValue(codeforcesAccountResult, null);
+    const artifactSummaries = getSettledValue(artifactSummaryResult, {
+      learningReportSummary: "",
+      reviewPlanSummary: "",
+      recentCodeAnalysisSummary: "",
+    });
 
     const recentProblems = collectRecentProblemIds(attempts);
     const recentAttemptSummary = summarizeAttempts(attempts);
     const recentWrongBookSummary = summarizeWrongBooks(wrongBooks);
     const recentReadingSummary = summarizeRecentReadings(articleReadings, readingSessions, readingSummary);
+    const recentCodeAnalysisSummary = chooseSummaryText(
+      artifactSummaries.recentCodeAnalysisSummary,
+      summarizeAnalysisHistoryFromDisk(input.userId),
+    );
 
     return {
       userLabel: input.displayName ?? input.userId,
@@ -69,6 +88,10 @@ export async function buildAssistantLearningContext(input: {
       recentWrongBookSummary,
       recentReadingSummary,
       learningGoalSummary: buildGoalSummary(profile?.overallScore ?? null, attempts.length),
+      codeforcesProfileSummary: summarizeCodeforcesAccount(codeforcesAccount),
+      learningReportSummary: artifactSummaries.learningReportSummary,
+      reviewPlanSummary: artifactSummaries.reviewPlanSummary,
+      recentCodeAnalysisSummary,
       recentRouteHint: recentProblems[0] ? `/problems/${recentProblems[0]}` : undefined,
     };
   } catch {
@@ -98,6 +121,10 @@ export function createEmptyAssistantLearningContext(
     recentWrongBookSummary: "",
     recentReadingSummary: "",
     learningGoalSummary: "",
+    codeforcesProfileSummary: "",
+    learningReportSummary: "",
+    reviewPlanSummary: "",
+    recentCodeAnalysisSummary: "",
     recentRouteHint: undefined,
   };
 }
@@ -130,6 +157,10 @@ export function mergeAssistantLearningContext(
     recentWrongBookSummary: chooseSummaryText(base.recentWrongBookSummary, override.recentWrongBookSummary),
     recentReadingSummary: chooseSummaryText(base.recentReadingSummary, override.recentReadingSummary),
     learningGoalSummary: chooseSummaryText(base.learningGoalSummary, override.learningGoalSummary),
+    codeforcesProfileSummary: chooseSummaryText(base.codeforcesProfileSummary ?? "", override.codeforcesProfileSummary ?? ""),
+    learningReportSummary: chooseSummaryText(base.learningReportSummary ?? "", override.learningReportSummary ?? ""),
+    reviewPlanSummary: chooseSummaryText(base.reviewPlanSummary ?? "", override.reviewPlanSummary ?? ""),
+    recentCodeAnalysisSummary: chooseSummaryText(base.recentCodeAnalysisSummary ?? "", override.recentCodeAnalysisSummary ?? ""),
     recentRouteHint: base.recentRouteHint ?? override.recentRouteHint,
   };
 }
@@ -203,6 +234,31 @@ function summarizeWrongBooks(
   return `错题本 ${wrongBooks.length} 条，最近问题：${top.problemTitle}（${top.wrongCount} 次）`;
 }
 
+function summarizeCodeforcesAccount(account: {
+  handle?: string | null;
+  currentRating?: number | null;
+  maxRating?: number | null;
+  rank?: string | null;
+  maxRank?: string | null;
+  contribution?: number | null;
+  friendOfCount?: number | null;
+  syncStatus?: string | null;
+  lastSyncedAt?: Date | string | null;
+} | null): string {
+  if (!account) {
+    return "";
+  }
+
+  return [
+    `Codeforces handle: ${account.handle ?? "unknown"}`,
+    typeof account.currentRating === "number" ? `current rating ${account.currentRating}` : "",
+    typeof account.maxRating === "number" ? `max rating ${account.maxRating}` : "",
+    account.rank ? `rank ${account.rank}` : "",
+    account.syncStatus ? `sync status ${account.syncStatus}` : "",
+    account.lastSyncedAt ? `last synced ${formatDateValue(account.lastSyncedAt)}` : "",
+  ].filter((item) => item.length > 0).join("; ");
+}
+
 export function summarizeRecentReadings(
   articleReadings: Array<{
     articleTitle: string;
@@ -260,6 +316,10 @@ function formatAbilityBand(score: number): string {
   if (score >= 55) return "intermediate";
   if (score >= 25) return "developing";
   return "starting";
+}
+
+function formatDateValue(value: Date | string): string {
+  return value instanceof Date ? value.toISOString() : value;
 }
 
 function buildGoalSummary(score: number | null, recentPracticeCount: number): string {

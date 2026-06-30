@@ -84,13 +84,19 @@ export {
 // --- New provider contract (A393) ---
 export { LlmChatRole, LlmProviderMode } from "./llm-provider-contract";
 export type {
+  LlmAssistantTurnResult,
+  LlmChatCompletionFinishReason as LlmChatCompletionFinishReasonValue,
   LlmChatMessage,
   LlmChatRequest,
   LlmChatResult,
+  LlmProviderCapabilities,
   LlmProvider,
   LlmSafeError,
   LlmSafeErrorKind,
   LlmProviderMode as LlmProviderModeValue,
+  LlmToolCall,
+  LlmToolChoice,
+  LlmToolDefinition,
 } from "./llm-provider-contract";
 export {
   createBlockedResult,

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { AssistantChatPanel } from "../_components/AssistantChatPanel.tsx";
 import { AssistantMemoryManager } from "./AssistantMemoryManager.tsx";
 import { AssistantMemoryOverviewPanel } from "./AssistantMemoryOverviewPanel.tsx";
+import { AssistantConversationManager } from "./AssistantConversationManager.tsx";
 import { ModelConfigPanel } from "../agent/models/page";
 import { CodeAnalysisPanel, type CodeAnalysisFormData } from "./CodeAnalysisPanel.tsx";
 import { CodeAnalysisReportView } from "./CodeAnalysisReport.tsx";
@@ -14,11 +15,12 @@ import type { A492PersonalizedResult } from "@learning-agent-platform/ai-core/co
 import { AnalysisHistoryPanel } from "./AnalysisHistoryPanel.tsx";
 import { AnalysisProgressBar } from "./AnalysisProgressBar.tsx";
 
-type TabId = "chat" | "models" | "memory";
+type TabId = "chat" | "models" | "memory" | "conversations";
 type ChatMode = "conversation" | "code_analysis";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "chat", label: "对话" },
+  { id: "conversations", label: "对话管理" },
   { id: "models", label: "模型管理" },
   { id: "memory", label: "记忆管理" },
 ];
@@ -35,25 +37,12 @@ export function AiAssistantTabs({
   return (
     <div>
       {/* Tab Bar */}
-      <div style={{
-        display: "flex", gap: "0", borderBottom: "1px solid #e5e7eb",
-        marginBottom: "20px",
-      }}>
+      <div className="a519-tabbar">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            style={{
-              padding: "10px 20px",
-              background: "none",
-              border: "none",
-              borderBottom: tab === t.id ? "2px solid #2563eb" : "2px solid transparent",
-              color: tab === t.id ? "#2563eb" : "#6b7280",
-              fontWeight: tab === t.id ? 600 : 400,
-              fontSize: "14px",
-              cursor: "pointer",
-              marginBottom: "-1px",
-            }}
+            aria-selected={tab === t.id}
           >
             {t.label}
           </button>
@@ -62,6 +51,7 @@ export function AiAssistantTabs({
 
       {/* Tab Content */}
       {tab === "chat" && <ChatTab hasSession={hasSession} displayName={displayName} />}
+      {tab === "conversations" && <AssistantConversationManager hasSession={hasSession} />}
       {tab === "models" && <ModelConfigPanel compact />}
       {tab === "memory" && <MemoryTab hasSession={hasSession} />}
     </div>
@@ -85,7 +75,7 @@ function ChatTab({
     setIsSubmitting(true);
     setAnalysisError(null);
     setAnalysisResult(null);
-    var runId = "run_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5);
+    const runId = "run_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5);
     setAnalysisRunId(runId);
 
     try {
@@ -127,24 +117,21 @@ function ChatTab({
     <div>
       {/* Session status bar */}
       <div style={{
-        padding: "8px 14px",
-        background: hasSession ? "#f0fdf4" : "#fefce8",
-        border: `1px solid ${hasSession ? "#bbf7d0" : "#fef08a"}`,
+        padding: "10px 14px",
+        background: hasSession ? "#eef8f0" : "#fff8e6",
+        border: `1px solid ${hasSession ? "#cfe0ce" : "#f1dfaa"}`,
         borderRadius: "8px",
         marginBottom: "16px",
         fontSize: "13px",
-        color: hasSession ? "#166534" : "#92400e",
+        color: hasSession ? "#0f6b48" : "#9a5b12",
       }}>
         {hasSession
-          ? `已登录${displayName ? ` · ${displayName}` : ""} — 助手可读取当前页面上下文和学习摘要`
-          : "未登录 — 仍可使用当前页面上下文进行问答"}
+          ? `已登录${displayName ? ` · ${displayName}` : ""} — 助手可结合当前页面和长期记忆进行问答`
+          : "未登录 — 仍可提问，但不会读取服务端长期记忆"}
       </div>
 
       {/* Mode Switch */}
-      <div style={{
-        display: "flex", gap: "0", borderBottom: "1px solid #e5e7eb",
-        marginBottom: "16px",
-      }}>
+      <div className="a519-tabbar">
         {([
           { id: "conversation" as const, label: "普通对话" },
           { id: "code_analysis" as const, label: "代码分析" },
@@ -152,17 +139,7 @@ function ChatTab({
           <button
             key={m.id}
             onClick={() => { setMode(m.id); handleReset(); }}
-            style={{
-              padding: "8px 16px",
-              background: "none",
-              border: "none",
-              borderBottom: mode === m.id ? "2px solid #2563eb" : "2px solid transparent",
-              color: mode === m.id ? "#2563eb" : "#6b7280",
-              fontWeight: mode === m.id ? 600 : 400,
-              fontSize: "13px",
-              cursor: "pointer",
-              marginBottom: "-1px",
-            }}
+            aria-selected={mode === m.id}
           >
             {m.label}
           </button>
@@ -170,12 +147,7 @@ function ChatTab({
       </div>
 
       {mode === "conversation" ? (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1.08fr) minmax(320px, 0.92fr)",
-          gap: "18px",
-          alignItems: "stretch",
-        }}>
+        <div className="a519-ai-grid">
           <section style={{
             height: "min(78vh, 760px)",
             minHeight: "640px",
@@ -268,7 +240,7 @@ function MemoryTab({ hasSession }: { hasSession: boolean }) {
   return (
     <div>
       <p style={{ fontSize: "13px", color: "#6b7280", marginBottom: "16px" }}>
-        手动添加、查看和删除自己的短文本记忆。助手在识别到稳定偏好、目标或学习进度后，也会自动写入长期记忆。
+        这里只管理长期记忆。你可以添加、启用、禁用或删除自己的短文本记忆。
       </p>
       <AssistantMemoryManager hasSession={hasSession} />
     </div>

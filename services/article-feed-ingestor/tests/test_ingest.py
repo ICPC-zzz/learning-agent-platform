@@ -125,6 +125,59 @@ class ArticleFeedIngestorTests(unittest.TestCase):
             self.assertFalse(wrote)
             self.assertEqual(output.read_text(encoding="utf-8"), "keep me")
 
+    def test_persist_articles_appends_new_items_without_overwriting_existing(self):
+        old_article = {
+            "id": "cnblogs:old",
+            "title": "Old Article",
+            "summary": "old summary",
+            "originalUrl": "https://example.com/old",
+            "sourceName": "Old Source",
+            "sourcePlatform": "cnblogs",
+            "author": None,
+            "publishedAt": "2024-06-17T10:00:00Z",
+            "categories": ["Python"],
+            "feedId": "old-feed",
+            "fetchedAt": "2024-06-17T12:00:00Z",
+        }
+        duplicate_old_article = {
+            **old_article,
+            "title": "Old Article Updated By New Fetch",
+            "fetchedAt": "2024-06-20T12:00:00Z",
+        }
+        new_article = {
+            "id": "csdn:new",
+            "title": "New Article",
+            "summary": "new summary",
+            "originalUrl": "https://example.com/new",
+            "sourceName": "New Source",
+            "sourcePlatform": "csdn",
+            "author": None,
+            "publishedAt": "2024-06-20T10:00:00Z",
+            "categories": ["AI"],
+            "feedId": "new-feed",
+            "fetchedAt": "2024-06-20T12:00:00Z",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "articles.generated.json"
+            output.write_text(json.dumps([old_article], ensure_ascii=False), encoding="utf-8")
+            result = IngestionResult(
+                source_results=[],
+                raw_articles=[duplicate_old_article, new_article],
+                deduped_articles=[duplicate_old_article, new_article],
+            )
+
+            wrote = persist_articles(result, output)
+            stored = json.loads(output.read_text(encoding="utf-8"))
+
+            self.assertTrue(wrote)
+            self.assertEqual(len(stored), 2)
+            self.assertEqual({item["originalUrl"] for item in stored}, {"https://example.com/old", "https://example.com/new"})
+            self.assertEqual(
+                next(item for item in stored if item["originalUrl"] == "https://example.com/old")["title"],
+                "Old Article",
+            )
+
     def test_collect_articles_walks_feed_pages_until_exhausted(self):
         source = SourceConfig(
             id="paged",

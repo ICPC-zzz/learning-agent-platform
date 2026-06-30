@@ -4,7 +4,6 @@
  * Article Favorites DB Server Action — dev-only toggle/check helpers.
  */
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import {
@@ -16,6 +15,7 @@ import {
   doIsFavoriteArticle,
   type ArticleFavoritesDbActionResult,
 } from "./article-favorites-db-actions";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 
 export type ToggleArticleFavoriteResult = ArticleFavoritesDbActionResult & {
   uiMessage: string;
@@ -29,33 +29,26 @@ export async function toggleArticleFavoriteDbAction(
   originalUrl: string,
   currentIsFavorite?: boolean,
 ): Promise<ToggleArticleFavoriteResult> {
-  let cookieValue: string | undefined;
-  try {
-    const cookieStore = await cookies();
-    cookieValue = cookieStore.get("lap-web-dev-session")?.value;
-  } catch {
-    cookieValue = undefined;
-  }
-
-  const guard = evaluateArticleLibraryDbGuard(cookieValue);
-  if (!guard.enabled || guard.sessionPayload === null) {
+  const session = await getCurrentAuthSession();
+  const guard = evaluateArticleLibraryDbGuard(undefined);
+  if (!session.hasSession) {
     return {
       ...buildBlockedResult(guard, articleId),
-      uiMessage: buildBlockedUiMessage(guard),
+      uiMessage: "请先登录后再收藏文章。",
     };
   }
 
-  const ownerId = guard.sessionPayload.userIdPreview;
+  const productionGuard = { ...guard, enabled: true, callsRepository: true, sessionPayload: null };
   const result = currentIsFavorite
-    ? await doRemoveFavoriteArticle(articleId, ownerId, guard)
+    ? await doRemoveFavoriteArticle(articleId, session.userId, productionGuard)
     : await doAddFavoriteArticle({
         articleId,
         articleTitle,
         sourcePlatform,
         sourceName,
         originalUrl,
-        ownerId,
-      }, guard);
+        ownerId: session.userId,
+      }, productionGuard);
 
   if (result.success) {
     try {
@@ -70,8 +63,8 @@ export async function toggleArticleFavoriteDbAction(
     return {
       ...result,
       uiMessage: result.isFavorite
-        ? "已加入文章收藏（dev-only / 已写入数据库）"
-        : "已从文章收藏中移除（dev-only / 已写入数据库）",
+        ? "已加入文章收藏。"
+        : "已从文章收藏中移除。",
     };
   }
 
@@ -79,23 +72,16 @@ export async function toggleArticleFavoriteDbAction(
     ...result,
     uiMessage: "reasonCode" in result && result.reasonCode === "db-action-failed"
       ? (result as { message: string }).message
-      : "文章收藏操作未完成，已保留本地状态。",
+      : "文章收藏操作未完成，请先登录或稍后重试。",
   };
 }
 
 export async function checkArticleFavoriteDbAction(
   articleId: string,
 ): Promise<ArticleFavoritesDbActionResult> {
-  let cookieValue: string | undefined;
-  try {
-    const cookieStore = await cookies();
-    cookieValue = cookieStore.get("lap-web-dev-session")?.value;
-  } catch {
-    cookieValue = undefined;
-  }
-
-  const guard = evaluateArticleLibraryDbGuard(cookieValue);
-  if (!guard.enabled || guard.sessionPayload === null) {
+  const session = await getCurrentAuthSession();
+  const guard = evaluateArticleLibraryDbGuard(undefined);
+  if (!session.hasSession) {
     return {
       success: false,
       devOnly: true,
@@ -110,7 +96,7 @@ export async function checkArticleFavoriteDbAction(
     };
   }
 
-  return doIsFavoriteArticle(articleId, guard.sessionPayload.userIdPreview, guard);
+  return doIsFavoriteArticle(articleId, session.userId, { ...guard, enabled: true, callsRepository: true, sessionPayload: null });
 }
 
 function buildBlockedResult(
@@ -129,11 +115,4 @@ function buildBlockedResult(
     blockedReasons: [...guard.blockedReasons],
     productionReady: false,
   };
-}
-
-function buildBlockedUiMessage(guard: ReturnType<typeof evaluateArticleLibraryDbGuard>): string {
-  if (guard.blockedReasons.length === 0) {
-    return "文章 DB 持久化未启用。使用本地 fallback。";
-  }
-  return guard.blockedReasons[0];
 }

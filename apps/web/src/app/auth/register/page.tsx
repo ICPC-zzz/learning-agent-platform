@@ -7,14 +7,13 @@
  * There is no separate registration form. Users simply enter their
  * email on the login page and an account is created on first use.
  *
- * @previewOnly — dev-only Auth
  */
 
 import Link from "next/link";
 
 export default function RegisterPage() {
   return (
-    <main className="page" style={{ maxWidth: "480px", paddingTop: "80px", textAlign: "center" }}>
+    <main className="page" style={{ maxWidth: "560px", paddingTop: "88px", textAlign: "center" }}>
       <div
         style={{
           display: "inline-flex",
@@ -22,8 +21,8 @@ export default function RegisterPage() {
           justifyContent: "center",
           width: "56px",
           height: "56px",
-          borderRadius: "var(--lap-radius-xl)",
-          background: "linear-gradient(135deg, var(--lap-accent-purple) 0%, #8b5cf6 100%)",
+          borderRadius: "10px",
+          background: "linear-gradient(135deg, #0f6b48 0%, #4f63d9 100%)",
           color: "#fff",
           fontSize: "1.5rem",
           fontWeight: 800,
@@ -33,7 +32,7 @@ export default function RegisterPage() {
         L
       </div>
 
-      <h1 style={{ fontSize: "1.5rem", margin: "0 0 12px", fontWeight: 700 }}>
+      <h1 style={{ fontSize: "2.1rem", margin: "0 0 12px", fontWeight: 800 }}>
         无需单独注册
       </h1>
 
@@ -47,7 +46,7 @@ export default function RegisterPage() {
           href="/"
           style={{
             display: "inline-flex", alignItems: "center",
-            background: "#0f172a", borderRadius: "var(--lap-radius-sm)",
+            background: "var(--lap-accent-primary)", borderRadius: "8px",
             color: "#f8fafc", fontSize: "0.875rem", fontWeight: 600,
             padding: "12px 28px", textDecoration: "none",
           }}
@@ -59,7 +58,7 @@ export default function RegisterPage() {
           style={{
             display: "inline-flex", alignItems: "center",
             border: "1px solid var(--lap-border-default)",
-            borderRadius: "var(--lap-radius-sm)",
+            borderRadius: "8px",
             color: "var(--lap-text-primary)", fontSize: "0.875rem",
             fontWeight: 600, padding: "12px 28px", textDecoration: "none",
           }}
@@ -75,7 +74,7 @@ export default function RegisterPage() {
           fontSize: "0.75rem", color: "var(--lap-text-subtle)",
         }}
       >
-        dev-only · 开发预览 · 非生产 Auth · A471
+        邮箱验证码登录 · 首次登录自动创建账号
       </div>
     </main>
   );

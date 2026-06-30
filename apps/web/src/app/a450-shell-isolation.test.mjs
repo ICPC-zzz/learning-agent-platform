@@ -36,13 +36,15 @@ describe("Shell components", () => {
   it("ShellRouter detects admin", () => { const c = rc("ShellRouter.tsx"); assert.ok(c.includes("startsWith(\"/admin\")")); });
 });
 
-describe("FloatingAiAssistant", () => {
-  it("is client component", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("\"use client\"")); });
-  it("hides on admin", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("startsWith(\"/admin\")") && c.includes("return null")); });
-  it("uses z-index token", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("var(--lap-z-floating-ai)")); });
-  it("has Esc handler", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("key === \"Escape\"")); });
-  it("has click-outside", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("mousedown")); });
-  it("has clamp for responsive", () => { const c = rc("FloatingAiAssistant.tsx"); assert.ok(c.includes("clamp")); });
+describe("FloatingAiAssistant removal", () => {
+  it("component file is removed", () => {
+    assert.equal(fs.existsSync(path.join(APP_DIR, "_components", "FloatingAiAssistant.tsx")), false);
+  });
+  it("root layout no longer mounts it", () => {
+    const c = rf("layout.tsx");
+    assert.equal(c.includes("FloatingAiAssistant"), false);
+    assert.equal(c.includes("<FloatingAiAssistant"), false);
+  });
 });
 
 describe("Admin pages", () => {
@@ -77,7 +79,7 @@ describe("Isolation", () => {
 describe("Design tokens", () => {
   it("has required tokens", () => {
     const c = rf("globals.css");
-    for (const t of ["--lap-layout-width-narrow","--lap-space-1","--lap-radius-sm","--lap-border-light","--lap-bg-page","--lap-text-primary","--lap-z-floating-ai","--lap-card-bg","--lap-font-family"]) {
+    for (const t of ["--lap-layout-width-narrow","--lap-space-1","--lap-radius-sm","--lap-border-light","--lap-bg-page","--lap-text-primary","--lap-card-bg","--lap-font-family"]) {
       assert.ok(c.includes(t), "missing: "+t);
     }
   });
@@ -91,7 +93,6 @@ describe("Design tokens", () => {
     assert.ok(zi.sticky < zi.sidebar);
     assert.ok(zi.sidebar < zi.overlay);
     assert.ok(zi.overlay < zi.modal);
-    assert.ok(zi.modal < zi["floating-ai"]);
   });
   it("has utility classes", () => {
     const c = rf("globals.css");

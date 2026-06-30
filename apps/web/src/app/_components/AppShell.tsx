@@ -20,9 +20,10 @@ import { AppSidebar } from "./AppSidebar";
 export interface AppShellProps {
   children: ReactNode;
   hasSession?: boolean;
+  canAccessAdmin?: boolean;
 }
 
-export function AppShell({ children, hasSession = false }: AppShellProps) {
+export function AppShell({ children, hasSession = false, canAccessAdmin = false }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const toggleMobileSidebar = useCallback(() => {
@@ -35,8 +36,16 @@ export function AppShell({ children, hasSession = false }: AppShellProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppHeader hasSession={hasSession} onToggleMobileSidebar={toggleMobileSidebar} />
-      <AppSidebar isOpen={mobileSidebarOpen} onClose={closeMobileSidebar} />
+      <AppHeader
+        hasSession={hasSession}
+        canAccessAdmin={canAccessAdmin}
+        onToggleMobileSidebar={toggleMobileSidebar}
+      />
+      <AppSidebar
+        isOpen={mobileSidebarOpen}
+        canAccessAdmin={canAccessAdmin}
+        onClose={closeMobileSidebar}
+      />
       <main style={{ flex: 1 }}>{children}</main>
     </div>
   );

@@ -16,9 +16,10 @@ import Link from "next/link";
 export interface AppSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  canAccessAdmin?: boolean;
 }
 
-export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
+export function AppSidebar({ isOpen, onClose, canAccessAdmin = false }: AppSidebarProps) {
   // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
@@ -91,8 +92,13 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
             minHeight: "56px",
           }}
         >
-          <span style={{ fontWeight: 800, fontSize: "1rem" }}>
-            Learning Platform
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 10, fontWeight: 800, fontSize: "1rem" }}>
+            <img
+              src="/a519/learning-agent-logo.png"
+              alt=""
+              style={{ width: 30, height: 30, borderRadius: 8, objectFit: "cover" }}
+            />
+            Learning Agent
           </span>
           <button
             onClick={onClose}
@@ -162,17 +168,19 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           }}
         >
           <span className="lap-dev-badge">dev-preview</span>
-          <Link
-            href="/admin"
-            onClick={onClose}
-            style={{
-              fontSize: "0.8125rem",
-              color: "var(--lap-text-subtle)",
-              textDecoration: "none",
-            }}
-          >
-            后台管理（开发预览）
-          </Link>
+          {canAccessAdmin ? (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              style={{
+                fontSize: "0.8125rem",
+                color: "var(--lap-text-subtle)",
+                textDecoration: "none",
+              }}
+            >
+              后台管理（开发预览）
+            </Link>
+          ) : null}
         </div>
       </div>
     </>
