@@ -1,13 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
-import {
-  loadFavorites,
-  persistFavorites,
-  removeFavorite,
-  type FavoriteBookEntry,
-} from "../../../../lib/local-user-library-store";
 import {
   toggleFavoriteDbAction,
 } from "../../favorites-db-server-action";
@@ -23,32 +17,15 @@ export function FavoriteBooksPageClient({
   pageView,
   dbFavoritesStatus,
 }: FavoriteBooksPageClientProps) {
-  const [mounted, setMounted] = useState(false);
-  const [localFavorites, setLocalFavorites] = useState<FavoriteBookEntry[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLocalFavorites(loadFavorites());
-    setMounted(true);
-  }, []);
-
-  // Build display items: DB-first, localStorage fallback
-  const displayItems = buildDisplayItems(
-    pageView,
-    localFavorites,
-    dbFavoritesStatus.enabled,
-  );
+  const displayItems = buildDisplayItems(pageView, dbFavoritesStatus.enabled);
 
   const handleUnfavorite = useCallback(
     async (item: FavoriteBooksPageItemView) => {
       setRemovingId(item.bookId);
 
       if (item.unfavoriteTarget === "db" && dbFavoritesStatus.enabled) {
-        // Remove DB favorite + local fallback
-        const updated = removeFavorite(localFavorites, item.bookId);
-        persistFavorites(updated);
-        setLocalFavorites(updated);
-
         try {
           await toggleFavoriteDbAction(
             item.bookId,
@@ -58,30 +35,14 @@ export function FavoriteBooksPageClient({
             true, // currently favorited
           );
         } catch {
-          // Best-effort — localStorage already updated
+          // Best effort; server action enforces the session boundary.
         }
-      } else {
-        // Remove localStorage favorite
-        const updated = removeFavorite(localFavorites, item.bookId);
-        persistFavorites(updated);
-        setLocalFavorites(updated);
       }
 
       setRemovingId(null);
     },
-    [localFavorites, dbFavoritesStatus.enabled],
+    [dbFavoritesStatus.enabled],
   );
-
-  if (!mounted) {
-    return (
-      <section className="learningPanel" aria-labelledby="fav-list-title">
-        <div className="panelHeader">
-          <h2 id="fav-list-title">Favorite Books</h2>
-        </div>
-        <p className="panelNote">Loading...</p>
-      </section>
-    );
-  }
 
   return (
     <section className="learningPanel" aria-labelledby="fav-list-title">
@@ -177,32 +138,15 @@ export function FavoriteBooksPageClient({
 }
 
 /**
- * Build display items by merging server-side DB favorites with
- * client-side localStorage favorites when DB is not active.
+ * Build display items from server-side DB favorites only.
  */
 function buildDisplayItems(
   pageView: FavoriteBooksPageView,
-  localFavorites: FavoriteBookEntry[],
   dbEnabled: boolean,
 ): FavoriteBooksPageItemView[] {
   if (pageView.items.length > 0 && pageView.dbFavoritesEnabled) {
     return pageView.items;
   }
 
-  // Fallback: map localStorage entries to page items
-  return localFavorites.map((fav) => ({
-    bookId: fav.bookId,
-    title: fav.title,
-    sourceType: fav.sourceType,
-    firstChapterId: fav.firstChapterId ?? null,
-    favoriteTime: fav.updatedAt,
-    badge: "local-fallback" as const,
-    badgeText: "本地收藏 fallback",
-    detailUrl: `/books/${encodeURIComponent(fav.bookId)}`,
-    readUrl: fav.firstChapterId
-      ? `/reader?bookId=${encodeURIComponent(fav.bookId)}&chapterId=${encodeURIComponent(fav.firstChapterId)}`
-      : null,
-    unfavoriteLabel: "取消收藏（本地）",
-    unfavoriteTarget: "local" as const,
-  }));
+  return dbEnabled ? pageView.items : [];
 }

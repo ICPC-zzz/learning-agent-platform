@@ -1,0 +1,18 @@
+[Unit]
+Description=Learning Agent Platform Web
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=APP_USER
+Group=APP_USER
+WorkingDirectory=/opt/learning-agent-platform
+EnvironmentFile=/etc/learning-agent-platform/web.env
+ExecStart=/usr/bin/pnpm --filter @learning-agent-platform/web start
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

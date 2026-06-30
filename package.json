@@ -15,12 +15,16 @@
     "content:sync:github-daily": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts --github",
     "content:sync:articles": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts --articles",
     "content:sync:all": "pnpm --filter @learning-agent-platform/db build && tsx scripts/content-sync.ts",
-    "auth:bootstrap-admin": "pnpm --filter @learning-agent-platform/db build && tsx scripts/auth-bootstrap-admin.ts",
+    "email:doctor": "tsx scripts/email-doctor.ts",
+    "email:smoke": "tsx scripts/email-smoke.ts",
+    "auth:bootstrap-admin": "tsx scripts/auth-bootstrap-admin.ts",
+    "test:e2e": "playwright test",
     "test:db:memory-integration": "node --test tests/a514-prisma-memory-integration.test.mjs",
     "desktop:test:gui": "node --test apps/desktop/desktop-gui-regression.test.mjs",
     "desktop:test:gui:ci": "node apps/desktop/run-desktop-gui-ci.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "1.51.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0"

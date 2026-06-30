@@ -2,46 +2,62 @@
 
 Date: 2026-06-30
 
+## A526 Update
+
+```text
+desktopEntryAllowed = false
+```
+
+A526 did not open Desktop entry. Local Web completion and server deployment readiness are accepted after user-confirmed manual Browser verification, but real server production verification is still pending Aliyun deployment, HTTPS validation, scheduler installation, and backup restore rehearsal.
+
 ## Gate Decision
 
 ```text
 desktopEntryAllowed = false
 ```
 
-Web 尚未完成，禁止进入 Desktop 开发。A523 后门禁仍关闭。
+Web is still not complete enough to enter Desktop development. A525 kept the gate closed.
 
-## Why Desktop Is Blocked
+## Why Desktop Is Still Blocked
 
-Desktop work must not start while the Web foundation still has unresolved P0 gaps:
+1. Real smoke email delivery was not executed because no real recipient mailbox was provided.
+2. Real OTP send, receive, and Browser verification are still incomplete.
+3. New WebSession creation and `lap_session` cookie inspection after real login are still incomplete.
+4. Refresh persistence and service restart persistence are still incomplete.
+5. Logout revocation is still incomplete.
+6. Admin Browser flow is still incomplete; current database count shows `admins = 0`.
+7. Ordinary-user admin rejection after real login is still incomplete.
+8. Two-user A/B isolation is still incomplete.
+9. Automated browser E2E for the accepted Auth flow is still missing.
+10. AI/Agent/Tool/Skill production scope remains preview-only, dev-only, mock, disabled-by-default, or unverified.
 
-1. Real email OTP send/receive is still blocked by missing Provider configuration.
-2. Full Browser Auth flow is incomplete: login persistence, restart recovery, logout revocation, admin flow, and A/B isolation are not fully verified.
-3. Automated browser E2E coverage is missing.
-4. Legacy preview/dev-session/localStorage fallback remains in books, reader, import, and several user subpages.
-5. Content scheduler is not deployment-neutral.
-6. AI provider is preview/mock-only or real-dev only, not production-ready.
-7. Codeforces Browser flow is not fully verified under a real bound user session.
-8. 404 and remaining preview routes are not fully product-polished.
+## A525 Evidence
+
+Passed:
+
+- `email:doctor`.
+- Typecheck for ai-core, db, web, and root.
+- Production build.
+- A515-A524 tests: `101` passed.
+- `/api/health` with database `ok`.
+- `@Browser` `/auth/login` smoke at 1440 x 900 and 390 x 844.
+
+Not passed:
+
+- Real Auth closure.
+- Server deployment readiness.
+- Desktop entry.
 
 ## Required Web Exit Criteria Before Desktop
 
-- Complete real email OTP send/receive/verify with a configured Provider.
+- Complete real email OTP send, receive, and verify with a configured Provider.
 - Verify `lap_session` login persistence, restart recovery, and logout revocation in Browser.
-- Add committed browser E2E for core flows: auth, articles, favorites, user dashboard, AI, Codeforces, admin sync, responsive smoke.
-- Verify admin routes in Browser with an authorized admin session.
-- Verify two-user A/B isolation for key data surfaces.
-- Add scheduler/cron deployment path for daily content sync, with lock/stale/failure preservation retained.
-- Keep raw prompt/response and secrets out of logs and docs.
-- Keep Agent/tool/Skill execution gated by permission, audit logs, and explicit user action.
-
-## Future Desktop Direction Only
-
-The future Desktop app should not be a separate mock product. It should be one stronger main Agent client that reuses Web/server capabilities and boundaries:
-
-- Reuse Web/server auth identity, LLM provider config, memory, tool runtime, Skill manifests, Codeforces data, reports, review plans, code analysis, and safety audit records.
-- Keep all tools permissioned and logged.
-- Keep community Skills disabled by default.
-- Treat Desktop as an execution/control surface over existing server-reviewed capabilities, not a bypass around Web guards.
+- Verify admin routes in Browser with an authorized database-backed admin session.
+- Verify ordinary user cannot access admin routes or admin actions.
+- Verify two-user A/B isolation for key user-owned data surfaces.
+- Add automated browser E2E for accepted Web P0 flows.
+- Keep raw prompt/response, secrets, OTPs, and session tokens out of logs and docs.
+- Keep Agent/tool/Skill execution gated by permissions, audit logs, and explicit user action.
 
 ## Non-Goals For Current Stage
 

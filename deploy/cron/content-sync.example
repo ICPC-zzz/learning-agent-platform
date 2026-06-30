@@ -1,0 +1,9 @@
+# Load secrets from /etc/learning-agent-platform/web.env, not from crontab.
+# Install as the APP_USER crontab or convert to a systemd timer.
+
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+
+15 */6 * * * set -a; source /etc/learning-agent-platform/web.env; set +a; cd /opt/learning-agent-platform && /usr/bin/flock -n /tmp/lap-content-sync-hot.lock pnpm content:sync:hot >> /var/log/learning-agent-platform/content-sync-hot.log 2>&1
+35 2 * * * set -a; source /etc/learning-agent-platform/web.env; set +a; cd /opt/learning-agent-platform && /usr/bin/flock -n /tmp/lap-content-sync-github.lock pnpm content:sync:github-daily >> /var/log/learning-agent-platform/content-sync-github.log 2>&1
+5 */6 * * * set -a; source /etc/learning-agent-platform/web.env; set +a; cd /opt/learning-agent-platform && /usr/bin/flock -n /tmp/lap-content-sync-articles.lock pnpm content:sync:articles >> /var/log/learning-agent-platform/content-sync-articles.log 2>&1

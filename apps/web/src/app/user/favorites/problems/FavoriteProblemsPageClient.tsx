@@ -1,19 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 
 import {
   buildFavoriteProblemsPageViewModel,
   type FavoriteProblemsPageViewModel,
 } from "./favorite-problems-page-view-model";
-import {
-  loadFavorites,
-  isFavoriteProblem,
-  removeFavoriteProblem,
-  persistFavorites,
-  type FavoriteProblemEntry,
-} from "../../../../lib/local-user-problem-store";
 import type { DbProblemFavoriteView } from "../../problem-favorites-db-loader";
 
 interface FavoriteProblemsPageClientProps {
@@ -34,40 +27,16 @@ export function FavoriteProblemsPageClient({
   dbFavoritesEnabled,
   hasSession,
 }: FavoriteProblemsPageClientProps) {
-  const [localFavs, setLocalFavs] = useState<FavoriteProblemEntry[]>([]);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setLocalFavs(loadFavorites());
-    setMounted(true);
-  }, []);
-
   const vm: FavoriteProblemsPageViewModel = useMemo(
     () =>
       buildFavoriteProblemsPageViewModel({
         dbFavorites,
         dbFavoritesEnabled,
-        localFavorites: localFavs,
+        localFavorites: [],
         hasSession,
       }),
-    [dbFavorites, dbFavoritesEnabled, localFavs, hasSession],
+    [dbFavorites, dbFavoritesEnabled, hasSession],
   );
-
-  const removeFavorite = useCallback((problemId: string) => {
-    setLocalFavs((prev) => {
-      const next = removeFavoriteProblem(prev, problemId);
-      persistFavorites(next);
-      return next;
-    });
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className="learningEmptyState" aria-live="polite">
-        <strong>加载中...</strong>
-      </div>
-    );
-  }
 
   // Empty state
   if (vm.items.length === 0) {
@@ -152,24 +121,6 @@ export function FavoriteProblemsPageClient({
                 >
                   查看详情
                 </Link>
-                <button
-                  onClick={() => removeFavorite(item.problemId)}
-                  style={{
-                    alignItems: "center",
-                    background: "#fef2f2",
-                    border: "1px solid #fecaca",
-                    borderRadius: "8px",
-                    color: "#dc2626",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    padding: "5px 10px",
-                  }}
-                  aria-label={`取消收藏 ${item.title}`}
-                >
-                  取消收藏
-                </button>
               </div>
             </div>
           </article>

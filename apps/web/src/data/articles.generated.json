@@ -1,5 +1,605 @@
 [
   {
+    "id": "cnblogs:https://www.cnblogs.com/tangkengz/p/20975134",
+    "title": "一次盘口数据误读复盘：从 bids/asks 展示到信号候选的边界 - Agent_王员外",
+    "summary": "【摘要】摘要：系统看到买一突然挂出一笔大单，触发观察逻辑，事后复盘发现那只是挂单状态的一次正常变化——不是成交信号，不是主力入场，只是盘口结构在刷新。这次误判的根因不是数据质量，而是设计上把“展示层”的视觉信息直接当成了“信号候选层”的决策输入。本文复盘这次误读，拆解盘口数据从展示、状态观察到信号候选的三层... 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/tangkengz/p/20975134",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "Agent_王员外",
+    "publishedAt": "2026-06-30T09:46:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/cheyunhua/p/20974423",
+    "title": "实现接口样例 - 技术颜良",
+    "summary": "【摘要】package initsystemimport ( \"fmt\" \"os/exec\" \"strings\" \"k8s.io/kubernetes/cmd/kubeadm/app/util/initsystem\")type InitSystem interface { // ServiceEnable 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/cheyunhua/p/20974423",
+    "sourceName": "技术颜良",
+    "sourcePlatform": "cnblogs",
+    "author": "技术颜良",
+    "publishedAt": "2026-06-30T09:32:00Z",
+    "categories": [
+      "鍏朵粬",
+      "运维/云原生"
+    ],
+    "feedId": "cnblogs-cheyunhua",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "csdn:https://blog.csdn.net/huang9604/article/details/162460543",
+    "title": "带了五年团队，AI出来之后我开始慌了",
+    "summary": "我以为自己已经过了\"被AI替代\"的焦虑阶段——毕竟我又不写CRUD了，我管人、做决策、跟业务对齐，这些AI不会吧？",
+    "originalUrl": "https://blog.csdn.net/huang9604/article/details/162460543",
+    "sourceName": "huang9604 的 CSDN 博客",
+    "sourcePlatform": "csdn",
+    "author": "huang9604",
+    "publishedAt": "2026-06-30T09:25:28Z",
+    "categories": [
+      "AI"
+    ],
+    "feedId": "csdn-huang9604",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "csdn:https://blog.csdn.net/huang9604/article/details/162460529",
+    "title": "K8s背得滚瓜烂熟，面试还是挂了",
+    "summary": "云原生方向三年，K8s、Istio、Helm、ArgoCD，该会的都会。上个月面试一家公司，技术轮过得很顺，到最后一面，面试官问了我一个问题，我答不上来：“你做过的这些云原生工作，给业务带来了什么可量化的价值？我说：稳定性提升了，故障恢复时间缩短了。他说：能说具体数字吗？我哑了。我不知道。我只知道我把平台搭起来了，但那些系统到底给业务省了多少钱、降了多少风险，我没算过，没人问过我，我也没想过要算。没拿到Offer。",
+    "originalUrl": "https://blog.csdn.net/huang9604/article/details/162460529",
+    "sourceName": "huang9604 的 CSDN 博客",
+    "sourcePlatform": "csdn",
+    "author": "huang9604",
+    "publishedAt": "2026-06-30T09:24:57Z",
+    "categories": [
+      "AI",
+      "运维/云原生"
+    ],
+    "feedId": "csdn-huang9604",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/mangod/p/20971979",
+    "title": "DeepSeek涨价了？大白话聊聊峰谷定价 - 程序员烟斗",
+    "summary": "【摘要】最近收到一封 DeepSeek API 价格调整邮件。 邮件里提到，DeepSeek V4 正式版计划于 7 月中旬上线，正式版发布后会调整 API 定价策略，引入峰谷定价机制。 邮件核心内容如下： 从图里看，高峰时段是每天 9:00-12:00 和 14:00-18:00（北京时间）。高峰时段价格 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/mangod/p/20971979",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "程序员烟斗",
+    "publishedAt": "2026-06-30T09:04:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/insus/p/20956686",
+    "title": "安装与配置node.js - Insus.NET",
+    "summary": "【摘要】参考下面，npm（随 Node.js 一起提供，https://www.npmjs.com/）https://www.npmjs.com/package/npm npm - a JavaScript package manager npm comes bundled with node, & mos 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/insus/p/20956686",
+    "sourceName": "Insus.NET",
+    "sourcePlatform": "cnblogs",
+    "author": "Insus.NET",
+    "publishedAt": "2026-06-30T09:04:00Z",
+    "categories": [
+      "鍏朵粬",
+      "node_cache",
+      "node_global"
+    ],
+    "feedId": "cnblogs-insus",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/wjszxli/p/20971393",
+    "title": "React 如何实现跨平台 - 老王以为",
+    "summary": "【摘要】之前做过一个在线海报编辑器——用户在浏览器里拖拽元素、改文字、调颜色，最后导出 PNG。业务跑得不错，但老板有了新的想法。 \"我们要出微信小程序版本。\"他在周会上说。 我算了算工作量。海报编辑器的前端有将近两百个组件——画布、图层面板、属性面板、文字编辑器、图片裁剪器……这些组件全部是基于 Reac 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/wjszxli/p/20971393",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "老王以为",
+    "publishedAt": "2026-06-30T08:57:00Z",
+    "categories": [
+      "其他",
+      "前端"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lzhdim/p/20970613",
+    "title": "最受欢迎的 10 大免费 AI 工具 - lzhdim",
+    "summary": "【摘要】我根据有免费额度、全球使用热度、近期增长综合整理了下面这份榜单： Top10 Canva AI 设计工具 适合海报、PPT、短视频封面、社媒图文。Canva 的优势在于把 AI 写作、图片生成、智能排版和模板生态放进了普通人最常用的设计流程里，门槛低。 Top9 CapCut AI 视频剪辑工具 短 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lzhdim/p/20970613",
+    "sourceName": "lzhdim",
+    "sourcePlatform": "cnblogs",
+    "author": "lzhdim",
+    "publishedAt": "2026-06-30T08:46:00Z",
+    "categories": [
+      "鍏朵粬",
+      "AI"
+    ],
+    "feedId": "cnblogs-lzhdim",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/mq0036/p/20970417",
+    "title": "WebSocket 快速入门教程（附示例源码） - jack_Meng",
+    "summary": "【摘要】合集 - C#/.NET开发者宝典(21) 1.WebSocket 快速入门教程（附示例源码）06-30 2.ML.NET 快速入门与实践教程：开源机器学习框架03-023..NET 权限系统（RBAC）怎么设计？直接可复用03-094.SQL Server安装避坑：这8个奇葩报错你遇到过几个？03 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/mq0036/p/20970417",
+    "sourceName": "jack_Meng",
+    "sourcePlatform": "cnblogs",
+    "author": "jack_Meng",
+    "publishedAt": "2026-06-30T08:44:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-mq0036",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/ylxin/p/20970107",
+    "title": "AI Agent 全日制30天速成｜Day8 完整学习笔记 - 云淡风轻YangG",
+    "summary": "【摘要】AI Agent 全日制30天速成｜Day8 完整学习笔记 文档说明 今日核心：多智能体分治架构，解决单一体Agent流程臃肿、推理不稳定问题 代码全部从零全新编写，不依赖Day1~Day7任何历史代码，拆分为6个独立分层文件，模块化可单独调试练习 完整复刻全套底层能力：异步LLM、SSE流式、RA 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/ylxin/p/20970107",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "云淡风轻YangG",
+    "publishedAt": "2026-06-30T08:42:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/uniqueDong/p/20968370",
+    "title": "给 Claude Code 布置任务，它为什么总是理解错——我找到原因了 - 码哥字节",
+    "summary": "【摘要】用了 Coding Agent 一段时间，你大概遇到过这种情况： 任务交下去，Agent 跑了七八分钟，打开一看——方向错了。它写了一套认为「对」的实现，但就是和你想要的差了两三个关键决策。你开始改需求、补说明、再跑一遍，又是十分钟出去了。 这个循环我经历过很多次，直到我意识到：问题不在 Agent 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/uniqueDong/p/20968370",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "码哥字节",
+    "publishedAt": "2026-06-30T08:15:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/Qiniu-developer/p/20961533",
+    "title": "论文解读：DeepSeek DSpark 在真实高并发推理服务中，如何保证 Token 生成又好又快？ - 小七-七牛开发者",
+    "summary": "【摘要】刚刚过去的周末，DeepSeek 发布了一篇关于推理加速的新论文：《DSpark: Confidence-Scheduled Speculative Decoding with Semi-Autoregressive Generation》，内容聚焦在大模型推理服务中的一个具体问题：在真实高并发场景 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/Qiniu-developer/p/20961533",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "小七-七牛开发者",
+    "publishedAt": "2026-06-30T06:21:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/xyz/p/20959918",
+    "title": "基于GA-BP神经网络的防空导弹实时目标分配方法 - Angry_Panda",
+    "summary": "【摘要】![图片](https://img2024.cnblogs.com/blog/1088037/202606/1088037-20260630135020566-1399887911.png) ![图片](https://img2024.cnblogs.com/blog/1088037/202606/1088037-20260630134115127-213164650.png) ![图片](htt 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/xyz/p/20959918",
+    "sourceName": "Angry_Panda",
+    "sourcePlatform": "cnblogs",
+    "author": "Angry_Panda",
+    "publishedAt": "2026-06-30T05:51:00Z",
+    "categories": [
+      "鍏朵粬",
+      "杂谈"
+    ],
+    "feedId": "cnblogs-xyz",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/luojin765/p/20959578",
+    "title": "Winform 能用 Native AOT 吗？—TDS 项目实战尝试 - LdotJdot",
+    "summary": "【摘要】winform 能用 Native AOT 吗？——TDS 项目的实战尝试 采用 .NET Native AOT 编译出来的 exe 启动快、体积小、不依赖运行时，做小工具非常合适，关键代码也没那么容易反编译泄漏开。但是传统 winform 重度依赖反射和动态代码生成，跟 AOT 的静态编译理念天然 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/luojin765/p/20959578",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "LdotJdot",
+    "publishedAt": "2026-06-30T05:41:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/Can-daydayup/p/20958904",
+    "title": "一套基于 .NET 10 + Vue 3 构建、高颜值、前后端分离的企业级多租户中后台管理系统 - 追逐时光者",
+    "summary": "【摘要】前言 做后台管理系统，总逃不过重复造轮子：每次新项目都要重搭登录、权限等基础功能，权限控制补丁越打越多，多租户实现更是牵一发而动全身。今天大姚给大家分享一套基于 .NET 10 + Vue 3 构建、开源（MIT License）、高颜值、前后端分离的企业级多租户中后台管理系统：XiHan.Basi 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/Can-daydayup/p/20958904",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "追逐时光者",
+    "publishedAt": "2026-06-30T05:05:00Z",
+    "categories": [
+      "其他",
+      "前端",
+      "后端"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/liujiaxin2018/p/20957226",
+    "title": "Linux中sed命令的-N选项 - 小鲨鱼2018",
+    "summary": "【摘要】N；把下一行读入模式空间： 001、 [root@PC1 test2]# ls a.txt [root@PC1 test2]# cat a.txt 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 [root@PC1 test2] 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/liujiaxin2018/p/20957226",
+    "sourceName": "小鲨鱼2018",
+    "sourcePlatform": "cnblogs",
+    "author": "小鲨鱼2018",
+    "publishedAt": "2026-06-30T03:56:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-liujiaxin2018",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/Carey-ccl/p/20915571",
+    "title": "15、BufferedReader的源码分析和使用方法详细分析（windows操作系统，JDK8） - Carey_ccl",
+    "summary": "【摘要】一、BufferedReader的源码——带有缓冲区的字符流装饰器类 在计算机中，文本是最普遍、最基础的数据交换格式，从日志文件到 JSON API，从数据库查询结果到机器学习训练集，文本无处不在。然而，原始的字符输入流（如 FileReader 或 InputStreamReader）每次读取操作 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/Carey-ccl/p/20915571",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "Carey_ccl",
+    "publishedAt": "2026-06-30T03:48:00Z",
+    "categories": [
+      "其他",
+      "数据库"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/ulricqin/p/20954077",
+    "title": "如何使用 AI 解答开源项目的问题，其实只需要一句话 - IT运维监控",
+    "summary": "【摘要】昨天社区小伙伴问了一个问题： 说：在 Categraf 中采集 es-exporter 的数据，明明配置了 insecure_skip_verify = true 为什么还是报错：x509: cannot validate certificate for 10.0.x because it does 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/ulricqin/p/20954077",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "IT运维监控",
+    "publishedAt": "2026-06-30T03:05:00Z",
+    "categories": [
+      "其他",
+      "AI",
+      "运维/云原生"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/ai-old-six/p/20952118",
+    "title": "SkillOpt 架构拆解：把 Skill 文本当参数，用执行轨迹训练 Agent - AI小老六",
+    "summary": "【摘要】SkillOpt 把 Skill 维护变成可验证训练：采样、反思、受限编辑、门禁筛选。 原文链接：AI 小老六 很多 Agent 项目的瓶颈，最后都会落到一份文本上。 这份文本可能叫 SKILL.md，也可能是工具调用说明、流程手册、输出规范、故障补救规则。它不参与模型训练，却会持续改变 Agent 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/ai-old-six/p/20952118",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "AI小老六",
+    "publishedAt": "2026-06-30T02:40:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/jinjiangongzuoshi/p/20950125",
+    "title": "测试工程师的AI 技能库：推荐5个让你效率翻倍的Skills - 狂师",
+    "summary": "【摘要】在 AI 全面赋能测试的今天，测试工程师的竞争力，早已不再是\"会用多少工具\"，而是\"能否合理运用AI赋能提效到自己的工作中\"。 作为测试工程师，日常工作中最耗时的不是分析问题、定位根因，而是那些重复的手动操作——写测试脚本、搭测试环境、设计测试用例、批量执行测试……这些机械工作占用了大量时间，让我们 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/jinjiangongzuoshi/p/20950125",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "狂师",
+    "publishedAt": "2026-06-30T01:58:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/javastack/p/20950000",
+    "title": "小厂面试官问我：“公司内部文档不多，直接用小模型代替 RAG 可行吗？”，我笑了说：“RAG 解决的不是文档多不多的问题。。” - Java技术栈",
+    "summary": "【摘要】大家好，我是R哥。 有个兄弟前段时间面试，面试官问了他一个很有意思的问题： 公司内部文档并不多，可能就几十份文档、几百页内容，为什么还要上 RAG？直接训练一个小模型不行吗？ 很多人听到这个问题，第一反应是肯定可以。毕竟文档量不大，把这些资料整理出来，微调一个小模型，然后直接提供问答能力，看起来似乎 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/javastack/p/20950000",
+    "sourceName": "Java技术栈",
+    "sourcePlatform": "cnblogs",
+    "author": "Java技术栈",
+    "publishedAt": "2026-06-30T01:56:00Z",
+    "categories": [
+      "鍏朵粬",
+      "rag",
+      "Java"
+    ],
+    "feedId": "cnblogs-javastack",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/alchemystar/p/20941040",
+    "title": "日常问题排查-同应用同流量，为什么CPU.busy差了 5 倍？ - 无毁的湖光-Al",
+    "summary": "【摘要】日常问题排查-同应用同流量，为什么CPU.busy差了 5 倍？ 1.前言 日常问题排查系列都是一些简单Bug的排查。在分享的同时也积累素材，方便我的AI分身蒸馏^_^。 2.问题现象 在容灾演练的时候，为了验证当前单元能够承载所有的线上流量，我们会将另一个互备单元的所有流量调拨过来过一个高峰期来验 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/alchemystar/p/20941040",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "无毁的湖光-Al",
+    "publishedAt": "2026-06-30T01:20:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/qqzsq/p/20945243",
+    "title": "自学Python第8天：函数——我终于能把重复的代码“打包”起来了 - qqzsq",
+    "summary": "【摘要】自学Python第8天：函数——我终于能把重复的代码“打包”起来了 新手向 | 2026-06-30 如果你还记得前面几篇的内容，我写过体温检测程序、写过猜数字游戏、写过安检程序。这些代码每一段都有几十行，而且每写一个新功能，就得重新写一遍类似的逻辑。 比如体温检测，从第一天到第七天，我至少写了三四 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/qqzsq/p/20945243",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "qqzsq",
+    "publishedAt": "2026-06-30T01:17:00Z",
+    "categories": [
+      "其他",
+      "Python"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/taoshihan/p/20946056",
+    "title": "拼多多客服如何实现24小时全自动值守、大幅降本增效？这款自动化插件帮你轻松破局！ - 唯一客服系统开发笔记",
+    "summary": "【摘要】做拼多多店铺的商家和客服，几乎都逃不开同一个困境：咨询高峰消息刷屏、重复问答占据大半工作时间、稍不留意就漏回消息、深夜咨询无人应答导致流失订单。人工客服精力有限，无法做到24小时秒回、全天候值守，而平台自带客服工具功能单一、智能回复生硬，很难适配多样化的用户咨询场景。 其实无需高价搭建专业客服系统， 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/taoshihan/p/20946056",
+    "sourceName": "唯一客服系统开发笔记",
+    "sourcePlatform": "cnblogs",
+    "author": "唯一客服系统开发笔记",
+    "publishedAt": "2026-06-30T01:11:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-taoshihan",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/kingster/p/20944044",
+    "title": "绩隐金日报 · 第47期 - 绩隐金",
+    "summary": "【摘要】 绩隐金日报 · 第47期 专注数据库前沿，为DBA提供实战视角 2026年6月30日 ｜ 精选5条全球重磅新闻 01｜OceanBase发布“湖库一体”AI数据库：一套引擎替代交易库+数仓+向量库+数据湖 6月29日，OceanBase正式发布面向AI时代的湖库一体AI数据库，提出以“湖库一体 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/kingster/p/20944044",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "绩隐金",
+    "publishedAt": "2026-06-30T00:45:00Z",
+    "categories": [
+      "其他",
+      "数据库",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lindexi/p/20943982",
+    "title": "AI 时代的设备所见即用 - lindexi",
+    "summary": "【摘要】本文记录的是我的思考内容，本篇是我从 2023 年思考到现在的内容。我感觉我大概对整个方向清晰了，于是记录了本文，期望能给大家带来一些灵感 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lindexi/p/20943982",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "lindexi",
+    "publishedAt": "2026-06-30T00:36:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/shenchuanchao/p/20932272/websocket-quick-start-tutorial-source-code",
+    "title": "WebSocket 快速入门教程（附示例源码） - 码农刚子",
+    "summary": "【摘要】本文详解 WebSocket 全双工通信原理、前端 API 及 C 服务端三种实现（ASP.NET Core/Fleck/HttpListener），涵盖心跳重连、安全扩展等工程实践，附完整源码助你快速上手实时应用开发。 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/shenchuanchao/p/20932272/websocket-quick-start-tutorial-source-code",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "码农刚子",
+    "publishedAt": "2026-06-30T00:04:00Z",
+    "categories": [
+      "其他",
+      "前端"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/rongfengliang/p/20680430",
+    "title": "agno 多agent 框架集成能力 - 荣锋亮",
+    "summary": "【摘要】agno 的多agent 框架集成是一个很有意思的能力，可以直接复用现有agent 框架去扩展现有能力 参考玩法 from agno.agent import Agent from agno.agents.claude import ClaudeAgent from agno.db.sqlite i 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/rongfengliang/p/20680430",
+    "sourceName": "荣锋亮",
+    "sourcePlatform": "cnblogs",
+    "author": "荣锋亮",
+    "publishedAt": "2026-06-30T00:00:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-rongfengliang",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/shanyou/p/20943627",
+    "title": "当 AI 不再只是\"说话\"：OpenClaw.NET 率先原生支持 MCP Apps - 张善友",
+    "summary": "【摘要】MCP Apps 的出现标志着 MCP 协议从\"工具调用\"向\"应用托管\"的进化。而 OpenClaw.NET 在 PR #168 中的实现，不仅是一次功能更新，更是 .NET 生态在 AI 应用架构领域的一次重要布局。 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/shanyou/p/20943627",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "张善友",
+    "publishedAt": "2026-06-29T23:29:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/doiito/p/20943549",
+    "title": "【Agent Harness】Gliding Horse 核心设计理念，不跟风开发自己的AI Agent - doiito",
+    "summary": "【摘要】核心设计理念：5W2H、JSON-LD 与通用知识图谱 摘要：本文深入解析 Gliding Horse Agent OS 的核心设计理念，阐述如何通过 5W2H 任务本体与 PDCA 执行模型的结合，构建可执行、可审计、可进化的通用工作框架。文章详细介绍了 JSON-LD 简化用法、Harness 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/doiito/p/20943549",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "doiito",
+    "publishedAt": "2026-06-29T23:14:00Z",
+    "categories": [
+      "其他",
+      "AI"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/yinzhengjie/p/20942368",
+    "title": "VictoriaMetrics集群部署实战 - 尹正杰",
+    "summary": "【摘要】作者：尹正杰 版权声明：原创作品，谢绝转载！否则将追究法律责任。 目录一.VictoriaMetrics概述1.VictoriaMetrics概述2.软件包选择二.VictoriaMetrics环境部署1.下载二进制的软件包2.将vm程序添加到系统path环境变量3.创建专用运行用户并配置授权目录4 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/yinzhengjie/p/20942368",
+    "sourceName": "尹正杰",
+    "sourcePlatform": "cnblogs",
+    "author": "尹正杰",
+    "publishedAt": "2026-06-29T18:34:00Z",
+    "categories": [
+      "鍏朵粬",
+      "Prometheus"
+    ],
+    "feedId": "cnblogs-yinzhengjie",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lzhdim/p/20941571",
+    "title": "六种AI生意，从月入一万到月入十万 - lzhdim",
+    "summary": "【摘要】你要问我现在做什么最赚钱？ 坦白说，AI这波浪潮，真不是让你去造大模型。 那是巨头们的游戏，普通人就去别凑那个热闹了。 真正的机会在哪？ 用AI干活，帮人省钱，帮人赚钱。 我自己就是这么过来的。 8年前从公司出来，啥都不会，就会写点代码。 现在呢？ 像这样的自动化工作流，我已经搞了300多个了。 不 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lzhdim/p/20941571",
+    "sourceName": "lzhdim",
+    "sourcePlatform": "cnblogs",
+    "author": "lzhdim",
+    "publishedAt": "2026-06-29T16:01:00Z",
+    "categories": [
+      "鍏朵粬",
+      "AI"
+    ],
+    "feedId": "cnblogs-lzhdim",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lzhdim/p/20941516",
+    "title": "5个国产大模型实测对比2026：DeepSeek、Kimi、豆包、通义、智谱哪个好用 - lzhdim",
+    "summary": "【摘要】2026年了，国产大模型的广告满天飞，每家都说自己\"全球领先\"。作为一个每天对着屏幕和AI说话的实验员，我已经对这些宣传词产生了生理性免疫。 这篇文章不讲融资、不讲估值、不讲\"对标GPT-4\"，就一件事：6道题实测5家，DeepSeek、Kimi、豆包、通义千问、智谱清言，看谁真的能用，谁只是好看。 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lzhdim/p/20941516",
+    "sourceName": "lzhdim",
+    "sourcePlatform": "cnblogs",
+    "author": "lzhdim",
+    "publishedAt": "2026-06-29T15:55:00Z",
+    "categories": [
+      "鍏朵粬",
+      "AI"
+    ],
+    "feedId": "cnblogs-lzhdim",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lzhdim/p/20941463",
+    "title": "豆包、元宝、千问、Kimi、DeepSeek，这么多AI软件，到底该用哪个？ - lzhdim",
+    "summary": "【摘要】很多读者常问：“豆包、元宝、千问、Kimi、DeepSeek这么多AI，我该用哪个？” 这其实是一个误区——以为应该只用“最强最顺手的那个”。 正确的思路是：什么场景，丢给什么AI。 因为它们各有所长，这才是效率爆炸的关键。下面，我们来具体分析它们各自擅长什么，我们在什么情况下用哪个AI会更有效。 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lzhdim/p/20941463",
+    "sourceName": "lzhdim",
+    "sourcePlatform": "cnblogs",
+    "author": "lzhdim",
+    "publishedAt": "2026-06-29T15:48:00Z",
+    "categories": [
+      "鍏朵粬",
+      "AI"
+    ],
+    "feedId": "cnblogs-lzhdim",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/yinzhengjie/p/20941460",
+    "title": "Squid正向代理实战 - 尹正杰",
+    "summary": "【摘要】作者：尹正杰 版权声明：原创作品，谢绝转载！否则将追究法律责任。 目录一.环境准备1.背景说明2.实验环境准备二.Squid基于IP地址放行案例1.安装Squid2.配置Squid3.测试验证三.基于源IP和目标域名限制1.编写Squid规则2.测试验证四.限制基于源IP和多个目标IP的限制1.测试 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/yinzhengjie/p/20941460",
+    "sourceName": "尹正杰",
+    "sourcePlatform": "cnblogs",
+    "author": "尹正杰",
+    "publishedAt": "2026-06-29T15:47:00Z",
+    "categories": [
+      "鍏朵粬",
+      "Squid"
+    ],
+    "feedId": "cnblogs-yinzhengjie",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lzhdim/p/20941431",
+    "title": "微软免费开源了一个 Linux 操作系统，没错！是微软出品 - lzhdim",
+    "summary": "【摘要】2026 年 6 月，Microsoft 在自己的 Build 2026 开发者大会上，正式把一款 Linux 发行版推向公众——免费、开源、免费下载、直接可用。 你听到\"微软出 Linux\"，第一反应肯定是\"微软不是一直在骂 Linux 吗\"？ 没错。但这次它真做了——Azure Linux 4. 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lzhdim/p/20941431",
+    "sourceName": "lzhdim",
+    "sourcePlatform": "cnblogs",
+    "author": "lzhdim",
+    "publishedAt": "2026-06-29T15:40:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-lzhdim",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/XY-Heruo/p/20941271",
+    "title": "Pydantic校验配置文件 - 花酒锄作田",
+    "summary": "【摘要】前言 最近很多新项目使用环境变量作配置，尤其是部署在k8s上的项目，把 configmap 或者 secret 直接塞到 pod 环境变量里面，再引入pydantic-settings做参数校验，用起来特别方便。但pydantic-settings是环境变量优先的，而对于大一点的项目，配置项可能上百 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/XY-Heruo/p/20941271",
+    "sourceName": "博客园首页精选",
+    "sourcePlatform": "cnblogs",
+    "author": "花酒锄作田",
+    "publishedAt": "2026-06-29T15:15:00Z",
+    "categories": [
+      "其他"
+    ],
+    "feedId": "cnblogs-sitehome",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/liujiaxin2018/p/20940224",
+    "title": "动物模型001 - 小鲨鱼2018",
+    "summary": "【摘要】y = Xb + Za + e y: 表型向量； b: 固定效应向量(群体均值μ，性别，场，年，季节等) X:固定效应向量的关联矩阵； a:随机效应向量，个体的加性遗传效应向量(相对于群体平均遗传水平的偏离，也就是加性育种值） Z：随机效应向量的关联矩阵 e: 随机残差效应向量。 其中Xb表示该个体 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/liujiaxin2018/p/20940224",
+    "sourceName": "小鲨鱼2018",
+    "sourcePlatform": "cnblogs",
+    "author": "小鲨鱼2018",
+    "publishedAt": "2026-06-29T13:25:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-liujiaxin2018",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
     "id": "cnblogs:https://www.cnblogs.com/chenying99/p/20935849",
     "title": "Flow Matching 训练的输入分布问题：从 VAE Latent 统计性质到归一化工程实践——以 VoxFlash-TTS 为例 - 刺猬的温驯",
     "summary": "【摘要】摘要：本文从 OT-CFM 插值路径的统计性质出发，系统推导 Flow Matching 模型输入分布与输出速度场分布的均值和方差，分析 VAE KL 散度权重对 latent 点云分散程度的影响，并借鉴图像生成领域的 SNR 失配理论，从理论角度论证逐通道归一化对 Flow Matching 训练 阅读全文",
@@ -19738,6 +20338,21 @@
     "fetchedAt": "2026-06-19T13:24:49.385640Z"
   },
   {
+    "id": "cnblogs:https://www.cnblogs.com/jijm123/p/18723419",
+    "title": "清华大学出版社配套资料即密码获取方式 - 广阔的编程世界",
+    "summary": "【摘要】清华大学出版社官方网址：http://www.tup.tsinghua.edu.cn/index.html （输入ISBN书号进行查找） 清华大学出版社 官网的电子课件的密码规则如下 **密码规则： 1、先后六位两两相加试一下（例：9787302224464，后六位两两相加，2+2=4 4+4=8 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/jijm123/p/18723419",
+    "sourceName": "广阔的编程世界",
+    "sourcePlatform": "cnblogs",
+    "author": "广阔的编程世界",
+    "publishedAt": "2025-02-19T02:00:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-jijm123",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
     "id": "cnblogs:https://www.cnblogs.com/telwanggs/p/18721247",
     "title": "【转】将postgresql表名和字段名统一转换为小写 - 疯子110",
     "summary": "【摘要】文章来源：https://blog.csdn.net/yiqiu_0130/article/details/143331804 在使用postgresql创建表、函数、字段的命名时，使用小写在开发过程中会减少不必要的麻烦，所以在命名时，使用小写。如果是迁移的表信息时，则可以使用执行脚本的方法，将表名 阅读全文",
@@ -25620,6 +26235,54 @@
     ],
     "feedId": "cnblogs-lxwphp",
     "fetchedAt": "2026-06-29T11:15:51.300986Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lxwphp/p/16811965.html",
+    "title": "golang 语言学习笔记 - 码农编程进阶笔记",
+    "summary": "【摘要】1.-bash: go: 未找到命令问题 方法1：（亲测可行） echo $PATH //查看go 命令路径是否存在 将go安装路径添加到/etc/profile sudo vi /etc/profile 最后关键一步不能丢：加载配置文件，使之生效 s... 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lxwphp/p/16811965.html",
+    "sourceName": "码农编程进阶笔记",
+    "sourcePlatform": "cnblogs",
+    "author": "码农编程进阶笔记",
+    "publishedAt": "2022-10-20T15:42:00Z",
+    "categories": [
+      "鍏朵粬",
+      "Go"
+    ],
+    "feedId": "cnblogs-lxwphp",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lxwphp/p/16811966.html",
+    "title": "nohup.out 文件的前世今生 - 码农编程进阶笔记",
+    "summary": "【摘要】一、nohup.out是什么文件，如何产生的 用途：LINUX命令用法，不挂断地运行命令。 语法：nohup Command [ Arg ... ] [ & ] 描述：nohup 命令运行由 Command 参数和任何相关的 Arg 参数指定的命令，忽略所... 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lxwphp/p/16811966.html",
+    "sourceName": "码农编程进阶笔记",
+    "sourcePlatform": "cnblogs",
+    "author": "码农编程进阶笔记",
+    "publishedAt": "2022-10-20T15:42:00Z",
+    "categories": [
+      "鍏朵粬"
+    ],
+    "feedId": "cnblogs-lxwphp",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
+  },
+  {
+    "id": "cnblogs:https://www.cnblogs.com/lxwphp/p/16811967.html",
+    "title": "字节跳动Go 语言面试会问哪些问题? - 码农编程进阶笔记",
+    "summary": "【摘要】1、Mutex 几种状态 mutexLocked — 表示互斥锁的锁定状态;mutexWoken — 表示从正常模式被从唤醒;mutexStarving — 当前的互斥锁进入饥饿状态;waitersCount — 当前互斥锁上等待的 Goroutine ... 阅读全文",
+    "originalUrl": "https://www.cnblogs.com/lxwphp/p/16811967.html",
+    "sourceName": "码农编程进阶笔记",
+    "sourcePlatform": "cnblogs",
+    "author": "码农编程进阶笔记",
+    "publishedAt": "2022-10-20T15:42:00Z",
+    "categories": [
+      "鍏朵粬",
+      "Go",
+      "AI"
+    ],
+    "feedId": "cnblogs-lxwphp",
+    "fetchedAt": "2026-06-30T09:49:37.831621Z"
   },
   {
     "id": "cnblogs:https://www.cnblogs.com/Free-Thinker/p/16806503.html",

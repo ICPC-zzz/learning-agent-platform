@@ -2,6 +2,8 @@
 
 import { getPrismaClient, PrismaEmailOtpRepository } from "@learning-agent-platform/db";
 
+import { getEmailRuntimeConfig } from "../../../lib/email/email-runtime-config";
+import { buildOtpEmail, sendResendEmail } from "../../../lib/email/resend-provider";
 import { generateOtpCode, hashOtpCode } from "../../../lib/email-otp-code";
 import { recordAuthAuditEvent } from "../../../lib/session/web-auth-session";
 
@@ -45,13 +47,13 @@ export async function sendEmailOtpAction(
     return blocked(`验证码已发送，请 ${rateLimit.retryAfterSeconds} 秒后再试。`, rateLimit.retryAfterSeconds);
   }
 
-  const resendConfig = getResendConfig();
+  const emailConfig = getEmailRuntimeConfig();
   const canUseDevConsole = canUseDevOtpConsole();
-  if (!resendConfig && !canUseDevConsole) {
+  if (!emailConfig.realSendAllowed && !canUseDevConsole) {
     await recordAuthAuditEvent({
       eventType: "auth_otp_requested",
       result: "blocked",
-      errorCode: "email_provider_not_configured",
+      errorCode: toSafeAuditErrorCode("email_provider_not_configured", emailConfig.blockedReasons.join("_")),
     });
     return blocked("邮件发送服务未配置，请稍后再试。", 0);
   }
@@ -82,19 +84,27 @@ export async function sendEmailOtpAction(
     return blocked("验证码服务暂时不可用，请稍后再试。", 0);
   }
 
-  if (resendConfig) {
-    const sent = await sendViaResend({
-      apiKey: resendConfig.apiKey,
-      from: resendConfig.from,
-      to: email,
+  if (emailConfig.realSendAllowed) {
+    const emailBody = buildOtpEmail({
       code,
+      expiryMinutes: OTP_EXPIRY_MINUTES,
     });
-    if (!sent) {
+    const sent = await sendResendEmail({
+      config: emailConfig,
+      to: email,
+      subject: emailBody.subject,
+      html: emailBody.html,
+      text: emailBody.text,
+    });
+    if (!sent.ok) {
       await consumeOtpAfterProviderFailure(otpRecordId);
       await recordAuthAuditEvent({
         eventType: "auth_otp_requested",
         result: "failure",
-        errorCode: "email_provider_send_failed",
+        errorCode: toSafeAuditErrorCode(
+          "email_provider_send_failed",
+          [sent.status, sent.errorCode, sent.requestId].filter(Boolean).join("_"),
+        ),
       });
       return blocked("邮件发送失败，请稍后再试。", 0);
     }
@@ -139,7 +149,7 @@ function normalizeEmail(email: string): string {
 }
 
 function isEmailAuthEnabled(): boolean {
-  if (getResendConfig()) {
+  if (getEmailRuntimeConfig().realSendAllowed) {
     return true;
   }
   if (process.env.NODE_ENV === "production") {
@@ -155,23 +165,6 @@ function isEmailAuthEnabled(): boolean {
 
 function canUseDevOtpConsole(): boolean {
   return process.env.NODE_ENV !== "production" && process.env.LAP_AUTH_DEV_MODE === "1";
-}
-
-function getResendConfig(): { apiKey: string; from: string } | null {
-  const apiKey = firstConfiguredEnv("LAP_EMAIL_API_KEY", "RESEND_API_KEY");
-  const from = firstConfiguredEnv("LAP_EMAIL_FROM", "RESEND_FROM_EMAIL", "EMAIL_FROM");
-  if (!apiKey || !from) return null;
-  return { apiKey, from };
-}
-
-function firstConfiguredEnv(...names: string[]): string | null {
-  for (const name of names) {
-    const value = process.env[name];
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-  return null;
 }
 
 function checkRateLimit(email: string, sourceKey: string): { allowed: boolean; retryAfterSeconds: number } {
@@ -196,37 +189,6 @@ function recordSendTime(email: string, sourceKey: string): void {
   lastSendTimeBySource.set(sourceKey, Date.now());
 }
 
-async function sendViaResend(input: {
-  apiKey: string;
-  from: string;
-  to: string;
-  code: string;
-}): Promise<boolean> {
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${input.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: input.from,
-        to: input.to,
-        subject: "Learning Agent Platform 邮箱验证码",
-        html: `<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-          <h2>邮箱验证码</h2>
-          <p>您的验证码是：</p>
-          <div style="font-size: 32px; font-weight: 700; letter-spacing: 6px;">${input.code}</div>
-          <p>此验证码 ${OTP_EXPIRY_MINUTES} 分钟内有效，请勿分享给他人。</p>
-        </div>`,
-      }),
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
 async function consumeOtpAfterProviderFailure(otpRecordId: string | null): Promise<void> {
   if (!otpRecordId) return;
   try {
@@ -234,6 +196,11 @@ async function consumeOtpAfterProviderFailure(otpRecordId: string | null): Promi
   } catch {
     // Best effort: provider failure must not leak details or block retry UX.
   }
+}
+
+function toSafeAuditErrorCode(prefix: string, detail: string): string {
+  const safeDetail = detail.trim().replace(/[^A-Za-z0-9_.:-]/g, "_").slice(0, 80);
+  return safeDetail.length > 0 ? `${prefix}:${safeDetail}` : prefix;
 }
 
 function blocked(message: string, retryAfterSeconds: number): EmailOtpSendResult {

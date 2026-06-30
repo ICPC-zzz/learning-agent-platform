@@ -1,550 +1,376 @@
 {
-  "generatedAt": "2026-06-28T16:11:01.501Z",
-  "date": "2026-06-28",
-  "count": 89,
+  "generatedAt": "2026-06-30T09:49:22.179Z",
+  "date": "2026-06-30",
+  "count": 76,
   "hotspots": [
     {
-      "id": "cmqxyvld50000g1nce3krixub",
-      "title": "Previewing GPT‑5.6 Sol: a next-generation model",
+      "id": "cmr0gt1ft000dg1icy7hlpqta",
+      "title": "Qwen 3.6 27B is the sweet spot for local development",
       "summary": null,
-      "originalUrl": "https://openai.com/index/previewing-gpt-5-6-sol/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48689028",
-      "author": "minimaxir",
+      "originalUrl": "https://quesma.com/blog/qwen-36-is-awesome/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48721903",
+      "author": "stared",
       "source": "hackernews",
-      "publishedAt": "2026-06-26T17:06:55.000Z",
-      "score": 1115,
-      "commentCount": 733,
+      "publishedAt": "2026-06-29T17:05:16.000Z",
+      "score": 917,
+      "commentCount": 613,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.923Z"
       }
     },
     {
-      "id": "cmqxqstz50000g19k0s9bwyjg",
-      "title": "Previewing GPT‑5.6 Sol: a next-generation model",
+      "id": "cmr0gt1g2000eg1icq5lhgdmq",
+      "title": "Pollen tried to remove my article and Google is assisting with it",
       "summary": null,
-      "originalUrl": "https://openai.com/index/previewing-gpt-5-6-sol/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48689028",
-      "author": "minimaxir",
+      "originalUrl": "https://blog.pragmaticengineer.com/pollen-tried-to-remove-my-article-about-callum-negus-fancey-and-google-is-assisting-to-it/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48716902",
+      "author": "taubek",
       "source": "hackernews",
-      "publishedAt": "2026-06-26T17:06:55.000Z",
-      "score": 1112,
-      "commentCount": 728,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T12:05:49.879Z"
-      }
-    },
-    {
-      "id": "cmqxyvlda0001g1ncpvr47abx",
-      "title": "Anonymous GitHub account mass-dropping undisclosed 0-days",
-      "summary": null,
-      "originalUrl": "https://github.com/bikini/exploitarium",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48698617",
-      "author": "binyu",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T14:31:00.000Z",
-      "score": 894,
-      "commentCount": 350,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlde0002g1ncxpli75pt",
-      "title": "DSpark: Speculative decoding accelerates LLM inference [pdf]",
-      "summary": null,
-      "originalUrl": "https://github.com/deepseek-ai/DeepSpec/blob/main/DSpark_paper.pdf",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48696585",
-      "author": "aurenvale",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T09:18:52.000Z",
-      "score": 775,
-      "commentCount": 337,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldf0003g1ncku12ahvp",
-      "title": "OpenRA",
-      "summary": null,
-      "originalUrl": "https://www.openra.net/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48697560",
-      "author": "tosh",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T12:10:27.000Z",
-      "score": 764,
-      "commentCount": 143,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldh0004g1ncbdvowlhm",
-      "title": "Zuckerberg's war on whistleblowers",
-      "summary": null,
-      "originalUrl": "https://pluralistic.net/2026/06/27/zuckerstreisand-2/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48698684",
-      "author": "HotGarbage",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T14:38:05.000Z",
-      "score": 727,
-      "commentCount": 273,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldj0005g1nctl2e2vnx",
-      "title": "Fintech Engineering Handbook",
-      "summary": null,
-      "originalUrl": "https://w.pitula.me/fintech-engineering-handbook/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48696982",
-      "author": "signa11",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T10:28:53.000Z",
-      "score": 606,
-      "commentCount": 197,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldl0006g1ncfdf81c5z",
-      "title": "The case for physical media ownership",
-      "summary": null,
-      "originalUrl": "https://dervis.de/physical/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48697335",
-      "author": "cemdervis",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T11:32:10.000Z",
-      "score": 468,
-      "commentCount": 332,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldo0007g1nc6x7el5ew",
-      "title": "Why does kinetic energy increase quadratically, not linearly, with speed? (2011)",
-      "summary": null,
-      "originalUrl": "https://physics.stackexchange.com/questions/535/why-does-kinetic-energy-increase-quadratically-not-linearly-with-speed",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48692946",
-      "author": "ProxyTracer",
-      "source": "hackernews",
-      "publishedAt": "2026-06-26T22:43:29.000Z",
-      "score": 366,
-      "commentCount": 199,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldr0008g1nchoy8l9qk",
-      "title": "Marfa Public Radio Puts You to Sleep",
-      "summary": null,
-      "originalUrl": "https://www.marfapublicradio.org/podcast/marfa-public-radio-puts-you-to-sleep",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48703759",
-      "author": "reaperducer",
-      "source": "hackernews",
-      "publishedAt": "2026-06-28T02:23:08.000Z",
-      "score": 338,
-      "commentCount": 98,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlds0009g1ncj43g48fg",
-      "title": "The best response to AI slop and online noise is from Robin Williams",
-      "summary": null,
-      "originalUrl": "https://jayacunzo.com/blog/your-move-chief",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48703452",
-      "author": "herbertl",
-      "source": "hackernews",
-      "publishedAt": "2026-06-28T01:28:10.000Z",
-      "score": 329,
-      "commentCount": 182,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldu000ag1ncxvk7vm61",
-      "title": "IP Crawl: Living atlas of open webcams discovered on the public internet",
-      "summary": null,
-      "originalUrl": "https://ipcrawl.com/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48700834",
-      "author": "arm32",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T19:09:49.000Z",
-      "score": 318,
-      "commentCount": 157,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvldw000bg1ncr4jy4eh9",
-      "title": "Turn your site into a place people can bump into each other",
-      "summary": null,
-      "originalUrl": "https://cauenapier.com/blog/townsquare_release/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48699928",
-      "author": "eustoria",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T17:11:20.000Z",
-      "score": 282,
+      "publishedAt": "2026-06-29T09:28:08.000Z",
+      "score": 887,
       "commentCount": 126,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvldy000cg1ncn164agxq",
-      "title": "Streaming services' obnoxiously loud ads become illegal on July 1 in California",
+      "id": "cmr0gt1g6000fg1ict6lfr8z5",
+      "title": "5k menus from the New York Public Library’s Buttolph Collection (1880-1920)",
       "summary": null,
-      "originalUrl": "https://arstechnica.com/gadgets/2026/06/streaming-services-obnoxiously-loud-ads-become-illegal-on-july-1-in-california/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48697768",
-      "author": "speckx",
+      "originalUrl": "https://pudding.cool/2026/06/menu-story/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48707763",
+      "author": "xbryanx",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T12:43:16.000Z",
-      "score": 275,
-      "commentCount": 90,
+      "publishedAt": "2026-06-28T14:44:56.000Z",
+      "score": 409,
+      "commentCount": 107,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvle5000eg1nc47105r4q",
-      "title": "Asian AI startups launch Mythos-like models",
+      "id": "cmr0gt1g9000gg1ic2ehyg9js",
+      "title": "Instagram is incorporating users' photos in ads for Meta Glasses",
       "summary": null,
-      "originalUrl": "https://techcrunch.com/2026/06/27/asian-ai-startups-launch-mythos-like-models-as-anthropics-export-ban-drags-on/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48697958",
-      "author": "bogdiyan",
+      "originalUrl": "https://twitter.com/i/status/2071277885646868536",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48719027",
+      "author": "notRobot",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T13:10:21.000Z",
-      "score": 258,
-      "commentCount": 187,
+      "publishedAt": "2026-06-29T13:26:35.000Z",
+      "score": 343,
+      "commentCount": 145,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvle1000dg1ncqkkue6sl",
-      "title": "Suspicious Discontinuities (2020)",
+      "id": "cmr0gt1gc000hg1ic8c1pyjyt",
+      "title": "Ornith-1.0: self-improving open-source models for agentic coding",
       "summary": null,
-      "originalUrl": "https://danluu.com/discontinuities/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48698151",
-      "author": "tosh",
+      "originalUrl": "https://github.com/deepreinforce-ai/Ornith-1",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48722052",
+      "author": "danboarder",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T13:32:20.000Z",
-      "score": 258,
-      "commentCount": 90,
+      "publishedAt": "2026-06-29T17:16:17.000Z",
+      "score": 211,
+      "commentCount": 39,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvle8000fg1ncayy8fi22",
-      "title": "Choosing a Public DNS Resolver",
+      "id": "cmr0gt1gf000ig1icsnwcbu1d",
+      "title": "Why did this journal retract two 1940s papers by Max Planck?",
       "summary": null,
-      "originalUrl": "https://evilbit.de/dns-resolver-guide.html",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48702273",
-      "author": "pawal",
+      "originalUrl": "https://arstechnica.com/science/2026/06/why-did-this-journal-retract-two-1940s-papers-by-max-planck/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48716634",
+      "author": "DR_MING",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T22:11:28.000Z",
-      "score": 235,
-      "commentCount": 102,
+      "publishedAt": "2026-06-29T08:58:09.000Z",
+      "score": 208,
+      "commentCount": 27,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlea000gg1ncfbhtihu0",
-      "title": "AMD Strix Halo RDMA Cluster Setup Guide",
+      "id": "cmr0gt1gi000jg1ickowxvxqu",
+      "title": "Sandia National Labs SA3000 8085 CPU",
       "summary": null,
-      "originalUrl": "https://github.com/kyuz0/amd-strix-halo-vllm-toolboxes/blob/main/rdma_cluster/setup_guide.md",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48703258",
-      "author": "jakogut",
+      "originalUrl": "https://www.cpushack.com/2026/06/03/sandia-national-labs-sa3000-8085-cpu/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48717287",
+      "author": "rbanffy",
       "source": "hackernews",
-      "publishedAt": "2026-06-28T00:46:52.000Z",
-      "score": 202,
-      "commentCount": 60,
+      "publishedAt": "2026-06-29T10:20:25.000Z",
+      "score": 171,
+      "commentCount": 45,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlec000hg1ncz0j1x4im",
-      "title": "What Ozempic does to the gut-brain axis",
+      "id": "cmr0gt1gk000kg1icmstwpqhq",
+      "title": "Daisugi, the Japanese technique of growing trees out of other trees (2020)",
       "summary": null,
-      "originalUrl": "https://www.psychologytoday.com/au/blog/mood-by-microbe/202606/what-ozempic-does-to-the-gut-brain-axis",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48701984",
-      "author": "randycupertino",
+      "originalUrl": "https://www.openculture.com/2020/10/daisugi.html",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48708859",
+      "author": "MaysonL",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T21:34:06.000Z",
-      "score": 182,
-      "commentCount": 453,
+      "publishedAt": "2026-06-28T16:28:50.000Z",
+      "score": 167,
+      "commentCount": 54,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvleg000ig1ncnol67wzv",
-      "title": "Michigan spent $1.8B and only created 602 jobs",
+      "id": "cmr0gt1go000lg1icafj1mi3p",
+      "title": "EU Open Sources Ten-Year Network Development Planning Tools",
       "summary": null,
-      "originalUrl": "https://www.msn.com/en-us/money/general/michigan-spent-1-8-billion-and-only-created-602-jobs/ar-AA26Cusu",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48702060",
-      "author": "littlexsparkee",
+      "originalUrl": "https://github.com/open-energy-transition/open-tyndp",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48707361",
+      "author": "lyoncy",
       "source": "hackernews",
-      "publishedAt": "2026-06-27T21:44:57.000Z",
-      "score": 180,
-      "commentCount": 84,
+      "publishedAt": "2026-06-28T14:05:47.000Z",
+      "score": 164,
+      "commentCount": 39,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlej000jg1ncpk6vfogd",
-      "title": "Show HN: Decomp Academy – Learn to decompile GameCube games into matching C",
+      "id": "cmr0gt1gs000mg1ic4h7a5tsh",
+      "title": "AI boom risks global financial crash, warn central bankers",
       "summary": null,
-      "originalUrl": "https://decomp-academy.dev",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48703412",
-      "author": "jackpriceburns",
+      "originalUrl": "https://www.telegraph.co.uk/business/2026/06/28/ai-boom-risks-global-financial-crash-central-bankers-warn/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48713697",
+      "author": "b-man",
       "source": "hackernews",
-      "publishedAt": "2026-06-28T01:21:20.000Z",
-      "score": 166,
+      "publishedAt": "2026-06-29T01:25:04.000Z",
+      "score": 156,
+      "commentCount": 206,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1gw000ng1ic1iirtixd",
+      "title": "LongCat-2.0, a large-scale MoE model with 1.6T total and 48B Active",
+      "summary": null,
+      "originalUrl": "https://longcat.chat/blog/longcat-2.0/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48727116",
+      "author": "benjiro29",
+      "source": "hackernews",
+      "publishedAt": "2026-06-30T00:30:11.000Z",
+      "score": 146,
+      "commentCount": 42,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1gy000og1ic5tlzye6z",
+      "title": "Working around dragons with the Lemote Yeeloong laptop and OpenBSD",
+      "summary": null,
+      "originalUrl": "http://oldvcr.blogspot.com/2026/06/working-around-dragons-with-lemote.html",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48709187",
+      "author": "zdw",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T16:58:59.000Z",
+      "score": 137,
+      "commentCount": 41,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1h1000pg1ic63i1m03x",
+      "title": "Ford rehires 'gray beard' engineers after AI falls short",
+      "summary": null,
+      "originalUrl": "https://techcrunch.com/2026/06/28/ford-rehires-gray-beard-engineers-after-ai-falls-short/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48710749",
+      "author": "rbanffy",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T19:35:57.000Z",
+      "score": 135,
+      "commentCount": 3,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1h4000qg1iccust5t52",
+      "title": "Knowledge Distillation of Black-Box Large Language Models (2024)",
+      "summary": null,
+      "originalUrl": "https://arxiv.org/abs/2401.07013",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48712420",
+      "author": "babelfish",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T22:32:04.000Z",
+      "score": 122,
+      "commentCount": 23,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1ha000sg1icac0i898s",
+      "title": "The origins of the school system aimed to produce independent, critical thinkers (2024)",
+      "summary": null,
+      "originalUrl": "https://www.cbc.ca/radio/ideas/humboldt-education-system-bildung-1.7172093",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48706877",
+      "author": "pseudolus",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T12:55:36.000Z",
+      "score": 109,
+      "commentCount": 67,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1h8000rg1icfl25m3xs",
+      "title": "Rebuilding the Computer Room",
+      "summary": null,
+      "originalUrl": "https://alexwlchan.net/2026/computer-room/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48717905",
+      "author": "ingve",
+      "source": "hackernews",
+      "publishedAt": "2026-06-29T11:34:36.000Z",
+      "score": 109,
+      "commentCount": 58,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1he000tg1icv3an16mo",
+      "title": "Is sunscreen the new margarine? (2019)",
+      "summary": null,
+      "originalUrl": "https://www.outsideonline.com/health/wellness/sunscreen-sun-exposure-skin-cancer-science/",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48715020",
+      "author": "markgavalda",
+      "source": "hackernews",
+      "publishedAt": "2026-06-29T05:05:35.000Z",
+      "score": 107,
+      "commentCount": 118,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1hu000yg1ic1udfagho",
+      "title": "What's Next for AI?",
+      "summary": "I have been writing about AI for quite a while now, but this is probably the first time I genuinely...",
+      "originalUrl": "https://dev.to/sylwia-lask/whats-next-for-ai-219i",
+      "discussionUrl": null,
+      "author": "Sylwia Laskowska",
+      "source": "forem",
+      "publishedAt": "2026-06-29T07:18:48.000Z",
+      "score": 96,
+      "commentCount": 116,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "llm",
+          "webdev"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1hg000ug1icj64gjz9x",
+      "title": "The MUMPS 76 Primer – anniversary edition",
+      "summary": null,
+      "originalUrl": "https://github.com/rochus-keller/MUMPS/blob/main/docs/MUMPS_Primer.adoc",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48706796",
+      "author": "Rochus",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T12:41:45.000Z",
+      "score": 89,
+      "commentCount": 58,
+      "metadataJson": {
+        "type": "story",
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1hj000vg1ic8o8ygcnb",
+      "title": "Do LLMs pass the mirror test?",
+      "summary": null,
+      "originalUrl": "https://blog.pascalschuster.de/article/do-llms-pass-the-mirror-test",
+      "discussionUrl": "https://news.ycombinator.com/item?id=48710414",
+      "author": "thepasch",
+      "source": "hackernews",
+      "publishedAt": "2026-06-28T19:06:07.000Z",
+      "score": 82,
       "commentCount": 66,
       "metadataJson": {
         "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlel000kg1nc7ryz4v56",
-      "title": "Post-Mythos Cybersecurity: Keep calm and carry on",
-      "summary": null,
-      "originalUrl": "https://cephalosec.com/blog/cybersecurity-in-the-post-mythos-era-keep-calm-and-carry-on/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48698559",
-      "author": "Versipelle",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T14:23:40.000Z",
-      "score": 165,
-      "commentCount": 63,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlem000lg1ncc1e1docm",
-      "title": "Anatomy of a Failed (Nation-State?) Attack",
-      "summary": null,
-      "originalUrl": "https://grack.com/blog/2026/06/25/dissecting-a-failed-nation-state-attack/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48694631",
-      "author": "signa11",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T02:41:53.000Z",
-      "score": 151,
-      "commentCount": 28,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvleo000mg1ncsjw0mxbz",
-      "title": "Beer CSS – Build material design in record time",
-      "summary": null,
-      "originalUrl": "https://www.beercss.com",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48696510",
-      "author": "Seb-C",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T09:06:11.000Z",
-      "score": 133,
-      "commentCount": 61,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvler000ng1ncs1p5awdd",
-      "title": "How Many Elementary Particles Are There, Really?",
-      "summary": null,
-      "originalUrl": "https://www.quantamagazine.org/how-many-elementary-particles-are-there-really-20260615/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48697746",
-      "author": "rwmj",
-      "source": "hackernews",
-      "publishedAt": "2026-06-27T12:40:59.000Z",
-      "score": 130,
-      "commentCount": 123,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvleu000og1nc16zuod16",
-      "title": "Flock cameras track more than your license plate, and they're spreading fast",
-      "summary": null,
-      "originalUrl": "https://www.engadget.com/2203000/flock-cameras-recording-license-plate/",
-      "discussionUrl": "https://news.ycombinator.com/item?id=48707673",
-      "author": "SanjayMehta",
-      "source": "hackernews",
-      "publishedAt": "2026-06-28T14:35:26.000Z",
-      "score": 123,
-      "commentCount": 52,
-      "metadataJson": {
-        "type": "story",
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlf7000tg1nc18fjp7b4",
-      "title": "I Almost Didn't Learn Programming Because I Was Bad at Math",
-      "summary": "For a long time, I thought programming wasn't for people like me.  Not because I wasn't interested in...",
-      "originalUrl": "https://dev.to/technogamerz/i-almost-didnt-learn-programming-because-i-was-bad-at-math-f16",
-      "discussionUrl": null,
-      "author": "𝕋𝕙𝕖 𝕃𝕒𝕫𝕪 𝔾𝕚𝕣𝕝 ",
-      "source": "forem",
-      "publishedAt": "2026-06-26T09:57:36.000Z",
-      "score": 47,
-      "commentCount": 24,
-      "metadataJson": {
-        "tags": [
-          "discuss",
-          "developer",
-          "coding",
-          "beginners"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlf1000rg1nc1dlu76a9",
-      "title": "Dev Opportunity Radar #5: A Fully Funded Trip to AWS re:Invent, Google Cloud Career Launchpad, and a $1,000 Award",
-      "summary": "TL;DR  Welcome back to Dev Opportunity Radar.  This is a weekly series where I share opportunities,...",
-      "originalUrl": "https://dev.to/devengers/dev-opportunity-radar-5-a-fully-funded-trip-to-aws-reinvent-google-cloud-career-launchpad-and-3p6e",
-      "discussionUrl": null,
-      "author": "Hemapriya Kanagala",
-      "source": "forem",
-      "publishedAt": "2026-06-26T14:59:34.000Z",
-      "score": 47,
-      "commentCount": 21,
-      "metadataJson": {
-        "tags": [
-          "discuss",
-          "community",
-          "opportunities",
-          "resources"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlez000qg1ncdzhbsrnh",
-      "title": "What was your win this week!?",
-      "summary": "👋👋👋👋 Looking back on your week -- what was something you're proud of? All wins count -- big or small...",
-      "originalUrl": "https://dev.to/devteam/what-was-your-win-this-week-4na1",
+      "id": "cmr0gt1hq000xg1icmnaz27wz",
+      "title": "Need a break? Play today's game from The Daily Context.",
+      "summary": "We (at DEV and MLH) are covering AI Engineer's World Fair by printing a physical newspaper called...",
+      "originalUrl": "https://dev.to/devteam/need-a-break-play-todays-game-from-the-daily-context-1fli",
       "discussionUrl": null,
       "author": "Jess Lee",
       "source": "forem",
-      "publishedAt": "2026-06-26T13:00:00.000Z",
-      "score": 39,
-      "commentCount": 28,
+      "publishedAt": "2026-06-29T20:00:00.000Z",
+      "score": 68,
+      "commentCount": 19,
       "metadataJson": {
         "tags": [
-          "discuss",
-          "weeklyretro"
+          "aie",
+          "gamedev",
+          "ai",
+          "gemini"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfh000xg1ncb7r1af1o",
-      "title": "One Agent or Many? Orchestrating AI Agents Without the Mess",
-      "summary": "Hello, I'm Maneshwar. I'm building git-lrc, a Micro AI code reviewer that runs on every commit. It is...",
-      "originalUrl": "https://dev.to/lovestaco/one-agent-or-many-orchestrating-ai-agents-without-the-mess-1g1l",
+      "id": "cmr0gt1hm000wg1icvuhk01h1",
+      "title": "Welcome to AI Engineer World’s Fair 2026",
+      "summary": "Welcome to the first edition of the AI Engineer World’s Fair newspaper!  On behalf of the organizing...",
+      "originalUrl": "https://dev.to/dailycontext/welcome-to-ai-engineer-worlds-fair-2026-2o09",
       "discussionUrl": null,
-      "author": "Athreya aka Maneshwar",
+      "author": "swyx",
       "source": "forem",
-      "publishedAt": "2026-06-25T17:44:06.000Z",
-      "score": 35,
+      "publishedAt": "2026-06-29T16:04:30.000Z",
+      "score": 68,
       "commentCount": 7,
       "metadataJson": {
         "tags": [
+          "aie",
           "ai",
-          "programming",
-          "webdev",
-          "beginners"
+          "techtalks",
+          "softwareengineering"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfy0015g1ncv5e8dmx6",
-      "title": "How To Learn Go Fast: A Practical Roadmap For Senior Backend Developers",
-      "summary": "Why I Am Writing This: A PHP Developer Crossing Into Go   I am a PHP developer.  I have...",
-      "originalUrl": "https://dev.to/nazar_boyko/how-to-learn-go-fast-a-practical-roadmap-for-senior-backend-developers-18l5",
-      "discussionUrl": null,
-      "author": "Nazar Boyko",
-      "source": "forem",
-      "publishedAt": "2026-06-27T04:12:26.000Z",
-      "score": 34,
-      "commentCount": 11,
-      "metadataJson": {
-        "tags": [
-          "go",
-          "architecture",
-          "career",
-          "learn"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlfw0014g1nc80zoemoo",
-      "title": "VP of Nothing: The CEO's Nephew Took Over My AI Platform. The Client Walked Within a Month.",
-      "summary": "Series: AI, Ego &amp; Regret — Bonus Chapter   Editor's Note: While compiling the old series for the...",
-      "originalUrl": "https://dev.to/xulingfeng/vp-of-nothing-the-ceos-nephew-took-over-my-ai-platform-the-client-walked-within-a-month-5dla",
-      "discussionUrl": null,
-      "author": "xulingfeng",
-      "source": "forem",
-      "publishedAt": "2026-06-28T04:43:40.000Z",
-      "score": 31,
-      "commentCount": 14,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "discuss",
-          "career",
-          "programming"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlf3000sg1ncucy7u310",
+      "id": "cmr0gt1if0015g1ico5rcq2i5",
       "title": "1%",
       "summary": "Santa Clara, 2029. A speculative fiction about hegemony, sanctions, and the playbook nobody followed.",
       "originalUrl": "https://dev.to/pascal_cescato_692b7a8a20/1-15n0",
@@ -552,8 +378,8 @@
       "author": "Pascal CESCATO",
       "source": "forem",
       "publishedAt": "2026-06-28T10:22:28.000Z",
-      "score": 27,
-      "commentCount": 34,
+      "score": 56,
+      "commentCount": 63,
       "metadataJson": {
         "tags": [
           "ai",
@@ -561,95 +387,219 @@
           "hardware",
           "fiction"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlex000pg1nc3x0o1sg8",
-      "title": "Never forget to enter the Stern Grove lottery again!",
-      "summary": "Browser automation with Playwright, Python, GitHub Actions, and Entire to auto-enter San Francisco Stern Grove concert lotteries each week!",
-      "originalUrl": "https://dev.to/entire/never-forget-to-enter-the-stern-grove-lottery-again-31i5",
+      "id": "cmr0gt1ij0016g1iclwzifo7s",
+      "title": "🗓️ Monthly Dev Report: June 2026",
+      "summary": "Hey everyone! I bring you my development journey on what I have discovered, accomplishments for this...",
+      "originalUrl": "https://dev.to/francistrdev/monthly-dev-report-june-2026-530a",
       "discussionUrl": null,
-      "author": "Lizzie Siegle",
+      "author": "FrancisTRᴅᴇᴠ (っ◔◡◔)っ",
       "source": "forem",
-      "publishedAt": "2026-06-26T17:18:04.000Z",
-      "score": 24,
-      "commentCount": 5,
+      "publishedAt": "2026-06-29T14:40:57.000Z",
+      "score": 53,
+      "commentCount": 6,
       "metadataJson": {
         "tags": [
-          "ai",
-          "playwright",
-          "githubactions",
-          "browserautomation"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyt6c60000g1tcwyqj0276",
-      "title": "Never forget to enter the Stern Grove lottery again!",
-      "summary": "Browser automation with Playwright, Python, GitHub Actions, and Entire to auto-enter San Francisco Stern Grove concert lotteries each week!",
-      "originalUrl": "https://dev.to/entire/never-forget-to-enter-the-stern-grove-lottery-again-31i5",
-      "discussionUrl": null,
-      "author": "Lizzie Siegle",
-      "source": "forem",
-      "publishedAt": "2026-06-26T17:18:04.000Z",
-      "score": 24,
-      "commentCount": 5,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "playwright",
-          "githubactions",
-          "browserautomation"
-        ],
-        "fetchedAt": "2026-06-28T15:50:02.671Z"
-      }
-    },
-    {
-      "id": "cmqxys86a0000g19gy5emusz3",
-      "title": "Never forget to enter the Stern Grove lottery again!",
-      "summary": "Browser automation with Playwright, Python, GitHub Actions, and Entire to auto-enter San Francisco Stern Grove concert lotteries each week!",
-      "originalUrl": "https://dev.to/entire/never-forget-to-enter-the-stern-grove-lottery-again-31i5",
-      "discussionUrl": null,
-      "author": "Lizzie Siegle",
-      "source": "forem",
-      "publishedAt": "2026-06-26T17:18:04.000Z",
-      "score": 24,
-      "commentCount": 5,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "playwright",
-          "githubactions",
-          "browserautomation"
-        ],
-        "fetchedAt": "2026-06-28T15:49:18.534Z"
-      }
-    },
-    {
-      "id": "cmqxyvlfb000ug1ncl0m72hmn",
-      "title": "Functional doesn't mean correct. That's the biggest risk with AI-generated code.",
-      "summary": "The code runs. That's not the question.   There's a failure mode with AI-generated code...",
-      "originalUrl": "https://dev.to/cyclopt_dimitrisk/functional-doesnt-mean-correct-thats-the-biggest-risk-with-ai-generated-code-29dh",
-      "discussionUrl": null,
-      "author": "Dimitris Kyrkos ",
-      "source": "forem",
-      "publishedAt": "2026-06-26T06:17:15.000Z",
-      "score": 20,
-      "commentCount": 31,
-      "metadataJson": {
-        "tags": [
+          "discuss",
+          "community",
           "programming",
+          "devjournal"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1hx000zg1icw7top1cw",
+      "title": "After a long journey, I've reached a deep burnout",
+      "summary": "Hi everyone, I've been rarely posting on dev, or even being active at all. I've started thinking...",
+      "originalUrl": "https://dev.to/embernoglow/after-a-long-journey-ive-reached-a-deep-burnout-1o4b",
+      "discussionUrl": null,
+      "author": "EmberNoGlow",
+      "source": "forem",
+      "publishedAt": "2026-06-28T09:04:04.000Z",
+      "score": 50,
+      "commentCount": 12,
+      "metadataJson": {
+        "tags": [
+          "discuss",
+          "ai",
+          "learning",
+          "productivity"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1jb001fg1icugg92rp2",
+      "title": "VP of Nothing: The CEO's Nephew Took Over My AI Platform. The Client Walked Within a Month.",
+      "summary": "Series: AI, Ego &amp; Regret — Bonus Chapter   Editor's Note: While compiling the old series for the...",
+      "originalUrl": "https://dev.to/xulingfeng/vp-of-nothing-the-ceos-nephew-took-over-my-ai-platform-the-client-walked-within-a-month-5dla",
+      "discussionUrl": null,
+      "author": "xulingfeng",
+      "source": "forem",
+      "publishedAt": "2026-06-28T04:43:40.000Z",
+      "score": 45,
+      "commentCount": 49,
+      "metadataJson": {
+        "tags": [
           "ai",
           "discuss",
-          "webdev"
+          "career",
+          "programming"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfs0012g1nc5a1jkfl7",
+      "id": "cmr0gt1i90013g1icj0l90mze",
+      "title": "The Model Does Not Need Memory. The Situation Does.",
+      "summary": "I think I was asking the wrong question.   For a while, the question was simple: does memory make...",
+      "originalUrl": "https://dev.to/marcosomma/the-model-does-not-need-memory-the-situation-does-196g",
+      "discussionUrl": null,
+      "author": "marcosomma",
+      "source": "forem",
+      "publishedAt": "2026-06-29T11:50:14.000Z",
+      "score": 43,
+      "commentCount": 14,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "rag",
+          "mcp",
+          "llm"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1i00010g1ic8so730fc",
+      "title": "You’re not really that far behind.",
+      "summary": "My non-tech friends still don’t get it. Despite what you’d believe from Twitter, most people still...",
+      "originalUrl": "https://dev.to/dailycontext/youre-not-really-that-far-behind-h4d",
+      "discussionUrl": null,
+      "author": "Ryan Swift",
+      "source": "forem",
+      "publishedAt": "2026-06-29T16:06:48.000Z",
+      "score": 40,
+      "commentCount": 3,
+      "metadataJson": {
+        "tags": [
+          "aie",
+          "ai",
+          "learning"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1i60012g1icenxxdzih",
+      "title": "Pragmatism in an Age of Infinite Code and Unavoidable Bottlenecks",
+      "summary": "Leading into the AI Engineer event in San Francisco, I’m looking forward to having my mind blown....",
+      "originalUrl": "https://dev.to/dailycontext/pragmatism-in-an-age-of-infinite-code-and-unavoidable-bottlenecks-1bkd",
+      "discussionUrl": null,
+      "author": "Ben Halpern",
+      "source": "forem",
+      "publishedAt": "2026-06-29T16:05:56.000Z",
+      "score": 39,
+      "commentCount": 6,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "aie",
+          "productivity",
+          "leadership"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1ic0014g1icrdkkedh0",
+      "title": "What Actually Happens When You Call an LLM API",
+      "summary": "you've felt it.  you type a prompt, hit send, and the response starts streaming in under a second....",
+      "originalUrl": "https://dev.to/dannwaneri/what-actually-happens-when-you-call-an-llm-api-28l6",
+      "discussionUrl": null,
+      "author": "Daniel Nwaneri",
+      "source": "forem",
+      "publishedAt": "2026-06-29T08:07:46.000Z",
+      "score": 35,
+      "commentCount": 34,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "webdev",
+          "beginners",
+          "discuss"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1i30011g1icsrlhg72y",
+      "title": "My commit message said \"You've hit your session limit\"",
+      "summary": "How I ended up running a local LLM to generate my git commit messages",
+      "originalUrl": "https://dev.to/shyamala_u/my-commit-message-said-youve-hit-your-session-limit-2abn",
+      "discussionUrl": null,
+      "author": "Shyamala",
+      "source": "forem",
+      "publishedAt": "2026-06-29T15:15:49.000Z",
+      "score": 35,
+      "commentCount": 5,
+      "metadataJson": {
+        "tags": [
+          "genai",
+          "ollama",
+          "learning",
+          "llm"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1ip0018g1icpe8b3vgx",
+      "title": "Coding Agents Play Favorites With Your Dependencies",
+      "summary": "Deep into a coding session, you realize you want beta testers to try some new functionality first....",
+      "originalUrl": "https://dev.to/dailycontext/coding-agents-play-favorites-with-your-dependencies-2dl6",
+      "discussionUrl": null,
+      "author": "Adam DuVander",
+      "source": "forem",
+      "publishedAt": "2026-06-29T16:05:43.000Z",
+      "score": 29,
+      "commentCount": 2,
+      "metadataJson": {
+        "tags": [
+          "agents",
+          "aie",
+          "tooling"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1j1001cg1iczwtnqyb7",
+      "title": "TanStack Query style caching, the Angular-native way",
+      "summary": "Angular has signals now - and as of 19.2, even a signal-based way to fetch: httpResource, built on...",
+      "originalUrl": "https://dev.to/dhutaryan/tanstack-query-style-caching-the-angular-native-way-4igc",
+      "discussionUrl": null,
+      "author": "Dzmitry Hutaryan",
+      "source": "forem",
+      "publishedAt": "2026-06-29T07:00:00.000Z",
+      "score": 27,
+      "commentCount": 3,
+      "metadataJson": {
+        "tags": [
+          "angular",
+          "typescript",
+          "webdev",
+          "opensource"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1jh001hg1icbg2hkd7h",
       "title": "I Got Tired of Rewriting AI API Wrappers, So I Built a Gateway",
       "summary": "Every side project starts the same way.  -Generate an OpenAI key. -Add it to .env. -Write a...",
       "originalUrl": "https://dev.to/manolito99/i-got-tired-of-rewriting-ai-api-wrappers-so-i-built-a-gateway-58n5",
@@ -657,8 +607,8 @@
       "author": "Lolo",
       "source": "forem",
       "publishedAt": "2026-06-27T19:35:50.000Z",
-      "score": 20,
-      "commentCount": 10,
+      "score": 23,
+      "commentCount": 15,
       "metadataJson": {
         "tags": [
           "ai",
@@ -666,177 +616,176 @@
           "llm",
           "showdev"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfj000yg1nczu05l6jr",
-      "title": "1,200 Applications. 4 Offers. Here's What Actually Got Me the Product-Based Role",
-      "summary": "I am going to start with a number most people will not say out loud.  1,200 applications.  That is...",
-      "originalUrl": "https://dev.to/varshithvhegde/1200-applications-4-offers-heres-what-actually-got-me-the-product-based-role-10mp",
+      "id": "cmr0gt1jq001kg1icgu8obmqe",
+      "title": "JavaScript still can't ship a full-stack module",
+      "summary": "Imagine if there were a way for us to somehow ship a full-stack package that you could plug into your...",
+      "originalUrl": "https://wasp.sh/blog/2026/06/22/javascript-still-cant-ship-a-full-stack-module",
       "discussionUrl": null,
-      "author": "Varshith V Hegde",
+      "author": "vincanger",
       "source": "forem",
-      "publishedAt": "2026-06-26T06:36:53.000Z",
-      "score": 17,
-      "commentCount": 4,
-      "metadataJson": {
-        "tags": [
-          "career",
-          "ai",
-          "programming",
-          "productivity"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlfd000vg1ncw3nprtjj",
-      "title": "Weekly Dev Log 2026-W11",
-      "summary": "Weekly learning log of iOS, web development, and cybersecurity — 2026-W11",
-      "originalUrl": "https://dev.to/umitomo-lab/weekly-dev-log-2026-w11-4ga6",
-      "discussionUrl": null,
-      "author": "Umitomo",
-      "source": "forem",
-      "publishedAt": "2026-06-26T21:04:23.000Z",
-      "score": 12,
+      "publishedAt": "2026-06-29T12:29:05.000Z",
+      "score": 21,
       "commentCount": 5,
       "metadataJson": {
         "tags": [
-          "beginners",
-          "devjournal",
-          "security",
-          "swift"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlhj001tg1nch1753p99",
-      "title": "🚀 Day 4 of Learning React: What Actually Makes React... React? (Hooks, useState, and State Explained)",
-      "summary": "📌 Missed Day 3? I covered what actually happens after running npm run dev, how bundlers work, JSX,...",
-      "originalUrl": "https://dev.to/bismay-exe/day-4-of-learning-react-what-actually-makes-react-react-hooks-usestate-and-state-198g",
-      "discussionUrl": null,
-      "author": "Bismay.exe",
-      "source": "forem",
-      "publishedAt": "2026-06-25T18:03:57.000Z",
-      "score": 11,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "react",
-          "javasc",
+          "fullstack",
           "webdev",
-          "beginners"
+          "npm"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfe000wg1ncyswm0ie5",
-      "title": "AI is not replacing developers anytime soon",
-      "summary": "I'm a professional developer, and AI has significantly increased my output—I'd say by maybe 30 or 40...",
-      "originalUrl": "https://dev.to/czmirek/ai-is-not-replacing-developers-anytime-soon-2l26",
+      "id": "cmr0gt1je001gg1icwpgduq1o",
+      "title": "Making the Context Across 46 Repositories Semantically Searchable for AI (Part 2)",
+      "summary": "The biggest issue Part 1 left open was that AI couldn't reach the 46-repo codebase by natural-language query (the entry-point problem). This post is how I solved it — by reusing the pattern proven in db-graph (1,133-table semantic search), then layering minimal annotations only around boundary nodes. Covers the separate-branch operation that keeps engineers' daily workflow untouched, the SLO that protects the joins between three graphs, the SAME_ENTITY normalization, and the April–May trial-and-error timeline traced through real commits.",
+      "originalUrl": "https://ryantsuji.dev/posts/code-graph-46-repos-part2",
       "discussionUrl": null,
-      "author": "Miroslav Thompson",
+      "author": "Ryosuke Tsuji",
       "source": "forem",
-      "publishedAt": "2026-06-26T06:39:13.000Z",
-      "score": 10,
+      "publishedAt": "2026-06-29T23:50:05.000Z",
+      "score": 15,
       "commentCount": 2,
       "metadataJson": {
         "tags": [
           "ai",
-          "career",
-          "discuss",
-          "productivity"
+          "knowledgegraph",
+          "staticanalysis",
+          "typescript"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlg60018g1ncakexqolm",
-      "title": "Testing Webhooks: The Pattern I Keep Reaching For",
-      "summary": "Three years ago, my webhook tests involved ngrok, a sleep(5) call, and crossed fingers. The current...",
-      "originalUrl": "https://dev.to/rishi_gaurav/testing-webhooks-the-pattern-i-keep-reaching-for-3cg",
+      "id": "cmr0gt1j9001eg1icfiuekzpr",
+      "title": "The German Tank Problem: Why You Need UUIDs",
+      "summary": "In World War II, the Allies had a very expensive question and no good way to answer it: how many...",
+      "originalUrl": "https://dev.to/towernter/the-german-tank-problem-why-you-need-uuids-85p",
       "discussionUrl": null,
-      "author": "Rishi Gaurav",
+      "author": "Tawanda Nyahuye",
       "source": "forem",
-      "publishedAt": "2026-06-26T13:36:47.000Z",
-      "score": 8,
-      "commentCount": 7,
+      "publishedAt": "2026-06-28T17:44:35.000Z",
+      "score": 13,
+      "commentCount": 2,
       "metadataJson": {
         "tags": [
-          "ai",
+          "backend",
           "api",
-          "testing",
-          "automation"
+          "webdev",
+          "programming"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlh6001ng1ncryp31ksg",
-      "title": "The AI reviewer scored 23/25 and missed the point",
-      "summary": "I've been building an AI-assisted editorial pipeline for my technical writing. Notion cards become...",
-      "originalUrl": "https://dev.to/michaeltruong/the-ai-reviewer-scored-2325-and-missed-the-point-51mh",
+      "id": "cmr0gt1in0017g1icaoumh4om",
+      "title": "What are your goals for the week? #185",
+      "summary": "It's hot, 9am and the heat index is 89F/31.7C already. humidity at 75%. Cut my morning walk short...",
+      "originalUrl": "https://dev.to/jarvisscript/what-are-your-goals-for-the-week-185-471m",
       "discussionUrl": null,
-      "author": "Michael Truong",
+      "author": "Chris Jarvis",
       "source": "forem",
-      "publishedAt": "2026-06-26T15:14:45.000Z",
-      "score": 7,
-      "commentCount": 15,
+      "publishedAt": "2026-06-29T14:22:31.000Z",
+      "score": 12,
+      "commentCount": 8,
+      "metadataJson": {
+        "tags": [
+          "discuss",
+          "motivation"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1iy001bg1icoyo9cwwb",
+      "title": "Someone Else Pays for Your AI Access",
+      "summary": "you probably didn't think about this when you signed up.  you entered your card details, verified...",
+      "originalUrl": "https://dev.to/dannwaneri/someone-else-pays-for-your-ai-access-5149",
+      "discussionUrl": null,
+      "author": "Daniel Nwaneri",
+      "source": "forem",
+      "publishedAt": "2026-06-30T07:22:16.000Z",
+      "score": 11,
+      "commentCount": 8,
       "metadataJson": {
         "tags": [
           "ai",
-          "workflow"
+          "webdev",
+          "security",
+          "discuss"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfq0011g1nczek4go7i",
-      "title": "I Built a Serverless VPN on Lambda MicroVMs — 12 Builds, 5 Dead Ends, 1 Working Architecture",
-      "summary": "TL;DR   I built a personal VPN using AWS Lambda MicroVMs. Your traffic exits from AWS. When...",
-      "originalUrl": "https://medium.com/@vivek-aws/i-built-a-serverless-vpn-on-lambda-microvms-12-builds-5-dead-ends-1-working-architecture-4df1a662b259",
+      "id": "cmr0gt1k2001og1ic0mbv7p2p",
+      "title": "Making of Tiny RPG Studio",
+      "summary": "This is the story of how I created Tiny RPG Studio: a small engine for simple RPGs, built to help...",
+      "originalUrl": "https://dev.to/andredarcie/making-of-tiny-rpg-studio-45oh",
       "discussionUrl": null,
-      "author": "Vivek V.",
+      "author": "André N. Darcie",
       "source": "forem",
-      "publishedAt": "2026-06-27T00:20:56.000Z",
-      "score": 7,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "lambda",
-          "microvm",
-          "firecracker",
-          "aws"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlhu001yg1nc4o0ns84a",
-      "title": "Redis on Windows with Laragon and Laravel: The PATH Issue That Looks Like a Redis Issue",
-      "summary": "A few days ago, I was working on a Laravel project on Windows. The project needed Redis for cache and...",
-      "originalUrl": "https://dev.to/tahsin000/redis-on-windows-with-laragon-and-laravel-the-path-issue-that-looks-like-a-redis-issue-4omd",
-      "discussionUrl": null,
-      "author": "Tahsin Abrar",
-      "source": "forem",
-      "publishedAt": "2026-06-26T13:19:09.000Z",
-      "score": 6,
+      "publishedAt": "2026-06-28T17:42:59.000Z",
+      "score": 11,
       "commentCount": 4,
       "metadataJson": {
         "tags": [
-          "php",
-          "windows",
-          "redis",
-          "laravel"
+          "webdev",
+          "gamedev",
+          "rpg",
+          "programming"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfp0010g1ncy5igi3n3",
+      "id": "cmr0gt1jv001mg1iccj0qyt8p",
+      "title": "Adding io::ErrorKind::TooManyOpenFiles to Rust",
+      "summary": "This is my second merged contribution to rust-lang, and like the first it lives in the low-level I/O...",
+      "originalUrl": "https://dev.to/valentynkit/adding-ioerrorkindtoomanyopenfiles-to-rust-4h0k",
+      "discussionUrl": null,
+      "author": "Valentyn Kit",
+      "source": "forem",
+      "publishedAt": "2026-06-27T17:56:58.000Z",
+      "score": 11,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "rust",
+          "systems",
+          "opensource",
+          "programming"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1kv001yg1ica3wiz3te",
+      "title": "Can retrieval agents like ChatGPT and Perplexity read your website? Agentis Lux sees what they see.",
+      "summary": "I created Agentis Lux for the purposes of entering H0 Hackathon (Vercel + AWS Databases)....",
+      "originalUrl": "https://dev.to/earlgreyhot1701d/can-retrieval-agents-like-chatgpt-and-perplexity-read-your-website-agentis-lux-sees-what-they-see-5cac",
+      "discussionUrl": null,
+      "author": "L. Cordero",
+      "source": "forem",
+      "publishedAt": "2026-06-28T21:13:08.000Z",
+      "score": 11,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "webdev",
+          "aws",
+          "showdev"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1j6001dg1icxrj1ctca",
       "title": "V.E.L.O.C.I.T.Y.-OS: Kimi K2.7 and the 'Safe-Room Security' Illusion (Part 1)",
       "summary": "How a casual comment thread about Cloudflare's Kimi K2.7 led to building a static credentials scanner gatekeeper.",
       "originalUrl": "https://dev.to/unitbuilds_cc/velocity-os-kimi-k27-and-the-safe-room-security-illusion-part-1-41oa",
@@ -844,8 +793,8 @@
       "author": "UnitBuilds",
       "source": "forem",
       "publishedAt": "2026-06-28T09:55:34.000Z",
-      "score": 6,
-      "commentCount": 3,
+      "score": 9,
+      "commentCount": 6,
       "metadataJson": {
         "tags": [
           "showdev",
@@ -853,11 +802,116 @@
           "compilers",
           "security"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlg10016g1nci5smap0g",
+      "id": "cmr0gt1l10020g1ic57ligwyo",
+      "title": "I added AI background removal to my image converter in a week, in Rust, no Python",
+      "summary": "Part of an ongoing build-in-public series on Convertify, a free image/file converter I build solo....",
+      "originalUrl": "https://dev.to/serhii_kalyna_730b636889c/i-added-ai-background-removal-to-my-image-converter-in-a-week-in-rust-no-python-2d75",
+      "discussionUrl": null,
+      "author": "Serhii Kalyna",
+      "source": "forem",
+      "publishedAt": "2026-06-29T08:10:04.000Z",
+      "score": 9,
+      "commentCount": 2,
+      "metadataJson": {
+        "tags": [
+          "rust",
+          "machinelearning",
+          "webdev",
+          "buildinpublic"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1jz001ng1icmav2lkl8",
+      "title": "I built an AI Chrome extension with zero backend cost — here's the exact architecture",
+      "summary": "You want to add AI to your Chrome extension.  The obvious path: spin up a Node.js server, hold a...",
+      "originalUrl": "https://dev.to/projekta2/i-built-an-ai-chrome-extension-with-zero-backend-cost-heres-the-exact-architecture-43j7",
+      "discussionUrl": null,
+      "author": "Projekta2",
+      "source": "forem",
+      "publishedAt": "2026-06-28T08:41:02.000Z",
+      "score": 8,
+      "commentCount": 9,
+      "metadataJson": {
+        "tags": [
+          "chrome",
+          "javascript",
+          "ai",
+          "webdev"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1jt001lg1icse9pgesg",
+      "title": "The Spec Was Never the Good Part",
+      "summary": "Spec-driven development hands AI the wrong job. The real win is arguing the design out in chat first, then letting the spec fall out of the conversation.",
+      "originalUrl": "https://dev.to/anchildress1/the-spec-was-never-the-good-part-45i4",
+      "discussionUrl": null,
+      "author": "Ashley Childress",
+      "source": "forem",
+      "publishedAt": "2026-06-30T02:59:11.000Z",
+      "score": 8,
+      "commentCount": 1,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "discuss",
+          "productivity",
+          "programming"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1is0019g1ic2m3nwkr4",
+      "title": "Engineering a Brainrot art installation on an Orange Pi Zero 🍊",
+      "summary": "How I built a gamified, infinite-scroll video installation for the TIAT \"Slop Epistemologies\"...",
+      "originalUrl": "https://dev.to/googleai/engineering-a-brainrot-art-installation-on-an-orange-pi-zero-4gmk",
+      "discussionUrl": null,
+      "author": "Paige Bailey",
+      "source": "forem",
+      "publishedAt": "2026-06-27T20:49:31.000Z",
+      "score": 7,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "webdev",
+          "programming",
+          "javascript"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1lc0024g1icupx6pcy4",
+      "title": "Is Programming Art?",
+      "summary": "Christopher Pitt asked a simple question: Can a developer be called a creative?   I am talking about...",
+      "originalUrl": "https://dev.to/headzoo/is-programming-art-313f",
+      "discussionUrl": null,
+      "author": "Sean H",
+      "source": "forem",
+      "publishedAt": "2026-06-27T17:25:09.000Z",
+      "score": 6,
+      "commentCount": 3,
+      "metadataJson": {
+        "tags": [
+          "developer",
+          "discuss",
+          "php",
+          "programming"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1k5001pg1icd2rlwk4a",
       "title": "Choreography of validation: how to make your auth form seamless and usable",
       "summary": "You know, for users the best login is no login at all. But we still need one, and the most popular is...",
       "originalUrl": "https://dev.to/a-dev/choreography-of-validation-how-to-make-your-auth-form-seamless-and-usable-1dpm",
@@ -874,74 +928,116 @@
           "ux",
           "uxdesign"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlga001ag1ncqzwbtujs",
-      "title": "Deploying a Containerized Backend to a VPS with Docker Compose + GitHub Actions (A Beginner's Runbook)",
-      "summary": "This is a complete, copy‑pasteable guide for shipping a backend app to a single Linux server using...",
-      "originalUrl": "https://dev.to/saint_vandora/deploying-a-containerized-backend-to-a-vps-with-docker-compose-github-actions-a-beginners-39m5",
+      "id": "cmr0gt1iv001ag1ickxco4gz1",
+      "title": "Need Career Guidance After Leaving My First Job – Feeling Lost",
+      "summary": "Hi everyone,  I really need some career advice because I feel completely stuck.  I started my career...",
+      "originalUrl": "https://dev.to/sarthak_pandey_e0f3a9326a/need-career-guidance-after-leaving-my-first-job-feeling-lost-58k",
       "discussionUrl": null,
-      "author": "FOLASAYO SAMUEL OLAYEMI",
+      "author": "sarthak pandey",
       "source": "forem",
-      "publishedAt": "2026-06-25T18:24:48.000Z",
-      "score": 5,
-      "commentCount": 0,
+      "publishedAt": "2026-06-29T15:10:55.000Z",
+      "score": 6,
+      "commentCount": 2,
       "metadataJson": {
         "tags": [
-          "devops",
-          "programming",
-          "tutorial",
-          "automation"
+          "career",
+          "anonymous",
+          "beginners",
+          "discuss"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlg80019g1ncfokk6327",
-      "title": "Adding io::ErrorKind::TooManyOpenFiles to Rust",
-      "summary": "This is my second merged contribution to rust-lang, and like the first it lives in the low-level I/O...",
-      "originalUrl": "https://dev.to/valentynkit/adding-ioerrorkindtoomanyopenfiles-to-rust-4h0k",
+      "id": "cmr0gt1kk001ug1icl1unozdr",
+      "title": "My Next.js 16 Auth Passed Every Test. Five Bugs That Only Showed Up When I Wired It Together.",
+      "summary": "The three-layer model works. Part 1 of this series is the invoice incident that proved it. Part 2 is...",
+      "originalUrl": "https://dev.to/shubhradev/my-nextjs-16-auth-passed-every-test-five-bugs-that-only-showed-up-when-i-wired-it-together-bgh",
       "discussionUrl": null,
-      "author": "Valentyn Kit",
+      "author": "Shubhra Pokhariya",
       "source": "forem",
-      "publishedAt": "2026-06-27T17:56:58.000Z",
-      "score": 5,
-      "commentCount": 0,
+      "publishedAt": "2026-06-30T06:01:36.000Z",
+      "score": 6,
+      "commentCount": 2,
       "metadataJson": {
         "tags": [
-          "rust",
-          "systems",
-          "opensource",
-          "programming"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgl001eg1nc71t6cax4",
-      "title": "How I Built a Custom Rust Blockchain for On-Chain Ride Lifecycle",
-      "summary": "Open-source ride-sharing stack with Aura consensus, client-side signing, GraphQL Hub API, and a live testnet you can try in the browser.",
-      "originalUrl": "https://dev.to/mehran_mazhar/how-i-built-a-custom-rust-blockchain-for-on-chain-ride-lifecycle-594i",
-      "discussionUrl": null,
-      "author": "Mehran Mazhar",
-      "source": "forem",
-      "publishedAt": "2026-06-26T15:08:49.000Z",
-      "score": 3,
-      "commentCount": 4,
-      "metadataJson": {
-        "tags": [
-          "rust",
-          "blockchain",
+          "nextjs",
+          "security",
           "webdev",
+          "javascript"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1ll0027g1icd6wjnevp",
+      "title": "Your MCP servers are burning 50k+ tokens before you type a word",
+      "summary": "Here is something I did not realize about the Model Context Protocol until my context window kept...",
+      "originalUrl": "https://dev.to/alih552/your-mcp-servers-are-burning-50k-tokens-before-you-type-a-word-2oc6",
+      "discussionUrl": null,
+      "author": "Ali Al-Jaafari",
+      "source": "forem",
+      "publishedAt": "2026-06-28T19:41:42.000Z",
+      "score": 5,
+      "commentCount": 6,
+      "metadataJson": {
+        "tags": [
+          "mcp",
+          "ai",
+          "claude",
+          "productivity"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1kb001rg1icvtsptj85",
+      "title": "The Prophet and the Price Cut",
+      "summary": "Two things happened this month and they tell you everything about where AI is actually...",
+      "originalUrl": "https://dev.to/jon_at_backboardio/the-prophet-and-the-price-cut-f5i",
+      "discussionUrl": null,
+      "author": "Jonathan Murray",
+      "source": "forem",
+      "publishedAt": "2026-06-29T00:36:34.000Z",
+      "score": 5,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "webdev",
+          "programming",
           "opensource"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlgp001gg1nccm3k4q4i",
+      "id": "cmr0gt1ls0029g1icauh6ias3",
+      "title": "The Codebase Is the Prompt",
+      "summary": "The database analogy is usually wrong when people use it to explain AI.  A language model is not a...",
+      "originalUrl": "https://dev.to/timon_krebs_c89f82a68ba4c/the-codebase-is-the-prompt-2llh",
+      "discussionUrl": null,
+      "author": "Timon Krebs",
+      "source": "forem",
+      "publishedAt": "2026-06-27T23:52:13.000Z",
+      "score": 4,
+      "commentCount": 9,
+      "metadataJson": {
+        "tags": [
+          "codequality",
+          "contextrot",
+          "legacy",
+          "ai"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1li0026g1ick73wokr0",
       "title": "You Don't Use Linked Lists. But They're Running Half Your Software.",
       "summary": "The data structure everyone learns for interviews and forgets by Monday — and why that's...",
       "originalUrl": "https://dev.to/islamhafez0/you-dont-use-linked-lists-but-theyre-running-half-your-software-4b37",
@@ -949,7 +1045,7 @@
       "author": "Islam Hafez",
       "source": "forem",
       "publishedAt": "2026-06-27T14:13:23.000Z",
-      "score": 3,
+      "score": 4,
       "commentCount": 4,
       "metadataJson": {
         "tags": [
@@ -958,220 +1054,116 @@
           "computerscience",
           "systemdesign"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlhg001sg1ncn7jv7h8j",
-      "title": "React lost the mass and Vercel is wearing its skin",
-      "summary": "There used to be a sense that the React community had ownership of the project. Nowadays, it feels...",
-      "originalUrl": "https://dev.to/adioof/react-lost-the-mass-and-vercel-is-wearing-its-skin-27fc",
+      "id": "cmr0gt1lf0025g1iccklpl30w",
+      "title": "How I Built a Realistic Page-Flip Engine in the Browser — and Wired It to an AI API",
+      "summary": "A solo developer's technical deep-dive into rendering, multi-format document parsing, and AI...",
+      "originalUrl": "https://dev.to/xin_tian_a0a3d6e12aff92d4/how-i-built-a-realistic-page-flip-engine-in-the-browser-and-wired-it-to-an-ai-api-mn2",
       "discussionUrl": null,
-      "author": "Aditya Agarwal",
+      "author": "FlipRead",
       "source": "forem",
-      "publishedAt": "2026-06-26T10:12:04.000Z",
-      "score": 3,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "react",
-          "vercel",
-          "javascript",
-          "webdev"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgy001kg1nca54fl7xw",
-      "title": "The Tracking-Link Bug That Only Breaks Signed URLs",
-      "summary": "Here's a bug with a great property: it works perfectly for almost every link in your email, and...",
-      "originalUrl": "https://dev.to/nasrulhazim/the-tracking-link-bug-that-only-breaks-signed-urls-38c",
-      "discussionUrl": null,
-      "author": "Nasrul Hazim Bin Mohamad",
-      "source": "forem",
-      "publishedAt": "2026-06-25T17:24:51.000Z",
-      "score": 3,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "laravel",
-          "php",
-          "webdev",
-          "testing"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgu001ig1nctx891tvm",
-      "title": "Three dumb ways our prod got slow (and not one was a slow algorithm)",
-      "summary": "TL;DR. Three prod slowdowns in one week. A 30-second timeout that was secretly TWO MINUTES. A math...",
-      "originalUrl": "https://dev.to/arvavit/three-dumb-ways-our-prod-got-slow-and-not-one-was-a-slow-algorithm-29ag",
-      "discussionUrl": null,
-      "author": "Vadym Arnaut",
-      "source": "forem",
-      "publishedAt": "2026-06-25T17:13:29.000Z",
-      "score": 3,
-      "commentCount": 1,
-      "metadataJson": {
-        "tags": [
-          "postgres",
-          "webdev",
-          "performance",
-          "supabase"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgj001dg1ncd6ticn8j",
-      "title": "Next.js isn't the best framework. It's the most reliable bet.",
-      "summary": "Next.js is the most used React meta-framework in the world and one of the most resented. The numbers...",
-      "originalUrl": "https://fredcorr.com/journals/journals/nextjs-isnt-the-best-framework",
-      "discussionUrl": null,
-      "author": "Federico Corradi",
-      "source": "forem",
-      "publishedAt": "2026-06-25T17:24:44.000Z",
-      "score": 3,
-      "commentCount": 1,
-      "metadataJson": {
-        "tags": [
-          "frontend",
-          "nextjs",
-          "architecture",
-          "webdev"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlh8001og1ncxbg1u9f6",
-      "title": "I Let My AI Agent Build a Bedrock RAG Knowledge Base, Here Are the 2 Mistakes the AWS Agent Toolkit Caught",
-      "summary": "Provisioning a Bedrock RAG knowledge base with S3 Vectors, without the hallucinated API calls.  If...",
-      "originalUrl": "https://dev.to/raabdahl/i-let-my-ai-agent-build-a-bedrock-rag-knowledge-base-here-are-the-2-mistakes-the-aws-agent-toolkit-3l49",
-      "discussionUrl": null,
-      "author": "Saurabh \"Rob\" Dahal",
-      "source": "forem",
-      "publishedAt": "2026-06-25T18:29:01.000Z",
-      "score": 3,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "aws",
-          "ai",
-          "agentskills",
-          "bedrock"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgn001fg1nc5zebdriv",
-      "title": "I built a CLI to break my highlights out of Apple Books",
-      "summary": "A macOS CLI + MCP server that exports Apple Books highlights to Markdown and gives AI assistants direct access to your reading notes.",
-      "originalUrl": "https://dev.to/andreykorchak/i-built-a-cli-to-break-my-highlights-out-of-apple-books-51jn",
-      "discussionUrl": null,
-      "author": "Andrey Korchak",
-      "source": "forem",
-      "publishedAt": "2026-06-26T08:11:51.000Z",
-      "score": 3,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "showdev",
-          "opensource",
-          "macos"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlge001bg1ncntph4w9i",
-      "title": "AI Didn't Invent Slop. It Only Made It Infinite.",
-      "summary": "AI didn't invent disposable culture. It only removed the last bottleneck — and that changes what your job as an engineer actually is.",
-      "originalUrl": "https://dev.to/copyleftdev/ai-didnt-invent-slop-it-only-made-it-infinite-21o4",
-      "discussionUrl": null,
-      "author": "Don Johnson",
-      "source": "forem",
-      "publishedAt": "2026-06-27T00:01:32.000Z",
-      "score": 2,
+      "publishedAt": "2026-06-28T14:59:16.000Z",
+      "score": 4,
       "commentCount": 4,
       "metadataJson": {
         "tags": [
           "ai",
-          "career",
-          "discuss",
-          "codequality"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvli80024g1ncjjb7t2tz",
-      "title": "I Built an AI Agent That Gets Curious On Its Own",
-      "summary": "Active inference in practice: an agent that minimizes surprise develops curiosity for free, going from 48% to 100% on a foraging task.",
-      "originalUrl": "https://dev.to/shridhar_shah2297/i-built-an-ai-agent-that-gets-curious-on-its-own-4oe1",
-      "discussionUrl": null,
-      "author": "Shridhar Shah",
-      "source": "forem",
-      "publishedAt": "2026-06-27T21:43:35.000Z",
-      "score": 2,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "machinelearning",
-          "llm",
-          "python"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvli00020g1nc7ff51d0k",
-      "title": "I Built a Dual-Pool Adversarial Review System for AI Agents — And It Actually Works",
-      "summary": "AI code review has a problem: abstract roles produce generic feedback. \"Saboteur\" says \"add error...",
-      "originalUrl": "https://dev.to/yuhaolin2005/i-built-a-dual-pool-adversarial-review-system-for-ai-agents-and-it-actually-works-595j",
-      "discussionUrl": null,
-      "author": "YuhaoLin2005",
-      "source": "forem",
-      "publishedAt": "2026-06-27T14:53:25.000Z",
-      "score": 2,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "opensource",
-          "ai",
-          "claude",
-          "codereview"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlil002ag1nccedmv1ew",
-      "title": "I Built a Random Wheel Spinner and Learned That Simple Tools Are the Hardest to Get Right",
-      "summary": "The Itch I Needed to Scratch   Every few weeks, someone in a group chat would ask: \"How do...",
-      "originalUrl": "https://dev.to/getinfotoyou/i-built-a-random-wheel-spinner-and-learned-that-simple-tools-are-the-hardest-to-get-right-hih",
-      "discussionUrl": null,
-      "author": "Getinfo Toyou",
-      "source": "forem",
-      "publishedAt": "2026-06-26T16:48:42.000Z",
-      "score": 2,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "webdev",
           "javascript",
           "showdev",
-          "beginners"
+          "webdev"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlhm001ug1nc0oj91ux5",
+      "id": "cmr0gt1jl001ig1icymgsf5co",
+      "title": "Want AI Agents That Don't Spill Secrets? Don't Give Them Secrets",
+      "summary": "Some time ago, I reviewed an AI agent implementation and found an API key in the system prompt. The...",
+      "originalUrl": "https://auth0.com/blog/want-ai-agents-that-don-t-spill-secrets-don-t-give-them-secrets/",
+      "discussionUrl": null,
+      "author": "Andrea Chiarelli",
+      "source": "forem",
+      "publishedAt": "2026-06-29T07:42:26.000Z",
+      "score": 4,
+      "commentCount": 1,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "secret",
+          "security",
+          "llm"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1mb002fg1icux6upt4f",
+      "title": "Form validation without Formik or React Hook Form: treat your rules as domain logic",
+      "summary": "We've all been here. A new form shows up, you install React Hook Form, add Zod or Yup, and in ten...",
+      "originalUrl": "https://dev.to/chacaponquin/form-validation-without-formik-or-react-hook-form-treat-your-rules-as-domain-logic-2j8e",
+      "discussionUrl": null,
+      "author": "Hector Angel Gomez Robaina",
+      "source": "forem",
+      "publishedAt": "2026-06-29T00:16:50.000Z",
+      "score": 4,
+      "commentCount": 1,
+      "metadataJson": {
+        "tags": [
+          "react",
+          "frontend",
+          "cleancode",
+          "typescript"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1ke001sg1icjsqptcn0",
+      "title": "V.E.L.O.C.I.T.Y.-OS: The Self-Healing Kernel & LLM Terminal Handover (Part 12)",
+      "summary": "How I finalized the self-healing loop, built a content-addressed P2P registry, and handed control to an interactive LLM Terminal.",
+      "originalUrl": "https://dev.to/unitbuilds_cc/velocity-os-the-self-healing-kernel-llm-terminal-handover-part-12-1f0i",
+      "discussionUrl": null,
+      "author": "UnitBuilds",
+      "source": "forem",
+      "publishedAt": "2026-06-28T15:41:17.000Z",
+      "score": 3,
+      "commentCount": 1,
+      "metadataJson": {
+        "tags": [
+          "showdev",
+          "coding",
+          "compilers",
+          "systems"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1l40021g1ic2l7gl286",
+      "title": "The cost of learning everyting",
+      "summary": "The more I tried to learn, the less I felt like I actually knew.   For the longest time, I thought...",
+      "originalUrl": "https://dev.to/shaq_attack/the-cost-of-learning-everyting-3m5d",
+      "discussionUrl": null,
+      "author": "Shaquille Niekerk",
+      "source": "forem",
+      "publishedAt": "2026-06-29T08:16:18.000Z",
+      "score": 3,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "learning",
+          "mentalhealth",
+          "productivity",
+          "softwareengineering"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1m4002dg1ictdrqq597",
       "title": "The 60% Trap: Why E-Commerce Giants Are Laundering Discounts (And How to Protect Yourself)",
       "summary": "Last Black Friday I watched someone in my flat buy a pair of headphones because the price tag showed...",
       "originalUrl": "https://getkibbo.com/blog/the-60-percent-trap-fake-discounts-dynamic-pricing.html",
@@ -1180,7 +1172,7 @@
       "source": "forem",
       "publishedAt": "2026-06-27T17:02:04.000Z",
       "score": 2,
-      "commentCount": 2,
+      "commentCount": 3,
       "metadataJson": {
         "tags": [
           "opensource",
@@ -1188,11 +1180,11 @@
           "security",
           "javascript"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlhe001rg1nc7u1tlft3",
+      "id": "cmr0gt1m1002cg1ic53mvqebd",
       "title": "Debugging Mobile Drag & CSS Specificity in a Real-Time PDF Diff Tool",
       "summary": "TLDR: Three UI problems, three different root causes. The column detection fix was algorithmic. The...",
       "originalUrl": "https://ginexys.com/blog#post:diff-ui-redesign-postmortem",
@@ -1209,32 +1201,74 @@
           "webdev",
           "ux"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlh2001mg1nchvy5q6tj",
-      "title": "How I auto-generate 800+ App Store screenshots across 39 languages and 3 devices",
-      "summary": "A solo-dev pipeline: XCUITest captures localized screens, Python + Pillow composes captioned marketing shots for iPhone, iPad and Apple Watch.",
-      "originalUrl": "https://dev.to/netflowers/how-i-auto-generate-800-app-store-screenshots-across-39-languages-and-3-devices-1em7",
+      "id": "cmr0gt1l60022g1ici4i1sqea",
+      "title": "I Built a Signal Protocol Messenger from Scratch with X3DH, Double Ratchet, Safety Numbers, P2P File Transfer",
+      "summary": "Most developers think TLS means secure. It doesn't.  TLS protects the transport. The server still...",
+      "originalUrl": "https://dev.to/abhiramp_2005/i-built-a-signal-protocol-messenger-from-scratch-with-x3dh-double-ratchet-safety-numbers-p2p-1jh7",
       "discussionUrl": null,
-      "author": "Yoshiaki Hirokawa",
+      "author": "Abhiram",
       "source": "forem",
-      "publishedAt": "2026-06-27T04:53:54.000Z",
+      "publishedAt": "2026-06-29T10:43:54.000Z",
+      "score": 2,
+      "commentCount": 2,
+      "metadataJson": {
+        "tags": [
+          "security",
+          "javascript",
+          "cryptography",
+          "opensource"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1kp001wg1iceyz09mwr",
+      "title": "V.E.L.O.C.I.T.Y.-OS: Reclaiming Ring 0 – UEFI Bootloader & GDT/IDT (Part 8)",
+      "summary": "How I exited UEFI boot services to build a standalone, Ring 0 operating system kernel that runs JIT code in L3 cache.",
+      "originalUrl": "https://dev.to/unitbuilds_cc/velocity-os-reclaiming-ring-0-uefi-bootloader-gdtidt-part-8-2b0e",
+      "discussionUrl": null,
+      "author": "UnitBuilds",
+      "source": "forem",
+      "publishedAt": "2026-06-28T14:32:14.000Z",
       "score": 2,
       "commentCount": 1,
       "metadataJson": {
         "tags": [
-          "ios",
-          "swift",
-          "automation",
-          "indiedev"
+          "showdev",
+          "coding",
+          "compilers",
+          "osdev"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlgs001hg1ncqwnyn0nj",
+      "id": "cmr0gt1m7002eg1icdi5sjvt5",
+      "title": "I'm 33, 7 Years Into UI Development, Here's Why I Started Learning JavaScript From Scratch",
+      "summary": "I'm a UI developer with 7+ years of experience. HTML, CSS, pixel-perfect Figma-to-code, I've done...",
+      "originalUrl": "https://dev.to/dev_santosh_kumar/im-33-7-years-into-ui-development-heres-why-i-started-learning-javascript-from-scratch-4pch",
+      "discussionUrl": null,
+      "author": "Santosh Kumar",
+      "source": "forem",
+      "publishedAt": "2026-06-27T14:44:41.000Z",
+      "score": 2,
+      "commentCount": 1,
+      "metadataJson": {
+        "tags": [
+          "javascript",
+          "beginners",
+          "career",
+          "100daysofcode"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1lv002ag1icug3hkc9q",
       "title": "I Built a QR Code Generator in Pure Vanilla JS — No Libraries, No Server, 202 Tests",
       "summary": "QR codes look like magic — a grid of black and white squares that encodes anything from a URL to a...",
       "originalUrl": "https://dev.to/dev_nestio_229945f10652e4/i-built-a-qr-code-generator-in-pure-vanilla-js-no-libraries-no-server-202-tests-7h",
@@ -1251,255 +1285,74 @@
           "devtools",
           "opensource"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlg40017g1nc50q3d8yq",
-      "title": "Moving to baweaver.com",
-      "summary": "I've started moving all of my content over to baweaver.com powered by Bridgetown under...",
-      "originalUrl": "https://dev.to/baweaver/moving-to-baweavercom-dm",
+      "id": "cmr0gt1km001vg1ict5kic3q2",
+      "title": "V.E.L.O.C.I.T.Y.-OS: The x86-64 Machine-Code JIT & SCEV-Lite (Part 6)",
+      "summary": "How I built a raw x86-64 machine-code compiler for scalar loops and implemented SCEV-Lite to solve loops at compile time.",
+      "originalUrl": "https://dev.to/unitbuilds_cc/velocity-os-the-x86-64-machine-code-jit-scev-lite-part-6-e36",
       "discussionUrl": null,
-      "author": "Brandon Weaver",
+      "author": "UnitBuilds",
       "source": "forem",
-      "publishedAt": "2026-06-26T04:32:51.000Z",
+      "publishedAt": "2026-06-28T14:11:56.000Z",
       "score": 2,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "webdev",
-          "ruby",
-          "rails"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvli20021g1nc8hvt9s73",
-      "title": "Why I still use NGINX over everything else",
-      "summary": "People keep recommending Caddy. The config is cleaner, automatic HTTPS, three lines and you're done....",
-      "originalUrl": "https://dev.to/mishansavy/why-i-still-use-nginx-over-everything-else-24hj",
-      "discussionUrl": null,
-      "author": "Mishan Raj Shah",
-      "source": "forem",
-      "publishedAt": "2026-06-27T16:10:32.000Z",
-      "score": 2,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "devops",
-          "discuss",
-          "infrastructure",
-          "performance"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvli60023g1ncuiy1o4lo",
-      "title": "I Built a Live Timeline of React Hooks (useState, useEffect, useMemo, useRef)",
-      "summary": "The rules of React hooks are easy to recite and easy to get subtly wrong. When exactly does an effect...",
-      "originalUrl": "https://dev.to/dev48v/i-built-a-live-timeline-of-react-hooks-usestate-useeffect-usememo-useref-47i3",
-      "discussionUrl": null,
-      "author": "Devanshu Biswas",
-      "source": "forem",
-      "publishedAt": "2026-06-26T20:57:50.000Z",
-      "score": 2,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "react",
-          "javascript",
-          "webdev",
-          "beginners"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlik0029g1ncif972tds",
-      "title": "I Deployed 6 AI Systems Live — Here's What Actually Broke",
-      "summary": "I Deployed 6 AI Systems Live — Here's What Actually Broke   A few weeks ago I wrote about...",
-      "originalUrl": "https://dev.to/danish08654/i-deployed-6-ai-systems-live-heres-what-actually-broke-4neo",
-      "discussionUrl": null,
-      "author": "DANISH ZULFIQAR ",
-      "source": "forem",
-      "publishedAt": "2026-06-28T03:16:53.000Z",
-      "score": 1,
-      "commentCount": 2,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "productivity",
-          "opensource",
-          "product"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlhn001vg1nckdvb4kuw",
-      "title": "tgo Dev log #4: The Dread of Competition, Native Compilation, and the Relentless Grind of Hard Things",
-      "summary": "I had a micro-heart attack this week.   I was in the middle of working through some deep...",
-      "originalUrl": "https://dev.to/mtleadership/tgo-dev-log-4-the-dread-of-competition-native-compilation-and-the-relentless-grind-of-hard-41l1",
-      "discussionUrl": null,
-      "author": "Mike Cornwell",
-      "source": "forem",
-      "publishedAt": "2026-06-27T04:00:00.000Z",
-      "score": 1,
       "commentCount": 1,
       "metadataJson": {
         "tags": [
-          "leadership",
-          "tgo",
-          "typescript",
-          "go"
+          "showdev",
+          "coding",
+          "compilers",
+          "assembly"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlih0028g1ncup5m7jv8",
-      "title": "\"I Found ~30 Mergeable OSS Bugs in a Day. They Were All the Same Shape.\"",
-      "summary": "Yesterday I shipped around 28 pull requests across real repos — zod, NestJS, Fastify, Scrapy,...",
-      "originalUrl": "https://dev.to/greymothjp/i-found-30-mergeable-oss-bugs-in-a-day-they-were-all-the-same-shape-5c86",
+      "id": "cmr0gt1ks001xg1ic9p6ze9v4",
+      "title": "V.E.L.O.C.I.T.Y.-OS: The JIT Compiler Core – From AST to Native Closures (Part 4)",
+      "summary": "How I built a two-tier closure JIT compiler in Rust and solved the lifetime reference problem using Higher-Ranked Trait Bounds (HRTBs).",
+      "originalUrl": "https://dev.to/unitbuilds_cc/velocity-os-the-jit-compiler-core-from-ast-to-native-closures-part-4-52f3",
       "discussionUrl": null,
-      "author": "greymoth",
+      "author": "UnitBuilds",
       "source": "forem",
-      "publishedAt": "2026-06-26T07:42:48.000Z",
-      "score": 1,
-      "commentCount": 0,
+      "publishedAt": "2026-06-28T13:44:55.000Z",
+      "score": 2,
+      "commentCount": 1,
       "metadataJson": {
         "tags": [
-          "opensource",
-          "productivity",
-          "claudecode",
-          "webdev"
+          "showdev",
+          "coding",
+          "compilers",
+          "rust"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlhs001xg1nc4de3fy4h",
-      "title": "Resurrecting Kepler: Getting Modern LLMs Running on a GTX 770 (Kernel 7.x)",
-      "summary": "⚠️ Experimental hack: Use on non-critical systems. Ensure you have backups. This patches a...",
-      "originalUrl": "https://dev.to/skyne/resurrecting-kepler-getting-modern-llms-running-on-a-gtx-770-kernel-7x-4na",
+      "id": "cmr0gt1ly002bg1icgpj6551i",
+      "title": "Building a 5G UPF That Actually Saturates a 10G Link: VPP + DPDK + Open5GS in Production",
+      "summary": "Most writing about DPDK and VPP stays comfortably abstract. Libraries and drivers for fast packet...",
+      "originalUrl": "https://dev.to/jarvis8/building-a-5g-upf-that-actually-saturates-a-10g-link-vpp-dpdk-open5gs-in-production-1041",
       "discussionUrl": null,
-      "author": "skyne",
+      "author": "Nalin Banga",
       "source": "forem",
-      "publishedAt": "2026-06-27T13:29:09.000Z",
-      "score": 1,
+      "publishedAt": "2026-06-28T19:19:24.000Z",
+      "score": 2,
       "commentCount": 0,
       "metadataJson": {
         "tags": [
-          "cuda",
+          "networking",
           "linux",
-          "llm",
-          "gpu"
+          "performance",
+          "5g"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlfn000zg1ncivaf0xsr",
-      "title": "Engineering a Brainrot art installation on an Orange Pi Zero 🍊",
-      "summary": "How I built a gamified, infinite-scroll video installation for the TIAT \"Slop Epistemologies\"...",
-      "originalUrl": "https://dev.to/googleai/engineering-a-brainrot-art-installation-on-an-orange-pi-zero-4gmk",
-      "discussionUrl": null,
-      "author": "Paige Bailey",
-      "source": "forem",
-      "publishedAt": "2026-06-27T20:49:31.000Z",
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "webdev",
-          "programming",
-          "javascript"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxytnc10000g15gizkfxns8",
-      "title": "diagnostic item",
-      "summary": null,
-      "originalUrl": null,
-      "discussionUrl": null,
-      "author": null,
-      "source": "diagnostic",
-      "publishedAt": null,
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "diagnostic": true
-      }
-    },
-    {
-      "id": "cmqxyvlgw001jg1nctlziptwp",
-      "title": "A Free Screenshot Editor That Never Uploads Your Image",
-      "summary": "A free screenshot and image editor that runs entirely in your browser. Keeping every edit reversible and handling big phone photos, in plain TypeScript and Canvas2D.",
-      "originalUrl": "https://dev.to/martinstark/a-free-screenshot-editor-that-never-uploads-your-image-npb",
-      "discussionUrl": null,
-      "author": "Martin Stark",
-      "source": "forem",
-      "publishedAt": "2026-06-26T11:34:04.000Z",
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "typescript",
-          "editor",
-          "canvas",
-          "images"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlfu0013g1ncdrx59d02",
-      "title": "A Rogue Registry in My Own Backyard: Anatomy of a Two-Line Supply Chain Attack",
-      "summary": "The previous parts of this series were written from a comfortable distance. I read the Trend Micro...",
-      "originalUrl": "https://dev.to/sebs/a-rogue-registry-in-my-own-backyard-anatomy-of-a-two-line-supply-chain-attack-5b0h",
-      "discussionUrl": null,
-      "author": "Sebastian Schürmann",
-      "source": "forem",
-      "publishedAt": "2026-06-27T22:30:09.000Z",
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "npm",
-          "security",
-          "supplychain"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlh0001lg1ncqnwl1mjr",
-      "title": "I Built a Full-Stack B2B Marketplace in 3 Days With V0, Next.js 16, and Vercel's AWS Integration — Here's What Actually Happened",
-      "summary": "The honest account: what worked, what broke, and what I'd do differently.     Three days. One B2B...",
-      "originalUrl": "https://dev.to/arek_h/i-built-a-full-stack-b2b-marketplace-in-3-days-with-v0-nextjs-16-and-vercels-aws-integration--4ma4",
-      "discussionUrl": null,
-      "author": "Arek H",
-      "source": "forem",
-      "publishedAt": "2026-06-27T08:20:08.000Z",
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "h0hackathon",
-          "aws",
-          "hackathon",
-          "vercel"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlgh001cg1nchgohaqce",
+      "id": "cmr0gt1ky001zg1icmebq23ho",
       "title": "What I Learned About PDAs in a Week of Building on Solana",
       "summary": "I spent a week building a counter program in Anchor. By the end, every user had their own account, a...",
       "originalUrl": "https://dev.to/lymah/what-i-learned-about-pdas-in-a-week-of-building-on-solana-4n51",
@@ -1516,170 +1369,32 @@
           "anchor",
           "webdev"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlip002bg1nc15w2zezs",
-      "title": "the same few bugs keep hiding in libraries you already trust",
-      "summary": "i've spent the last while sending small fixes to bigger repos: langchain, vite, bat, mistune,...",
-      "originalUrl": "https://dev.to/greymothjp/the-same-few-bugs-keep-hiding-in-libraries-you-already-trust-1pgp",
+      "id": "cmr0gt1kh001tg1ic1ejggsu1",
+      "title": "I built CarvePHP: finding service boundaries in Laravel monoliths",
+      "summary": "I built CarvePHP: finding service boundaries in Laravel monoliths   I recently released...",
+      "originalUrl": "https://dev.to/mwaleedkhalil/i-built-carvephp-finding-service-boundaries-in-laravel-monoliths-103m",
       "discussionUrl": null,
-      "author": "greymoth",
+      "author": "Muhammad Waleed Khalil",
       "source": "forem",
-      "publishedAt": "2026-06-26T16:43:49.000Z",
+      "publishedAt": "2026-06-27T18:00:52.000Z",
       "score": 1,
       "commentCount": 0,
       "metadataJson": {
         "tags": [
+          "laravel",
+          "php",
           "opensource",
-          "debugging",
-          "programming",
-          "webdev"
+          "microservices"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlic0025g1ncmkf7k3nx",
-      "title": "Building a KVM Virtual Machine in Rust: Running a binary",
-      "summary": "Recap   This is a continuation of Part 2 of KVM in Rust series, where we successfully set up...",
-      "originalUrl": "https://dev.to/stjepan86/building-a-kvm-virtual-machine-in-rust-running-a-binary-ian",
-      "discussionUrl": null,
-      "author": "Stjepan",
-      "source": "forem",
-      "publishedAt": "2026-06-28T05:26:47.000Z",
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "kvm",
-          "qemu",
-          "rust"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxytwy80000g1lc84kv106c",
-      "title": "diagnostic item",
-      "summary": null,
-      "originalUrl": null,
-      "discussionUrl": null,
-      "author": null,
-      "source": "diagnostic",
-      "publishedAt": null,
-      "score": 1,
-      "commentCount": 0,
-      "metadataJson": null
-    },
-    {
-      "id": "cmqxyvlhy001zg1nco3yvbe3r",
-      "title": "The Agent Told Me It Was Done. The Tests Said Otherwise.",
-      "summary": "There's a specific kind of confidence that a coding agent projects when it finishes a task. It...",
-      "originalUrl": "https://blog.rfditservices.com/?p=100",
-      "discussionUrl": null,
-      "author": "Robert Floyd Dugger",
-      "source": "forem",
-      "publishedAt": "2026-06-28T00:45:50.000Z",
-      "score": 0,
-      "commentCount": 1,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "codingagents",
-          "testing",
-          "specdrivendevelopment"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlha001pg1ncbrv4wnck",
-      "title": "AI Helps Us Write Code Faster. So Why Aren’t Projects Moving Faster?",
-      "summary": "We can generate code faster than ever.  Features that once took several days can now be implemented...",
-      "originalUrl": "https://dev.to/swrzalek/ai-helps-us-write-code-faster-so-why-arent-projects-moving-faster-49jo",
-      "discussionUrl": null,
-      "author": "Sebastian Wrzalek",
-      "source": "forem",
-      "publishedAt": "2026-06-27T08:40:00.000Z",
-      "score": 0,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "ai",
-          "discuss",
-          "productivity",
-          "softwareengineering"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlhp001wg1nc9hn9st3s",
-      "title": "How to Run Out of Senior Engineers Without Firing Any",
-      "summary": "The industry is going to wake up in five to seven years to a shortage of senior engineers, and it will not be because we fired any of them. The current cohort of senior engineers is, by most…",
-      "originalUrl": "https://pickles.news/posts/how-to-run-out-of-senior-engineers/",
-      "discussionUrl": null,
-      "author": "Arthur",
-      "source": "forem",
-      "publishedAt": "2026-06-25T16:00:00.000Z",
-      "score": 0,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "career",
-          "devculture",
-          "aiimpact",
-          "seniors"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvli40022g1ncuuhzhrvd",
-      "title": "How I Built a Self-Learning YouTube AI on AWS Aurora (And Barely Survived the Weekend)",
-      "summary": "Eight months ago, I couldn't write a single line of code. I was just a guy in Tunisia trying to...",
-      "originalUrl": "https://dev.to/neo_gamers_d7450d6e9b8785/how-i-built-a-self-learning-youtube-ai-on-aws-aurora-and-barely-survived-the-weekend-1gen",
-      "discussionUrl": null,
-      "author": "Neo Gamers",
-      "source": "forem",
-      "publishedAt": "2026-06-28T11:03:07.000Z",
-      "score": 0,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "h0hackathon",
-          "v0",
-          "vercel",
-          "aws"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlie0026g1nchbo423xz",
-      "title": "We Added a Cache; Three Days Later It Took the Database Down at Peak",
-      "summary": "Adding a cache is one line of fetch — but it buys a new class of failures. Four production caching traps: stampede, treating cache as source of truth, unbounded keys blowing up memory, and caching failed results.",
-      "originalUrl": "https://dev.to/danewu/we-added-a-cache-three-days-later-it-took-the-database-down-at-peak-p46",
-      "discussionUrl": null,
-      "author": "Dane Wu",
-      "source": "forem",
-      "publishedAt": "2026-06-27T01:39:38.000Z",
-      "score": 0,
-      "commentCount": 0,
-      "metadataJson": {
-        "tags": [
-          "rails",
-          "performance",
-          "caching",
-          "redis"
-        ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
-      }
-    },
-    {
-      "id": "cmqxyvlif0027g1nch0trsw4k",
+      "id": "cmr0gt1lp0028g1icnzfbv1f1",
       "title": "How I Replaced Gemini with a Self-Hosted LLM for Two Production Apps",
       "summary": "A while back I wrote about my terminal-inspired portfolio and the products it indexes. Two of those...",
       "originalUrl": "https://dev.to/smngvlkz/how-i-replaced-gemini-with-a-self-hosted-llm-for-two-production-apps-3069",
@@ -1687,7 +1402,7 @@
       "author": "Simangaliso Vilakazi",
       "source": "forem",
       "publishedAt": "2026-06-27T13:56:38.000Z",
-      "score": 0,
+      "score": 1,
       "commentCount": 0,
       "metadataJson": {
         "tags": [
@@ -1696,28 +1411,89 @@
           "nextjs",
           "ollama"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     },
     {
-      "id": "cmqxyvlhc001qg1nc763czmi4",
-      "title": "Three Loops, No Ship",
-      "summary": "I spent three iterations on an auto-fix pipeline that still doesn't work reliably. Here's what I...",
-      "originalUrl": "https://dev.to/vystartasv/three-loops-no-ship-2pg0",
+      "id": "cmr0gt1k8001qg1icdhahpesl",
+      "title": "The Paywall That Wasn't: Debugging a 919-Video Leak on WordPress",
+      "summary": "The ticket was three sentences long: \"Some paid members can't play the on-demand videos. They log in,...",
+      "originalUrl": "https://www.vicentereyes.org/blog/the-paywall-that-wasnt-debugging-a-919-video-leak-on-wordpress-20651c3f",
       "discussionUrl": null,
-      "author": "Vilius",
+      "author": "Vicente G. Reyes",
       "source": "forem",
-      "publishedAt": "2026-06-25T21:59:12.000Z",
+      "publishedAt": "2026-06-30T07:31:56.000Z",
+      "score": 1,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "wordpress",
+          "webdev",
+          "security",
+          "php"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1jn001jg1icgnvia2e3",
+      "title": "A Rogue Registry in My Own Backyard: Anatomy of a Two-Line Supply Chain Attack",
+      "summary": "The previous parts of this series were written from a comfortable distance. I read the Trend Micro...",
+      "originalUrl": "https://dev.to/sebs/a-rogue-registry-in-my-own-backyard-anatomy-of-a-two-line-supply-chain-attack-5b0h",
+      "discussionUrl": null,
+      "author": "Sebastian Schürmann",
+      "source": "forem",
+      "publishedAt": "2026-06-27T22:30:09.000Z",
+      "score": 1,
+      "commentCount": 0,
+      "metadataJson": {
+        "tags": [
+          "npm",
+          "security",
+          "supplychain"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1me002gg1icjpgcasje",
+      "title": "The Agent Told Me It Was Done. The Tests Said Otherwise.",
+      "summary": "There's a specific kind of confidence that a coding agent projects when it finishes a task. It...",
+      "originalUrl": "https://blog.rfditservices.com/?p=100",
+      "discussionUrl": null,
+      "author": "Robert Floyd Dugger",
+      "source": "forem",
+      "publishedAt": "2026-06-28T00:45:50.000Z",
+      "score": 0,
+      "commentCount": 5,
+      "metadataJson": {
+        "tags": [
+          "ai",
+          "codingagents",
+          "testing",
+          "specdrivendevelopment"
+        ],
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
+      }
+    },
+    {
+      "id": "cmr0gt1l90023g1icgb5dd9x7",
+      "title": "Choosing the Right Database Abstraction",
+      "summary": "A question came up recently in the Perl community asking whether, in a Mojolicious application, it’s...",
+      "originalUrl": "https://perlhacks.com/2026/06/choosing-the-right-database-abstraction/",
+      "discussionUrl": null,
+      "author": "Dave Cross",
+      "source": "forem",
+      "publishedAt": "2026-06-28T09:24:43.000Z",
       "score": 0,
       "commentCount": 0,
       "metadataJson": {
         "tags": [
-          "ai",
-          "opensource",
-          "agents",
-          "localllms"
+          "database",
+          "dbi",
+          "dbixclass"
         ],
-        "fetchedAt": "2026-06-28T15:51:55.593Z"
+        "fetchedAt": "2026-06-30T09:49:21.924Z"
       }
     }
   ]

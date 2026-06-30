@@ -1,12 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  getRecentReadings,
-  loadRecentReadings,
-  type RecentReadingEntry,
-} from "../../../lib/local-user-library-store";
 import type { RecentReadingPageView, RecentReadingPageItemView } from "./recent-reading-page-view-model";
 
 interface RecentReadingPageClientProps {
@@ -16,30 +10,8 @@ interface RecentReadingPageClientProps {
 
 export function RecentReadingPageClient({
   pageView,
-  dbProgressEnabled,
 }: RecentReadingPageClientProps) {
-  const [mounted, setMounted] = useState(false);
-  const [localEntries, setLocalEntries] = useState<RecentReadingEntry[]>([]);
-
-  useEffect(() => {
-    const all = loadRecentReadings();
-    setLocalEntries(getRecentReadings(all, 15));
-    setMounted(true);
-  }, []);
-
-  // Build display items: DB-first, localStorage fallback
-  const displayItems = buildDisplayItems(pageView, localEntries, dbProgressEnabled);
-
-  if (!mounted) {
-    return (
-      <section className="learningPanel" aria-labelledby="recent-reading-list-title">
-        <div className="panelHeader">
-          <h2 id="recent-reading-list-title">Recent Reading</h2>
-        </div>
-        <p className="panelNote">Loading...</p>
-      </section>
-    );
-  }
+  const displayItems = buildDisplayItems(pageView);
 
   return (
     <section className="learningPanel" aria-labelledby="recent-reading-list-title">
@@ -122,30 +94,8 @@ export function RecentReadingPageClient({
   );
 }
 
-/**
- * Build display items: DB-first with localStorage fallback.
- */
 function buildDisplayItems(
   pageView: RecentReadingPageView,
-  localEntries: RecentReadingEntry[],
-  dbProgressEnabled: boolean,
 ): RecentReadingPageItemView[] {
-  if (pageView.items.length > 0 && pageView.dbProgressEnabled) {
-    return pageView.items;
-  }
-
-  // Fallback: map localStorage entries to page items
-  return localEntries.map((entry) => ({
-    bookId: entry.bookId,
-    bookTitle: entry.bookTitle,
-    chapterTitle: entry.chapterTitle,
-    progressPercent: 0,
-    progressDisplay: "N/A（本地记录）",
-    updatedAt: entry.lastReadAt,
-    sourceType: entry.sourceType,
-    badge: "local-fallback" as const,
-    badgeText: "本地最近阅读 fallback",
-    continueReadingUrl: `/reader?bookId=${encodeURIComponent(entry.bookId)}&chapterId=${encodeURIComponent(entry.chapterId)}`,
-    detailUrl: `/books/${encodeURIComponent(entry.bookId)}`,
-  }));
+  return pageView.dbProgressEnabled ? pageView.items : [];
 }

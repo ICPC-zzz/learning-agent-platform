@@ -24,6 +24,8 @@ export default async function UserPage() {
     redirect("/auth/login?returnTo=/user");
   }
 
+  const roleLabel = session.role === "ADMIN" ? "管理员" : "学习者";
+  const emailLabel = session.email ?? "未绑定邮箱";
   let codeforcesDashboard: CodeforcesDashboardData;
   const [articleFavorites, articleReadings] = await Promise.all([
     loadDbArticleFavoritesForUser(session.userId, session.displayName).catch(
@@ -71,6 +73,43 @@ export default async function UserPage() {
         <MetricPill label="最近阅读" value={articleReadings.items.length} status="muted" />
         <MetricPill label="Codeforces" value={codeforcesDashboard.hasAccount ? "已绑定" : "未绑定"} status={codeforcesDashboard.hasAccount ? "success" : "warning"} />
       </PageHero>
+      <section className="learningPanel" aria-labelledby="current-account-title">
+        <div className="panelHeader">
+          <p className="eyebrow">当前账号</p>
+          <h2 id="current-account-title">账号信息</h2>
+          <p className="panelNote">以下收藏、阅读记录和学习数据都按这个登录账号读取。</p>
+        </div>
+        <dl
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "12px",
+            margin: "16px 0 0",
+          }}
+        >
+          {[
+            ["显示名称", session.displayName],
+            ["登录邮箱", emailLabel],
+            ["账号角色", roleLabel],
+            ["会话状态", "数据库会话"],
+          ].map(([label, value]) => (
+            <div
+              key={label}
+              style={{
+                border: "1px solid var(--lap-border)",
+                borderRadius: "8px",
+                padding: "12px",
+                background: "rgba(248, 250, 252, 0.72)",
+              }}
+            >
+              <dt style={{ color: "var(--lap-text-muted)", fontSize: "12px", marginBottom: "6px" }}>{label}</dt>
+              <dd style={{ color: "var(--lap-text-primary)", fontWeight: 700, margin: 0, overflowWrap: "anywhere" }}>
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
       <UserFavoriteArticlesPanel
         hasSession={articleFavorites.guardEnabled}
         dbFavorites={articleFavorites.items}

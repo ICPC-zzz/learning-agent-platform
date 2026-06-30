@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 
-import {
-  loadFavoriteArticles,
-  persistFavoriteArticles,
-  removeFavoriteArticle,
-  type FavoriteArticleEntry,
-} from "../../lib/local-user-article-store";
 import type { DbFavoriteArticleView } from "../../app/user/article-favorites-db-view-model";
 import { toggleArticleFavoriteDbAction } from "../../app/user/article-favorites-db-server-action";
 
@@ -27,7 +21,7 @@ interface FavoriteDisplayItem {
   originalUrl: string;
   createdAt: string;
   updatedAt: string;
-  source: "db-article-favorite" | "local-storage-fallback";
+  source: "db-article-favorite";
   ownerLabel: string | null;
   notice: string;
 }
@@ -38,31 +32,6 @@ export function UserFavoriteArticlesPanel({
   dbEnabled = false,
   ownerLabel = null,
 }: UserFavoriteArticlesPanelProps) {
-  const [mounted, setMounted] = useState(false);
-  const [favorites, setFavorites] = useState<FavoriteArticleEntry[]>([]);
-
-  useEffect(() => {
-    setFavorites(loadFavoriteArticles());
-    setMounted(true);
-  }, []);
-
-  const localItems = useMemo<FavoriteDisplayItem[]>(
-    () =>
-      favorites.map((entry) => ({
-        articleId: entry.articleId,
-        articleTitle: entry.title,
-        sourcePlatform: entry.sourcePlatform,
-        sourceName: entry.sourceName,
-        originalUrl: entry.originalUrl,
-        createdAt: entry.updatedAt,
-        updatedAt: entry.updatedAt,
-        source: "local-storage-fallback",
-        ownerLabel,
-        notice: "local fallback",
-      })),
-    [favorites, ownerLabel],
-  );
-
   const dbItems = useMemo<FavoriteDisplayItem[]>(
     () =>
       (dbFavorites ?? []).map((entry) => ({
@@ -84,13 +53,6 @@ export function UserFavoriteArticlesPanel({
     const seen = new Set<string>();
     const merged: FavoriteDisplayItem[] = [];
 
-    for (const item of localItems) {
-      if (!seen.has(item.articleId)) {
-        seen.add(item.articleId);
-        merged.push(item);
-      }
-    }
-
     for (const item of dbItems) {
       if (!seen.has(item.articleId)) {
         seen.add(item.articleId);
@@ -99,13 +61,9 @@ export function UserFavoriteArticlesPanel({
     }
 
     return merged;
-  }, [dbItems, localItems]);
+  }, [dbItems]);
 
   const handleRemove = async (item: FavoriteDisplayItem) => {
-    const next = removeFavoriteArticle(favorites, item.articleId);
-    persistFavoriteArticles(next);
-    setFavorites(next);
-
     try {
       await toggleArticleFavoriteDbAction(
         item.articleId,
@@ -116,21 +74,9 @@ export function UserFavoriteArticlesPanel({
         true,
       );
     } catch {
-      // localStorage already updated; DB removal is best effort here.
+      // Best effort; server action enforces the authenticated user boundary.
     }
   };
-
-  if (!mounted) {
-    return (
-      <section className="learningPanel" aria-labelledby="fav-articles-title">
-        <div className="panelHeader">
-          <p className="eyebrow">Favorites</p>
-          <h2 id="fav-articles-title">收藏文章</h2>
-        </div>
-        <p className="panelNote">Loading...</p>
-      </section>
-    );
-  }
 
   return (
     <section className="learningPanel" aria-labelledby="fav-articles-title">
@@ -139,10 +85,10 @@ export function UserFavoriteArticlesPanel({
         <h2 id="fav-articles-title">收藏文章</h2>
         <p className="panelNote">
           {dbEnabled && dbFavorites && dbFavorites.length > 0
-            ? "文章收藏已同步到数据库，并与本地收藏合并展示。"
+            ? "文章收藏来自当前登录账号的数据库记录。"
             : hasSession
-              ? "当前会话文章收藏优先同步数据库，同时保留本地 fallback。"
-              : "未登录 dev session，文章收藏保存在浏览器本地。"}
+              ? "当前登录账号暂无数据库收藏记录。"
+              : "请先登录后查看文章收藏。"}
         </p>
       </div>
 
@@ -158,7 +104,7 @@ export function UserFavoriteArticlesPanel({
           </p>
           {hasSession ? (
             <p style={{ color: "#64748b", fontSize: "11px", marginTop: "8px" }}>
-              当前 dev session 已连接，收藏会优先写入数据库并保留本地副本。
+              当前视图只读取登录账号的数据库记录，不合并浏览器本地缓存。
             </p>
           ) : null}
         </div>

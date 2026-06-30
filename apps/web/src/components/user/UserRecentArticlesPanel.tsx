@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 
-import {
-  getRecentArticleReadings,
-  loadRecentArticleReadings,
-  type RecentArticleReadingEntry,
-} from "../../lib/local-user-article-store";
 import type { DbRecentArticleReadingView } from "../../app/user/article-recent-reading-db-view-model";
 
 interface UserRecentArticlesPanelProps {
@@ -26,7 +21,7 @@ interface RecentDisplayItem {
   lastReadAt: string;
   createdAt: string;
   updatedAt: string;
-  source: "db-article-reading" | "local-storage-fallback";
+  source: "db-article-reading";
   ownerLabel: string | null;
   notice: string;
 }
@@ -37,32 +32,6 @@ export function UserRecentArticlesPanel({
   dbEnabled = false,
   ownerLabel = null,
 }: UserRecentArticlesPanelProps) {
-  const [mounted, setMounted] = useState(false);
-  const [localReadings, setLocalReadings] = useState<RecentArticleReadingEntry[]>([]);
-
-  useEffect(() => {
-    setLocalReadings(getRecentArticleReadings(loadRecentArticleReadings(), 15));
-    setMounted(true);
-  }, []);
-
-  const localItems = useMemo<RecentDisplayItem[]>(
-    () =>
-      localReadings.map((entry) => ({
-        articleId: entry.articleId,
-        articleTitle: entry.title,
-        sourcePlatform: entry.sourcePlatform,
-        sourceName: entry.sourceName,
-        originalUrl: entry.originalUrl,
-        lastReadAt: entry.lastReadAt,
-        createdAt: entry.lastReadAt,
-        updatedAt: entry.lastReadAt,
-        source: "local-storage-fallback",
-        ownerLabel,
-        notice: "local fallback",
-      })),
-    [localReadings, ownerLabel],
-  );
-
   const dbItems = useMemo<RecentDisplayItem[]>(
     () =>
       (dbReadings ?? []).map((entry) => ({
@@ -85,13 +54,6 @@ export function UserRecentArticlesPanel({
     const seen = new Set<string>();
     const merged: RecentDisplayItem[] = [];
 
-    for (const item of localItems) {
-      if (!seen.has(item.articleId)) {
-        seen.add(item.articleId);
-        merged.push(item);
-      }
-    }
-
     for (const item of dbItems) {
       if (!seen.has(item.articleId)) {
         seen.add(item.articleId);
@@ -100,19 +62,7 @@ export function UserRecentArticlesPanel({
     }
 
     return merged;
-  }, [dbItems, localItems]);
-
-  if (!mounted) {
-    return (
-      <section className="learningPanel" aria-labelledby="recent-articles-title">
-        <div className="panelHeader">
-          <p className="eyebrow">Recent</p>
-          <h2 id="recent-articles-title">最近阅读文章</h2>
-        </div>
-        <p className="panelNote">Loading...</p>
-      </section>
-    );
-  }
+  }, [dbItems]);
 
   return (
     <section className="learningPanel" aria-labelledby="recent-articles-title">
@@ -121,10 +71,10 @@ export function UserRecentArticlesPanel({
         <h2 id="recent-articles-title">最近阅读文章</h2>
         <p className="panelNote">
           {dbEnabled && dbReadings && dbReadings.length > 0
-            ? "最近阅读已同步到数据库，并与本地记录合并展示。"
+            ? "最近阅读来自当前登录账号的数据库记录。"
             : hasSession
-              ? "当前会话最近阅读优先同步数据库，同时保留本地 fallback。"
-              : "未登录 dev session，最近阅读保存在浏览器本地。"}
+              ? "当前登录账号暂无数据库最近阅读记录。"
+              : "请先登录后查看最近阅读。"}
         </p>
       </div>
 
