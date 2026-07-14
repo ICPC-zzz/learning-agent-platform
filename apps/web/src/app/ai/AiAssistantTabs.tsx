@@ -10,6 +10,7 @@ import { CodeAnalysisPanel, type CodeAnalysisFormData } from "./CodeAnalysisPane
 import { CodeAnalysisReportView } from "./CodeAnalysisReport.tsx";
 import { A492PersonalizedReportView } from "./A492PersonalizedReport.tsx";
 import { runCodeAnalysisAction } from "./code-analysis-actions.ts";
+import { getServerActionRecoveryMessage } from "./server-action-recovery.ts";
 import type { CodeAnalysisResult } from "@learning-agent-platform/ai-core/code-analysis/types";
 import type { A492PersonalizedResult } from "@learning-agent-platform/ai-core/code-analysis/a492-types";
 import { AnalysisHistoryPanel } from "./AnalysisHistoryPanel.tsx";
@@ -97,7 +98,13 @@ function ChatTab({
       });
       setAnalysisResult(result);
     } catch (err: unknown) {
-      setAnalysisError(err instanceof Error ? err.message : "代码分析请求失败");
+      const recoveryMessage = getServerActionRecoveryMessage(err);
+      if (recoveryMessage) {
+        setAnalysisError(recoveryMessage);
+        window.setTimeout(() => window.location.reload(), 300);
+      } else {
+        setAnalysisError(err instanceof Error ? err.message : "代码分析请求失败");
+      }
     } finally {
       setIsSubmitting(false);
     }
