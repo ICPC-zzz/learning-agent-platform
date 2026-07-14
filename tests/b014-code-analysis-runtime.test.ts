@@ -7,7 +7,7 @@ import { generateStructured } from "../packages/ai-core/src/model-gateway/struct
 test("code analysis gets enough time but keeps production latency bounded", () => {
   assert.deepEqual(resolveCodeAnalysisRuntimeLimits(30_000, 4_096), {
     timeoutMs: 120_000,
-    maxOutputTokens: 2_048,
+    maxOutputTokens: 4_096,
   });
   assert.deepEqual(resolveCodeAnalysisRuntimeLimits(140_000, 1_024), {
     timeoutMs: 140_000,
@@ -15,7 +15,7 @@ test("code analysis gets enough time but keeps production latency bounded", () =
   });
   assert.deepEqual(resolveCodeAnalysisRuntimeLimits(300_000, 8_192), {
     timeoutMs: 150_000,
-    maxOutputTokens: 2_048,
+    maxOutputTokens: 4_096,
   });
 });
 

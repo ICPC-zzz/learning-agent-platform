@@ -89,7 +89,7 @@ export function A492PersonalizedReportView({
           />
         ) : (
           <div style={{ padding: "16px", background: "#fefce8", borderRadius: "8px", color: "#92400e", fontSize: "0.85rem" }}>
-            代码分析未能完成（可能因模型调用超时或 Provider 不可用）。以下展示题目画像、用户画像和个性化建议。
+            代码分析未能完成：{report.baseReportError?.safeMessage ?? "模型未返回完整的分析报告"}。以下展示题目画像、用户画像和个性化建议。
           </div>
         )}
       </SectionCard>

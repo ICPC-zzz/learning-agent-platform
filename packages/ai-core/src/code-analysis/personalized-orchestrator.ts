@@ -374,6 +374,7 @@ export async function runPersonalizedCodeAnalysis(
 
     const report: A492PersonalizedReport = {
       baseReport: codeResult.report,
+      baseReportError: codeResult.error,
       problemProfile,
       learnerProfile,
       difficultyFit,

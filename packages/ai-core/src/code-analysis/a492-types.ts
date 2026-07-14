@@ -5,7 +5,7 @@
  * CF profile controls, and new report sections:
  * - ProblemProfile, LearnerProfile, DifficultyFit, PersonalizedAdvice
  */
-import type { CodeAnalysisReport } from "./types.ts";
+import type { CodeAnalysisError, CodeAnalysisReport } from "./types.ts";
 
 // ---------------------------------------------------------------------------
 // A492 Extended Input
@@ -196,6 +196,9 @@ export interface CandidateProblem {
 export interface A492PersonalizedReport {
   /** A491 base report (null if analysis timed out or failed) */
   baseReport: CodeAnalysisReport | null;
+
+  /** Safe failure metadata when baseReport is null. Optional for old saved reports. */
+  baseReportError?: CodeAnalysisError | null;
 
   /** A492: problem profile */
   problemProfile: ProblemProfile;

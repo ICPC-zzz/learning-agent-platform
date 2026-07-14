@@ -1,6 +1,6 @@
 export const CODE_ANALYSIS_MIN_TIMEOUT_MS = 120_000;
 export const CODE_ANALYSIS_MAX_TIMEOUT_MS = 150_000;
-export const CODE_ANALYSIS_MAX_OUTPUT_TOKENS = 2_048;
+export const CODE_ANALYSIS_MAX_OUTPUT_TOKENS = 4_096;
 
 export interface CodeAnalysisRuntimeLimits {
   timeoutMs: number;

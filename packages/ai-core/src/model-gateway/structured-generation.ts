@@ -350,6 +350,24 @@ async function makeStructuredCall(
       };
     }
 
+    // A length-limited response is normally incomplete JSON. Detect it before
+    // parsing so it is not misclassified as INVALID_JSON and sent through a
+    // second full generation that has the same output limit.
+    const finishReason = firstChoice?.finish_reason;
+    if (finishReason === "length") {
+      return {
+        success: false,
+        output: null,
+        usage: getUsageFromResponse(parsedHttp),
+        latencyMs,
+        modelCalled: config.modelId,
+        errorCode: "OUTPUT_TRUNCATED",
+        errorMessage: "模型输出达到长度上限，未能生成完整报告",
+        hadFormatRepair: false,
+        usedJsonSchema,
+      };
+    }
+
     // Parse the actual report JSON from the content
     let reportJson: unknown;
     try {
@@ -386,22 +404,6 @@ async function makeStructuredCall(
           usedJsonSchema,
         };
       }
-    }
-
-    // Check if output was truncated (finish_reason === "length")
-    const finishReason = firstChoice?.finish_reason;
-    if (finishReason === "length") {
-      return {
-        success: false,
-        output: reportJson,
-        usage: getUsageFromResponse(parsedHttp),
-        latencyMs,
-        modelCalled: config.modelId,
-        errorCode: "OUTPUT_TRUNCATED",
-        errorMessage: "模型输出被截断，请尝试减少代码长度",
-        hadFormatRepair: false,
-        usedJsonSchema,
-      };
     }
 
     return {
