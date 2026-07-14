@@ -68,7 +68,7 @@ sudo systemctl enable --now learning-agent-platform
 sudo journalctl -u learning-agent-platform -f
 ```
 
-The service runs `next start` through `pnpm --filter @learning-agent-platform/web start` and listens on `127.0.0.1:3000`.
+The service starts the completed production build directly with Node.js and listens on `127.0.0.1:3000`. Do not use `pnpm` as the systemd entrypoint: release deployments that reuse an existing `node_modules` directory can otherwise trigger pnpm's non-interactive dependency reconciliation. The service sets `NODE_PATH` to `packages/db/node_modules` so the Prisma client remains resolvable at runtime.
 
 ## Nginx And HTTPS
 

@@ -34,4 +34,4 @@ Result: typecheck passed; 7 directed tests passed.
 
 ## Deployment Rule
 
-For this server, do not run `pnpm install` or `next build` in the live release path. Build a complete Linux-compatible release artifact under a CPU quota, verify it, then change the `current` symlink once and restart the service. This keeps the current service available during preparation and avoids the prior CPU spike.
+For this server, do not run `pnpm install` or `next build` in the live release path. Build an exact commit artifact in an isolated local worktree, upload it to a new release directory, verify its `BUILD_ID`, then change the `current` symlink once and restart the service. The systemd service must start Next.js directly with `NODE_PATH` set to `packages/db/node_modules`; using pnpm as the service entrypoint can trigger a non-interactive dependency reconciliation and make the release unavailable. This keeps the current service available during preparation and avoids the prior CPU spike.

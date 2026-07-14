@@ -6,9 +6,12 @@ After=network.target postgresql.service
 Type=simple
 User=APP_USER
 Group=APP_USER
-WorkingDirectory=/opt/learning-agent-platform
+WorkingDirectory=/opt/learning-agent-platform/apps/web
 EnvironmentFile=/etc/learning-agent-platform/web.env
-ExecStart=/usr/bin/pnpm --filter @learning-agent-platform/web start
+# Start the completed production build directly. This avoids pnpm attempting an
+# interactive dependency reconciliation when a release reuses node_modules.
+Environment=NODE_PATH=/opt/learning-agent-platform/packages/db/node_modules
+ExecStart=/usr/bin/node /opt/learning-agent-platform/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
