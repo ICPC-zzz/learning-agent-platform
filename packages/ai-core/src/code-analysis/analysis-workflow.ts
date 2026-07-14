@@ -32,6 +32,7 @@ import {
   createPlaceholderPromptSections,
 } from "../agent-runtime/prompts/prompt-section.ts";
 import type { CodeLanguage } from "./types.ts";
+import { resolveCodeAnalysisRuntimeLimits } from "./code-analysis-runtime.ts";
 
 // ---------------------------------------------------------------------------
 // Main entry point
@@ -147,17 +148,19 @@ export async function runCodeAnalysisWorkflow(
     preAnalysis,
   );
 
-  // Build structured generation config
-  // Code analysis prompts are long and complex — use at least 60s timeout
-  const analysisTimeoutMs = Math.max(resolvedModel.provider.requestTimeoutMs, 90000);
+  // Keep enough time for slower providers while bounding latency and output size.
+  const runtimeLimits = resolveCodeAnalysisRuntimeLimits(
+    resolvedModel.provider.requestTimeoutMs,
+    resolvedModel.profile.maxOutputTokens,
+  );
 
   const genConfig: StructuredGenerationConfig = {
     baseUrl: resolvedModel.provider.baseUrl,
     authMode: resolvedModel.provider.authMode,
     secrets: resolvedModel.provider.secrets,
     modelId: resolvedModel.profile.modelId,
-    timeoutMs: analysisTimeoutMs,
-    maxOutputTokens: resolvedModel.profile.maxOutputTokens,
+    timeoutMs: runtimeLimits.timeoutMs,
+    maxOutputTokens: runtimeLimits.maxOutputTokens,
     temperature: resolvedModel.profile.temperature,
     supportsJsonSchema: resolvedModel.profile.supportsJsonSchema,
   };
@@ -173,7 +176,7 @@ export async function runCodeAnalysisWorkflow(
       { role: "user", content: userPrompt },
     ],
     jsonSchema,
-    maxOutputChars: resolvedModel.profile.maxOutputTokens * 2, // rough estimation
+    maxOutputChars: runtimeLimits.maxOutputTokens * 2,
   });
 
   modelCallCount = genResult.hadFormatRepair ? 2 : 1;

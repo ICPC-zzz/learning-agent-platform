@@ -41,13 +41,13 @@ export async function profileProblem(
         range: null,
         source: "user_provided",
         confidence: 1.0,
-        reasoning: ["User-provided rating."],
+        reasoning: ["用户填写的 Rating。"],
       },
       tags: normalizeTags(input.userProvidedTags ?? []).map((tag) => ({
         tag,
         source: "user_provided" as ProfileSource,
         confidence: 1.0,
-        evidence: ["User-provided tag."],
+        evidence: ["用户填写的标签。"],
       })),
       problemType: [],
       requiredKnowledge: [],
@@ -114,7 +114,7 @@ function mergeModelProfile(
       tag: entry.tag.trim().toLowerCase(),
       source: "model_inferred" as ProfileSource,
       confidence: clamp01(entry.confidence),
-      evidence: entry.evidence.length > 0 ? entry.evidence.slice(0, 3) : ["Model-inferred tag."],
+      evidence: entry.evidence.length > 0 ? entry.evidence.slice(0, 3) : ["模型推断的标签。"],
     }))
     .filter((entry) => isKnownCfTag(entry.tag));
 
@@ -122,7 +122,7 @@ function mergeModelProfile(
     tag,
     source: "user_provided" as ProfileSource,
     confidence: 1.0,
-    evidence: ["User-provided tag."],
+    evidence: ["用户填写的标签。"],
   }));
 
   return {
@@ -155,21 +155,21 @@ function buildRuleEstimatedProblemProfile(input: ProblemProfilingInput): Problem
       source: "rule_estimated",
       confidence: tags.length > 0 ? 0.55 : 0.35,
       reasoning: [
-        "Rule estimate from constraints, tags, and common Codeforces difficulty distribution.",
-        "This fallback is used when the model profiler is slow or unavailable.",
+        "根据约束、标签和常见 Codeforces 难度分布进行规则估算。",
+        "模型画像响应较慢或不可用时使用此备用估算。",
       ],
     },
     tags: tags.map((tag) => ({
       tag,
       source: userTags.includes(tag) ? "user_provided" as ProfileSource : "rule_estimated" as ProfileSource,
       confidence: userTags.includes(tag) ? 1.0 : 0.5,
-      evidence: [userTags.includes(tag) ? "User-provided tag." : "Keyword-based tag estimate."],
+      evidence: [userTags.includes(tag) ? "用户填写的标签。" : "根据题面关键词估算的标签。"],
     })),
     problemType: [],
     requiredKnowledge: tags.slice(0, 5),
     keyConstraints: extractConstraintHints(text),
     uncertaintyWarnings: [
-      "Problem rating is rule-estimated. It is suitable for recommendation bands; enter a rating manually for exact matching.",
+      "题目 Rating 为规则估算值，适合用于推荐难度区间；如需精确匹配，请手动填写 Rating。",
     ],
   };
 }

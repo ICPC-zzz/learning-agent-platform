@@ -69,6 +69,7 @@ export interface StructuredGenerationResult {
 
 const MAX_REPAIR_CALLS = 1;
 const MAX_OUTPUT_TOKENS_DEFAULT = 4096;
+const MAX_REQUEST_TIMEOUT_MS = 150000;
 
 // ---------------------------------------------------------------------------
 // Main structured generation function
@@ -121,7 +122,9 @@ export async function generateStructured(
   }
 
   const endpoint = resolveEndpoint(ssrfResult.normalizedUrl);
-  const timeoutMs = Math.min(config.timeoutMs ?? 60000, 120000);
+  const timeoutMs = Math.min(config.timeoutMs ?? 60000, MAX_REQUEST_TIMEOUT_MS);
+  const deadline = startTime + Math.max(1, timeoutMs);
+  const remainingTimeoutMs = () => Math.max(1, deadline - Date.now());
 
   // 3. First call
   let result = await makeStructuredCall(
@@ -129,12 +132,15 @@ export async function generateStructured(
     authResult.headers,
     config,
     request,
-    timeoutMs,
+    remainingTimeoutMs(),
     startTime,
   );
 
   // 4. If first call failed to produce valid JSON, attempt ONE repair call
-  if (!result.success && result.errorCode === "INVALID_JSON" && request.jsonSchema) {
+  if (MAX_REPAIR_CALLS > 0 && !result.success && result.errorCode === "INVALID_JSON" && request.jsonSchema) {
+    const repairTimeoutMs = deadline - Date.now();
+    if (repairTimeoutMs <= 0) return result;
+
     const repairRequest: StructuredGenerationRequest = {
       messages: [
         ...request.messages,
@@ -158,7 +164,7 @@ export async function generateStructured(
       authResult.headers,
       config,
       repairRequest,
-      timeoutMs,
+      repairTimeoutMs,
       startTime,
     );
 
@@ -197,10 +203,11 @@ async function makeStructuredCall(
   };
 
   // Set max_tokens
-  const maxTokens = request.maxOutputChars
+  const estimatedMaxTokens = request.maxOutputChars
     ? Math.ceil(request.maxOutputChars * 0.6) // ~0.6 tokens per char for non-English
     : MAX_OUTPUT_TOKENS_DEFAULT;
-  body.max_tokens = maxTokens;
+  const configuredMaxTokens = config.maxOutputTokens ?? MAX_OUTPUT_TOKENS_DEFAULT;
+  body.max_tokens = Math.min(estimatedMaxTokens, configuredMaxTokens);
 
   // JSON Schema mode — only set response_format when the provider explicitly supports it.
   // Many providers (Spark, older models) don't support json_schema or json_object;

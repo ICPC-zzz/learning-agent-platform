@@ -13,6 +13,7 @@
  */
 
 import type { A492PersonalizedResult, A492PersonalizedReport } from "@learning-agent-platform/ai-core/code-analysis/a492-types";
+import { formatProblemProfileTag, formatProblemProfileText } from "@learning-agent-platform/ai-core/code-analysis/problem-profile-display";
 import { CodeAnalysisReportView } from "./CodeAnalysisReport.tsx";
 import type { CodeAnalysisResult } from "@learning-agent-platform/ai-core/code-analysis/types";
 
@@ -167,7 +168,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
       {rating.reasoning.length > 0 && (
         <div style={{ marginTop: "6px", fontSize: "0.8rem", color: "#6b7280" }}>
           {rating.reasoning.map((r, i) => (
-            <div key={i}>• {r}</div>
+            <div key={i}>• {formatProblemProfileText(r)}</div>
           ))}
         </div>
       )}
@@ -183,7 +184,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
               border: t.source === "user_provided" ? "1px solid #6ee7b7" : t.source === "rule_estimated" ? "1px solid #fde68a" : "1px solid #c7d2fe",
               color: t.source === "user_provided" ? "#065f46" : t.source === "rule_estimated" ? "#92400e" : "#4338ca",
             }}>
-              {t.tag}
+              {formatProblemProfileTag(t.tag)}
               <span style={{ fontSize: "0.65rem", marginLeft: "4px", opacity: 0.7 }}>
                 ({sourceLabel(t.source)})
               </span>
@@ -197,7 +198,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
         <div style={{ marginTop: "10px" }}>
           <div style={fieldLabelStyle}>所需知识:</div>
           <div style={{ fontSize: "0.82rem", color: "#374151" }}>
-            {profile.requiredKnowledge.join(", ")}
+            {profile.requiredKnowledge.map(formatProblemProfileTag).join(", ")}
           </div>
         </div>
       )}
@@ -207,7 +208,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
         <div style={{ marginTop: "8px" }}>
           <div style={fieldLabelStyle}>关键约束:</div>
           <div style={{ fontSize: "0.82rem", color: "#374151" }}>
-            {profile.keyConstraints.map((c, i) => <div key={i}>• {c}</div>)}
+            {profile.keyConstraints.map((c, i) => <div key={i}>• {formatProblemProfileText(c)}</div>)}
           </div>
         </div>
       )}
@@ -215,7 +216,7 @@ function ProblemProfileSection({ profile }: { profile: A492PersonalizedReport["p
       {/* Uncertainty */}
       {profile.uncertaintyWarnings.length > 0 && (
         <div style={{ marginTop: "10px", padding: "8px 12px", background: "#fefce8", borderRadius: "6px", fontSize: "0.8rem", color: "#92400e" }}>
-          ⚠️ {profile.uncertaintyWarnings.join("; ")}
+          ⚠️ {profile.uncertaintyWarnings.map(formatProblemProfileText).join("；")}
         </div>
       )}
     </div>
@@ -258,7 +259,7 @@ function LearnerProfileSection({ profile }: { profile: NonNullable<A492Personali
                 background: w.evidenceLevel === "strong" ? "#fee2e2" : w.evidenceLevel === "moderate" ? "#fef3c7" : "#f3f4f6",
                 border: "1px solid #e5e7eb", fontSize: "0.78rem",
               }}>
-                {w.tag}
+                {formatProblemProfileTag(w.tag)}
                 <span style={{ fontSize: "0.65rem", color: "#6b7280" }}>
                   ({Math.round(w.completionRate * 100)}%)
                 </span>
@@ -273,7 +274,7 @@ function LearnerProfileSection({ profile }: { profile: NonNullable<A492Personali
         <div style={{ marginTop: "10px" }}>
           <div style={fieldLabelStyle}>复习重点标签:</div>
           <span style={{ fontSize: "0.85rem", color: "#d97706" }}>
-            {profile.reviewFocusTags.join(", ")}
+            {profile.reviewFocusTags.map(formatProblemProfileTag).join(", ")}
           </span>
         </div>
       )}
