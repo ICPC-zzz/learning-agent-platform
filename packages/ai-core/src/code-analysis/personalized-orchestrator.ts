@@ -4,12 +4,11 @@
  * Fixed 8-step multi-agent workflow:
  *   1. Validate input
  *   2. Optionally refresh CF data
- *   3. ProblemProfileAgent (parallel-safe with LearnerProfileAgent)
+ *   3. ProblemProfileAgent || CodeDebugAgent (independent model work)
  *   4. LearnerProfileAgent (deterministic, no LLM)
- *   5. CodeDebugAgent (A491 + personalization context)
- *   6. LearningAdviceAgent (aggregation + difficulty match + candidates)
- *   7. Validate final report
- *   8. Aggregate output
+ *   5. LearningAdviceAgent (aggregation + difficulty match + candidates)
+ *   6. Validate final report
+ *   7. Aggregate output
  *
  * Maximum: 8 tool calls, 3 model calls, 12 total steps, 120s timeout.
  *
@@ -18,7 +17,7 @@
  * and only uses current CF data (via cache with 5-min TTL). User skill levels
  * change over time, so past analyses are irrelevant to current ones.
  */
-import type { CodeAnalysisResult } from "./types.ts";
+import type { CodeAnalysisInput, CodeAnalysisResult } from "./types.ts";
 import { runCodeAnalysisWorkflow } from "./analysis-workflow.ts";
 import type {
   PersonalizedCodeAnalysisInput,
@@ -79,6 +78,9 @@ export interface AgentDeps {
     userProvidedRating?: number;
     userProvidedTags?: string[];
   }) => Promise<ProblemProfile>;
+
+  /** Code analysis workflow; injectable for orchestration tests. */
+  runCodeAnalysis?: (input: CodeAnalysisInput, userId: string) => Promise<CodeAnalysisResult>;
 
   /** Model info for display */
   modelInfo?: {
@@ -170,7 +172,7 @@ export async function runPersonalizedCodeAnalysis(
     const hasCfProfile = input.enableCfProfile && deps.getCfSnapshot !== undefined;
 
     pushEvent("orchestrator_create_plan", "orchestrator", "completed",
-      `计划: ProblemProfile → CodeDebug → ${hasCfProfile ? "LearnerProfile → " : ""}LearningAdvice`,
+      `计划: ProblemProfile || CodeDebug → ${hasCfProfile ? "LearnerProfile → " : ""}LearningAdvice`,
     );
 
     // =====================================================================
@@ -179,32 +181,32 @@ export async function runPersonalizedCodeAnalysis(
     deps.reportProgress?.("分析题目画像", 2, 7);
     pushEvent("problem_profile_agent", "problem-profiler", "running", "分析题目难度与标签");
 
-    let problemProfile: ProblemProfile;
-    try {
-      problemProfile = await (deps.profileProblem?.({
-        problemStatement: input.problemStatement,
-        code: input.sourceCode,
-        userProvidedRating: rating,
-        userProvidedTags: userTags.length > 0 ? userTags : undefined,
-      }) ?? Promise.resolve(makeDefaultProblemProfile(rating, userTags)));
+    const problemProfilePromise = (async (): Promise<ProblemProfile> => {
+      try {
+        const problemProfile = await (deps.profileProblem?.({
+          problemStatement: input.problemStatement,
+          code: input.sourceCode,
+          userProvidedRating: rating,
+          userProvidedTags: userTags.length > 0 ? userTags : undefined,
+        }) ?? Promise.resolve(makeDefaultProblemProfile(rating, userTags)));
 
-      if (deps.profileProblem && rating === undefined) {
-        modelCallCount++;
-        if (modelCallCount > MAX_MODEL_CALLS) throw new Error("Exceeded max model calls");
+        if (deps.profileProblem && rating === undefined) {
+          modelCallCount++;
+          if (modelCallCount > MAX_MODEL_CALLS) throw new Error("Exceeded max model calls");
+        }
+
+        pushEvent("problem_profile_agent", "problem-profiler", "completed",
+          `Rating: ${problemProfile.rating.value ?? "未知"} (${problemProfile.rating.source === "user_provided" ? "用户填写" : problemProfile.rating.source === "model_inferred" ? "模型推断" : problemProfile.rating.source === "rule_estimated" ? "规则估算" : "未推断"}), 置信度: ${Math.round(problemProfile.rating.confidence * 100)}%` +
+          (problemProfile.tags.length > 0 ? `, 标签: ${problemProfile.tags.map(function(t) { return t.tag; }).join(", ")}` : ""),
+          { toolName: "cf.problem.rating.estimate", confidence: problemProfile.rating.confidence }
+        );
+        return problemProfile;
+      } catch (err: unknown) {
+        pushEvent("problem_profile_agent", "problem-profiler", "failed",
+          `题目画像失败: ${err instanceof Error ? err.message : String(err)}`);
+        return makeDefaultProblemProfile(rating, userTags);
       }
-
-      pushEvent("problem_profile_agent", "problem-profiler", "completed",
-        `Rating: ${problemProfile.rating.value ?? "未知"} (${problemProfile.rating.source === "user_provided" ? "用户填写" : problemProfile.rating.source === "model_inferred" ? "模型推断" : problemProfile.rating.source === "rule_estimated" ? "规则估算" : "未推断"}), 置信度: ${Math.round(problemProfile.rating.confidence * 100)}%` +
-        (problemProfile.tags.length > 0 ? `, 标签: ${problemProfile.tags.map(function(t) { return t.tag; }).join(", ")}` : ""),
-        { toolName: "cf.problem.rating.estimate", confidence: problemProfile.rating.confidence }
-      );
-    } catch (err: unknown) {
-      pushEvent("problem_profile_agent", "problem-profiler", "failed",
-        `题目画像失败: ${err instanceof Error ? err.message : String(err)}`);
-      problemProfile = makeDefaultProblemProfile(rating, userTags);
-    }
-
-    checkTimeout();
+    })();
 
     // =====================================================================
     // Step 3: CodeDebugAgent (A491 code analysis — the heavy work)
@@ -212,21 +214,29 @@ export async function runPersonalizedCodeAnalysis(
     deps.reportProgress?.("分析代码（最耗时）", 3, 7);
     pushEvent("code_debug_agent", "code-debugger", "running", "分析代码复杂度、Bug 和修改建议");
 
-    let codeResult: CodeAnalysisResult;
-    try {
-      codeResult = await runCodeAnalysisWorkflow(
-        { problemStatement: input.problemStatement, sourceCode: input.sourceCode, selectedLanguage: input.selectedLanguage as any, errorInfo: input.errorInfo, testInput: input.testInput, actualOutput: input.actualOutput, expectedOutput: input.expectedOutput, failedCases: input.failedCases },
-        input.userId,
-      );
-      modelCallCount += codeResult.timeline.modelCallCount;
-      if (modelCallCount > MAX_MODEL_CALLS) throw new Error("Exceeded max model calls");
+    const codeResultPromise = (async (): Promise<CodeAnalysisResult> => {
+      try {
+        const runCodeAnalysis = deps.runCodeAnalysis ?? runCodeAnalysisWorkflow;
+        const codeResult = await runCodeAnalysis(
+          { problemStatement: input.problemStatement, sourceCode: input.sourceCode, selectedLanguage: input.selectedLanguage as any, errorInfo: input.errorInfo, testInput: input.testInput, actualOutput: input.actualOutput, expectedOutput: input.expectedOutput, failedCases: input.failedCases },
+          input.userId,
+        );
 
-      pushEvent("code_debug_agent", "code-debugger", codeResult.success ? "completed" : "failed",
-        codeResult.success ? `发现 ${codeResult.report?.findings.length ?? 0} 个问题` : `代码分析失败: ${codeResult.error?.safeMessage ?? "unknown"}`);
-    } catch (err: unknown) {
-      pushEvent("code_debug_agent", "code-debugger", "failed", `代码分析异常: ${err instanceof Error ? err.message : String(err)}`);
-      codeResult = { success: false, report: null, timeline: { events: [], totalDurationMs: 0, modelCallCount: 0, hadFormatRepair: false }, error: { code: "UNKNOWN_ERROR" as any, safeMessage: "代码分析异常", retryable: false }, modelInfo: null };
-    }
+        pushEvent("code_debug_agent", "code-debugger", codeResult.success ? "completed" : "failed",
+          codeResult.success ? `发现 ${codeResult.report?.findings.length ?? 0} 个问题` : `代码分析失败: ${codeResult.error?.safeMessage ?? "unknown"}`);
+        return codeResult;
+      } catch (err: unknown) {
+        pushEvent("code_debug_agent", "code-debugger", "failed", `代码分析异常: ${err instanceof Error ? err.message : String(err)}`);
+        return { success: false, report: null, timeline: { events: [], totalDurationMs: 0, modelCallCount: 0, hadFormatRepair: false }, error: { code: "UNKNOWN_ERROR" as any, safeMessage: "代码分析异常", retryable: false }, modelInfo: null };
+      }
+    })();
+
+    const [problemProfile, codeResult] = await Promise.all([
+      problemProfilePromise,
+      codeResultPromise,
+    ]);
+    modelCallCount += codeResult.timeline.modelCallCount;
+    if (modelCallCount > MAX_MODEL_CALLS) throw new Error("Exceeded max model calls");
 
     checkTimeout();
 
