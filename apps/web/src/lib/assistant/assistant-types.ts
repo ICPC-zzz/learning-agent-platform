@@ -492,8 +492,8 @@ export interface AssistantResponse {
     memoryContextUsed: boolean;
     rawPromptStored: false;
     rawResponseStored: false;
-    devOnly: true;
-    productionReady: false;
+    devOnly: boolean;
+    productionReady: boolean;
   };
   blockedReasons: string[];
   warnings: string[];

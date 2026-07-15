@@ -26,6 +26,7 @@ import type {
 } from "../../lib/assistant/assistant-types.ts";
 import { useAssistantConversation, type AssistantChatMessage } from "./AssistantConversationStore.tsx";
 import { useAssistantPageContext } from "./AssistantPageContextProvider.tsx";
+import { getServerActionRecoveryMessage } from "../ai/server-action-recovery.ts";
 
 export function AssistantChatPanel({
   compact = false,
@@ -39,6 +40,7 @@ export function AssistantChatPanel({
   const router = useRouter();
   const pageContext = useAssistantPageContext();
   const messagesScrollRef = useRef<HTMLDivElement>(null);
+  const deploymentRecoveryStartedRef = useRef(false);
   const {
     conversationId,
     messages,
@@ -102,9 +104,9 @@ export function AssistantChatPanel({
         setError(null);
         void refreshConversationList();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!cancelled) {
-          setError("读取服务端会话失败。");
+          handleServerActionError(error, "读取服务端会话失败。");
         }
       });
 
@@ -112,6 +114,21 @@ export function AssistantChatPanel({
       cancelled = true;
     };
   }, [mounted]);
+
+  function handleServerActionError(error: unknown, fallbackMessage: string): void {
+    const recoveryMessage = getServerActionRecoveryMessage(error);
+    if (!recoveryMessage) {
+      setError(fallbackMessage);
+      return;
+    }
+
+    setError(recoveryMessage);
+    if (deploymentRecoveryStartedRef.current) {
+      return;
+    }
+    deploymentRecoveryStartedRef.current = true;
+    window.setTimeout(() => window.location.reload(), 300);
+  }
 
   useEffect(() => {
     if (!mounted) {
@@ -147,6 +164,8 @@ export function AssistantChatPanel({
       if (result.ok) {
         setConversationList(result.active);
       }
+    } catch (error: unknown) {
+      handleServerActionError(error, "刷新会话列表失败。");
     } finally {
       setIsLoadingConversations(false);
     }
@@ -181,7 +200,7 @@ export function AssistantChatPanel({
       setStatus(null);
       setProviderMode(null);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "切换会话失败。");
+      handleServerActionError(err, "切换会话失败。");
     }
   }
 
@@ -235,7 +254,7 @@ export function AssistantChatPanel({
     } catch (err: unknown) {
       setStatus("error");
       setProviderMode("error");
-      setError(err instanceof Error ? err.message : "AI 请求失败。");
+      handleServerActionError(err, "AI 请求失败。");
     } finally {
       setIsSubmitting(false);
     }
@@ -262,7 +281,7 @@ export function AssistantChatPanel({
       setProviderMode("unavailable");
       await refreshConversationList();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "压缩执行失败。");
+      handleServerActionError(err, "压缩执行失败。");
     } finally {
       setIsCompressing(false);
     }
@@ -289,7 +308,7 @@ export function AssistantChatPanel({
       setContextCompression(result.contextCompression);
       await refreshConversationList();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "创建会话失败。");
+      handleServerActionError(err, "创建会话失败。");
     }
   }
 
@@ -318,7 +337,7 @@ export function AssistantChatPanel({
         }
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "归档会话失败。");
+      handleServerActionError(err, "归档会话失败。");
     }
   }
 
@@ -351,41 +370,53 @@ export function AssistantChatPanel({
         }
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "删除会话失败。");
+      handleServerActionError(err, "删除会话失败。");
     }
   }
 
   async function handleCancelTask(taskId: string) {
     setError(null);
-    const result = await cancelAssistantTaskAction({ taskId });
-    if (!result.ok) {
-      setError(result.error);
-      return;
+    try {
+      const result = await cancelAssistantTaskAction({ taskId });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setTasks((current) => replaceTask(current, result.task));
+      void refreshTasks();
+    } catch (error: unknown) {
+      handleServerActionError(error, "取消任务失败。");
     }
-    setTasks((current) => replaceTask(current, result.task));
-    void refreshTasks();
   }
 
   async function handleRetryAgent(taskId: string, agentName: AssistantMultiAgentTaskView["canRetryAgentNames"][number]) {
     setError(null);
-    const result = await retryAssistantAgentTaskAction({ taskId, agentName });
-    if (!result.ok) {
-      setError(result.error);
-      return;
+    try {
+      const result = await retryAssistantAgentTaskAction({ taskId, agentName });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setTasks((current) => replaceTask(current, result.task));
+      void refreshTasks();
+    } catch (error: unknown) {
+      handleServerActionError(error, "重试步骤失败。");
     }
-    setTasks((current) => replaceTask(current, result.task));
-    void refreshTasks();
   }
 
   async function handleRetryTask(taskId: string) {
     setError(null);
-    const result = await retryAssistantTaskAction({ taskId });
-    if (!result.ok) {
-      setError(result.error);
-      return;
+    try {
+      const result = await retryAssistantTaskAction({ taskId });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setTasks((current) => replaceTask(current, result.task));
+      void refreshTasks();
+    } catch (error: unknown) {
+      handleServerActionError(error, "重试任务失败。");
     }
-    setTasks((current) => replaceTask(current, result.task));
-    void refreshTasks();
   }
 
   return (

@@ -34,6 +34,8 @@ import {
   isCodeforcesRefreshReminderMemory,
 } from "./assistant-intent-resolver.ts";
 import { createOpenAiCompatibleLlmProvider } from "./providers/openai-compatible-llm-provider.ts";
+import { createAssistantProviderEnvSnapshot } from "./config/assistant-provider-config.ts";
+import { evaluateWebAiQaGuard } from "../web-ai-qa-guard.ts";
 
 const MAX_PROMPT_MEMORY_ITEMS = 8;
 const MAX_PROMPT_MEMORY_CHARS = 1200;
@@ -298,6 +300,7 @@ export async function queueAssistantMemoryConsolidationAfterTurn(input: {
   memoryOwnerIds?: readonly string[];
   provider?: AssistantMemoryCandidateProvider | null;
   customFetch?: ExternalProviderFetch;
+  env?: Record<string, string | undefined>;
 }): Promise<{ queued: boolean; trailing: boolean; taskId: string | null }> {
   if (!isNonEmptyString(input.userId ?? undefined) || !input.conversation) {
     return { queued: false, trailing: false, taskId: null };
@@ -330,6 +333,7 @@ export async function queueAssistantMemoryConsolidationAfterTurn(input: {
     memoryOwnerIds: input.memoryOwnerIds,
     provider: input.provider,
     customFetch: input.customFetch,
+    env: input.env,
     taskId,
   }).finally(() => {
     runningMemoryConsolidations.delete(key);
@@ -452,6 +456,7 @@ export async function runAssistantMemoryConsolidationNow(input: {
 
   const provider = input.provider ?? createConfiguredAssistantMemoryCandidateProvider({
     customFetch: input.customFetch,
+    env,
   });
   if (!provider) {
     await repository.updateMemoryConsolidationState({
@@ -880,6 +885,7 @@ async function runQueuedMemoryConsolidation(input: {
   memoryOwnerIds?: readonly string[];
   provider?: AssistantMemoryCandidateProvider | null;
   customFetch?: ExternalProviderFetch;
+  env?: Record<string, string | undefined>;
   taskId: string;
 }): Promise<void> {
   await input.repository.updateMemoryConsolidationState({
@@ -900,6 +906,7 @@ async function runQueuedMemoryConsolidation(input: {
     memoryOwnerIds: input.memoryOwnerIds,
     provider: input.provider,
     customFetch: input.customFetch,
+    env: input.env,
   });
 
   const cursor = await input.repository.getMemoryConsolidationState({
@@ -924,6 +931,7 @@ async function runQueuedMemoryConsolidation(input: {
       memoryOwnerIds: input.memoryOwnerIds,
       provider: input.provider,
       customFetch: input.customFetch,
+      env: input.env,
       force: true,
     });
   }
@@ -931,8 +939,17 @@ async function runQueuedMemoryConsolidation(input: {
 
 function createConfiguredAssistantMemoryCandidateProvider(input: {
   customFetch?: ExternalProviderFetch;
+  env?: Record<string, string | undefined>;
 } = {}): AssistantMemoryCandidateProvider | null {
-  const bundle = createOpenAiCompatibleLlmProvider({ customFetch: input.customFetch });
+  const providerEnv = input.env ?? createAssistantProviderEnvSnapshot();
+  const guard = evaluateWebAiQaGuard(providerEnv);
+  if (!guard.allowed) {
+    return null;
+  }
+  const bundle = createOpenAiCompatibleLlmProvider({
+    env: providerEnv,
+    customFetch: input.customFetch,
+  });
   if (!bundle.provider) {
     return null;
   }

@@ -324,16 +324,16 @@ export async function runAssistantOrchestrator(
           learning: usedLearningContext(userId),
           memory: memoryContext.promptText.length > 0,
         },
-        fallbackReason: llmResult.answerSummary,
+        fallbackReason: "AI 服务暂时不可用，但工具结果可用。",
       });
     }
 
     return createUnavailableResponse(
       "unavailable",
-      llmResult.answerSummary,
+      "AI 服务暂时不可用，请稍后重试。",
       pageContext,
       [],
-      llmResult.warnings.map((warning) => String(warning)),
+      ["provider_call_failed"],
       {
         page: true,
         learning: usedLearningContext(userId),
@@ -379,8 +379,8 @@ export async function runAssistantOrchestrator(
       memoryContextUsed: usedContext.memory,
       rawPromptStored: false,
       rawResponseStored: false,
-      devOnly: true,
-      productionReady: false,
+      devOnly: guardResult.devOnly,
+      productionReady: guardResult.productionReady,
     },
     blockedReasons: [],
     warnings: [

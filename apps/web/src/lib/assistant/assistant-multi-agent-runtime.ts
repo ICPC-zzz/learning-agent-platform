@@ -18,6 +18,7 @@ import {
 import type { ToolExecutionResult } from "@learning-agent-platform/ai-core/tools";
 
 import { createAssistantProviderEnvSnapshot } from "./config/assistant-provider-config.ts";
+import { evaluateWebAiQaGuard } from "../web-ai-qa-guard.ts";
 import { isCodeforcesRefreshReminderMemory } from "./assistant-intent-resolver.ts";
 import { listAssistantLongTermMemories } from "./memory-service.ts";
 import { createOpenAiCompatibleLlmProvider } from "./providers/openai-compatible-llm-provider.ts";
@@ -608,6 +609,12 @@ async function resolveReliableAgentLoopProvider(input: {
     }
   }
 
+  const providerEnv = input.guardEnv ?? createAssistantProviderEnvSnapshot();
+  const guard = evaluateWebAiQaGuard(providerEnv);
+  if (!guard.allowed) {
+    return null;
+  }
+
   const userProvider = await resolveUserModelLlmProvider({
     userId: input.userId,
     customFetch: input.customFetch,
@@ -630,7 +637,7 @@ async function resolveReliableAgentLoopProvider(input: {
   }
 
   const envProvider = createOpenAiCompatibleLlmProvider({
-    env: input.guardEnv,
+    env: providerEnv,
     customFetch: input.customFetch,
   });
   if (!envProvider.provider) {
@@ -1695,6 +1702,7 @@ async function runResultAggregatorAndFinish(
       failedAgents,
       shouldRefreshReportsFirst,
       customFetch: input.customFetch,
+      guardEnv: input.guardEnv,
       signal: input.signal,
     });
     const deterministicAnswer = buildFinalAnswer({
@@ -2054,8 +2062,15 @@ async function generateModelFinalAnswer(input: {
   failedAgents: readonly AssistantTaskAgentRunRecord[];
   shouldRefreshReportsFirst: boolean;
   customFetch?: ExternalProviderFetch;
+  guardEnv?: Record<string, string | undefined>;
   signal: AbortSignal;
 }): Promise<{ answer: string | null; providerResolved: boolean }> {
+  const providerEnv = input.guardEnv ?? createAssistantProviderEnvSnapshot();
+  const guard = evaluateWebAiQaGuard(providerEnv);
+  if (!guard.allowed) {
+    return { answer: null, providerResolved: false };
+  }
+
   const provider = await resolveUserModelLlmProvider({
     userId: input.userId,
     customFetch: input.customFetch,

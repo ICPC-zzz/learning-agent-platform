@@ -353,6 +353,7 @@ export async function runAssistantAction(
       conversation: conversationSnapshot,
       conversationRepository: repository,
       customFetch: _options?.customFetch,
+      env: _options?.guardEnv,
     });
 
     return attachConversationStateToResponse({

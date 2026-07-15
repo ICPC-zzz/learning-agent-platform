@@ -4,7 +4,7 @@ const DEPLOYMENT_MISMATCH_PATTERNS = [
   "older or newer deployment",
 ];
 
-const RECOVERY_MESSAGE = "系统刚完成更新，正在刷新页面，请稍后重新提交代码分析。";
+const RECOVERY_MESSAGE = "系统刚完成更新，正在刷新页面，请稍后重新执行当前 AI 操作。";
 
 /**
  * Next.js server actions carry a build-specific identifier. A page that was

@@ -11,6 +11,8 @@ export const LAP_LLM_DEV_TIMEOUT_MS_KEY = "LAP_LLM_DEV_TIMEOUT_MS";
 export const LAP_WEB_LLM_QA_DEV_ENABLED_KEY = "LAP_WEB_LLM_QA_DEV_ENABLED";
 export const LAP_READER_AI_QA_DEV_ENABLED_KEY = "LAP_READER_AI_QA_DEV_ENABLED";
 export const LAP_ALLOW_EXTERNAL_LLM_PROVIDER_KEY = "LAP_ALLOW_EXTERNAL_LLM_PROVIDER";
+export const LAP_ALLOW_REAL_LLM_KEY = "LAP_ALLOW_REAL_LLM";
+export const LAP_ALLOW_PRODUCTION_WEB_AI_KEY = "LAP_ALLOW_PRODUCTION_WEB_AI";
 export const LAP_LLM_DEV_APIPASSWORD_LEGACY_KEY = "LAP_LLM_DEV_APIPassword";
 export const LAP_ASSISTANT_ENABLED_KEY = "LAP_ASSISTANT_ENABLED";
 export const LAP_ASSISTANT_EXTERNAL_TOOLS_ENABLED_KEY = "LAP_ASSISTANT_EXTERNAL_TOOLS_ENABLED";
@@ -33,27 +35,45 @@ export const WEB_AI_QA_AUTH_ENV_KEYS = [
   LAP_LLM_API_PASSWORD_KEY,
 ];
 
-export function evaluateWebAiQaGuard(
-  env: AssistantProviderEnv = {},
-): {
-  mode: "blocked" | "external_dev";
+export type WebAiQaGuardMode = "blocked" | "external_dev" | "external_production";
+
+export interface WebAiQaGuardResult {
+  mode: WebAiQaGuardMode;
   allowMock: boolean;
   allowExternalDev: boolean;
+  allowExternalProduction: boolean;
   allowed: boolean;
   blockedReasons: string[];
   missingEnvKeys: string[];
   nonProduction: boolean;
-  devOnly: true;
-  productionReady: false;
+  devOnly: boolean;
+  productionReady: boolean;
   notice: string;
   sourceLabel: string;
-} {
+}
+
+export function evaluateWebAiQaGuard(
+  env: AssistantProviderEnv = {},
+): WebAiQaGuardResult {
   const config = loadAssistantProviderConfig(env);
   const nonProduction = isNonProductionEnv(env.NODE_ENV);
+  const productionWebAiEnabled = parseBooleanCandidate(
+    env.LAP_ALLOW_PRODUCTION_WEB_AI,
+    undefined,
+    false,
+  );
+  const realLlmEnabled = parseBooleanCandidate(
+    env.LAP_ALLOW_REAL_LLM,
+    undefined,
+    false,
+  );
   const blockedReasons: string[] = [];
   const missingEnvKeys: string[] = [];
 
-  if (!parseBooleanCandidate(env.LAP_WEB_LLM_QA_DEV_ENABLED, env.LAP_READER_AI_QA_DEV_ENABLED, false)) {
+  if (
+    nonProduction
+    && !parseBooleanCandidate(env.LAP_WEB_LLM_QA_DEV_ENABLED, env.LAP_READER_AI_QA_DEV_ENABLED, false)
+  ) {
     blockedReasons.push("web_llm_qa_dev_disabled");
     missingEnvKeys.push(LAP_WEB_LLM_QA_DEV_ENABLED_KEY, LAP_READER_AI_QA_DEV_ENABLED_KEY);
   }
@@ -76,6 +96,11 @@ export function evaluateWebAiQaGuard(
       LAP_ALLOW_WEB_AI_KEY,
       LAP_ALLOW_EXTERNAL_LLM_PROVIDER_KEY,
     );
+  }
+
+  if (!config.llm.enabled) {
+    blockedReasons.push("llm_disabled");
+    missingEnvKeys.push(LAP_LLM_ENABLED_KEY);
   }
 
   if (config.llm.provider === "none") {
@@ -104,8 +129,14 @@ export function evaluateWebAiQaGuard(
     missingEnvKeys.push(LAP_LLM_MODEL_KEY, LAP_LLM_DEV_MODEL_KEY);
   }
 
-  if (!nonProduction) {
+  if (!nonProduction && (!productionWebAiEnabled || !realLlmEnabled)) {
     blockedReasons.push("production_only");
+    if (!productionWebAiEnabled) {
+      missingEnvKeys.push(LAP_ALLOW_PRODUCTION_WEB_AI_KEY);
+    }
+    if (!realLlmEnabled) {
+      missingEnvKeys.push(LAP_ALLOW_REAL_LLM_KEY);
+    }
   }
 
   const allowed = blockedReasons.length === 0;
@@ -116,18 +147,32 @@ export function evaluateWebAiQaGuard(
       mode: "blocked",
       allowMock: false,
       allowExternalDev: false,
+      allowExternalProduction: false,
       allowed: false,
       blockedReasons,
       missingEnvKeys: missingList,
       nonProduction,
-      devOnly: true,
+      devOnly: nonProduction,
       productionReady: false,
-      notice: missingList.length > 0
-        ? `Web AI dev guard is blocked. Missing env keys: ${missingList.join(", ")}.`
-        : "Web AI dev guard is blocked because NODE_ENV is production.",
-      sourceLabel: missingList.length > 0
-        ? `blocked (missing: ${missingList.join(", ")})`
-        : "blocked (production only)",
+      notice: buildSafeBlockedNotice(nonProduction),
+      sourceLabel: nonProduction ? "开发模型配置未就绪" : "正式模型配置未就绪",
+    };
+  }
+
+  if (!nonProduction) {
+    return {
+      mode: "external_production",
+      allowMock: false,
+      allowExternalDev: false,
+      allowExternalProduction: true,
+      allowed: true,
+      blockedReasons: [],
+      missingEnvKeys: [],
+      nonProduction: false,
+      devOnly: false,
+      productionReady: true,
+      notice: "正式 AI 模型服务已启用。",
+      sourceLabel: "正式外部模型",
     };
   }
 
@@ -135,15 +180,22 @@ export function evaluateWebAiQaGuard(
     mode: "external_dev",
     allowMock: true,
     allowExternalDev: true,
+    allowExternalProduction: false,
     allowed: true,
     blockedReasons: [],
     missingEnvKeys: [],
     nonProduction,
     devOnly: true,
     productionReady: false,
-    notice: "dev-only external LLM provider is available. No raw prompt, response, key, or secret will be exposed.",
-    sourceLabel: "external-dev (dev-only preview)",
+    notice: "开发环境外部模型已启用，不会向页面暴露原始提示词、响应或密钥。",
+    sourceLabel: "开发外部模型",
   };
+}
+
+function buildSafeBlockedNotice(nonProduction: boolean): string {
+  return nonProduction
+    ? "AI 模型服务尚未完整配置，请联系管理员检查模型设置。"
+    : "AI 服务暂时不可用，请稍后重试。";
 }
 
 function isNonProductionEnv(nodeEnv: string | undefined): boolean {

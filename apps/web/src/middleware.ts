@@ -20,7 +20,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const loginUrl = new URL("/auth/login", request.url);
+  const publicOrigin = resolvePublicOrigin(request);
+  if (!publicOrigin) {
+    return new NextResponse("服务配置暂不可用。", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  const loginUrl = new URL("/auth/login", publicOrigin);
   loginUrl.searchParams.set("returnTo", safeReturnTo(pathname));
   return NextResponse.redirect(loginUrl);
 }
@@ -32,4 +40,30 @@ export const config = {
 function safeReturnTo(pathname: string): string {
   if (!pathname.startsWith("/") || pathname.startsWith("//")) return "/";
   return pathname;
+}
+
+function resolvePublicOrigin(request: NextRequest): string | null {
+  const configuredBaseUrl = process.env.APP_BASE_URL?.trim();
+  if (configuredBaseUrl) {
+    try {
+      const url = new URL(configuredBaseUrl);
+      const allowedProtocol = url.protocol === "https:"
+        || (process.env.NODE_ENV !== "production" && url.protocol === "http:");
+      if (allowedProtocol && !url.username && !url.password && !isLocalHostname(url.hostname)) {
+        return url.origin;
+      }
+    } catch {
+      // Fall back to the request origin when the deployment setting is invalid.
+    }
+  }
+
+  return process.env.NODE_ENV === "production" ? null : request.nextUrl.origin;
+}
+
+function isLocalHostname(hostname: string): boolean {
+  const normalized = hostname.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  return normalized === "localhost"
+    || normalized.endsWith(".localhost")
+    || normalized === "127.0.0.1"
+    || normalized === "::1";
 }

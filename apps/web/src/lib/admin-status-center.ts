@@ -19,20 +19,21 @@
  */
 
 import { evaluateWebAiQaGuard } from "./web-ai-qa-guard.ts";
+import {
+  createAssistantProviderEnvSnapshot,
+  loadAssistantProviderConfig,
+} from "./assistant/config/assistant-provider-config.ts";
 import { getLlmDevProviderConfig } from "./llm-dev-provider-config.ts";
-import { evaluateLlmDevGuard } from "./llm-dev-provider-guard.ts";
 import { LLM_DEV_ENV, LLM_DEV_ENV_LEGACY } from "./llm-dev-provider-config.ts";
 import {
   evaluateExternalApiDevGuard,
   getUnifiedApiStatus,
-  type UnifiedApiStatus,
   BOOK_API_CONTRACT,
   PROBLEM_API_CONTRACT,
   PHONE_AUTH_CONTRACT,
   EMAIL_AUTH_CONTRACT,
-  type ThirdPartyApiEnvContract,
 } from "@learning-agent-platform/shared";
-import { evaluatePdfImportGuard, type PdfImportGuardResult } from "./pdf-import-guard";
+import { evaluatePdfImportGuard } from "./pdf-import-guard";
 import { evaluateDocxImportGuard } from "./docx-import-guard";
 import { getEmailOtpGuardStatus } from "./web-auth-email-otp-guard";
 
@@ -186,45 +187,40 @@ function computeSummary(items: StatusItem[]) {
 // ---------------------------------------------------------------------------
 
 function collectLlmStatus(): StatusItem[] {
-  // Evaluate both old and new guard
-  const guard = evaluateWebAiQaGuard({
-    NODE_ENV: safeGetEnv("NODE_ENV"),
-    // Canonical names (A469)
-    LAP_ALLOW_DEV_LLM: safeGetEnv(LLM_DEV_ENV.ALLOW_DEV_LLM),
-    LAP_ALLOW_WEB_AI: safeGetEnv(LLM_DEV_ENV.ALLOW_WEB_AI),
-    LAP_LLM_DEV_ENDPOINT: safeGetEnv(LLM_DEV_ENV.ENDPOINT),
-    LAP_LLM_DEV_API_KEY: safeGetEnv(LLM_DEV_ENV.API_KEY),
-    LAP_LLM_DEV_API_PASSWORD: safeGetEnv(LLM_DEV_ENV.API_PASSWORD),
-    LAP_LLM_DEV_MODEL: safeGetEnv(LLM_DEV_ENV.MODEL),
-    // Legacy names (backward compat)
-    LAP_WEB_LLM_QA_DEV_ENABLED: safeGetEnv(LLM_DEV_ENV_LEGACY.ALLOW_DEV_LLM),
-    LAP_ALLOW_EXTERNAL_LLM_PROVIDER: safeGetEnv(LLM_DEV_ENV_LEGACY.ALLOW_WEB_AI),
-    LAP_LLM_DEV_APIPassword: safeGetEnv(LLM_DEV_ENV_LEGACY.API_PASSWORD),
-  });
+  const env = createAssistantProviderEnvSnapshot();
+  const guard = evaluateWebAiQaGuard(env);
+  const runtimeConfig = loadAssistantProviderConfig(env);
 
-  // New LLM dev provider config
   const config = getLlmDevProviderConfig();
-  const devGuard = evaluateLlmDevGuard();
 
   const items: StatusItem[] = [];
 
-  // LLM dev provider overall
+  const runtimeRequiredEnvNames = [
+    "LAP_ALLOW_PRODUCTION_WEB_AI",
+    "LAP_ALLOW_REAL_LLM",
+    "LAP_ASSISTANT_ENABLED",
+    "LAP_ASSISTANT_EXTERNAL_TOOLS_ENABLED",
+    "LAP_LLM_ENABLED",
+    "LAP_LLM_BASE_URL",
+    "LAP_LLM_MODEL",
+  ];
+
   items.push(makeItem(
     "llm.dev_provider",
-    "LLM Dev Provider 状态",
+    "Web AI 模型服务状态",
     "llm",
-    config.ready ? "enabled" : (config.missingEnvNames.length > 0 ? "missing-env" : "blocked"),
-    [LLM_DEV_ENV.ALLOW_DEV_LLM, LLM_DEV_ENV.ALLOW_WEB_AI, LLM_DEV_ENV.ENDPOINT, LLM_DEV_ENV.API_KEY, LLM_DEV_ENV.MODEL],
-    [...config.configuredEnvNames],
-    [...config.missingEnvNames],
-    config.ready
-      ? `LLM dev provider 已启用（dev-only preview）。Provider: ${config.provider ?? "未指定"}，Model: ${config.model ?? "未指定"}。`
-      : `LLM dev provider 已阻止。原因：${devGuard.blockedReasons.join("；")}。`,
-    config.productionBlocked,
+    guard.allowed ? "enabled" : (guard.missingEnvKeys.length > 0 ? "missing-env" : "blocked"),
+    runtimeRequiredEnvNames,
+    runtimeRequiredEnvNames.filter((name) => !guard.missingEnvKeys.includes(name)),
+    [...guard.missingEnvKeys],
+    guard.allowed
+      ? `${guard.notice} Provider: ${runtimeConfig.llm.provider}，Model: ${runtimeConfig.llm.model ?? "未指定"}。`
+      : guard.notice,
+    !guard.nonProduction && !guard.allowed,
   ));
 
   // Provider
-  const providerName = config.provider ?? safeGetEnv(LLM_DEV_ENV.PROVIDER);
+  const providerName = runtimeConfig.llm.provider === "none" ? undefined : runtimeConfig.llm.provider;
   items.push(makeItem(
     "llm.provider",
     "LLM Provider",
@@ -303,29 +299,30 @@ function collectLlmStatus(): StatusItem[] {
   ));
 
   // Model
-  const modelCfg = config.envStatus.find((s) => s.name === LLM_DEV_ENV.MODEL);
   items.push(makeItem(
     "llm.model",
     LLM_DEV_ENV.MODEL,
     "llm",
-    config.model ? "enabled" : "missing-env",
+    runtimeConfig.llm.model ? "enabled" : "missing-env",
     [LLM_DEV_ENV.MODEL],
-    config.model ? [LLM_DEV_ENV.MODEL] : [],
-    config.model ? [] : [LLM_DEV_ENV.MODEL],
-    `Model: ${config.model ?? "未指定"}。`,
+    runtimeConfig.llm.model ? [LLM_DEV_ENV.MODEL] : [],
+    runtimeConfig.llm.model ? [] : [LLM_DEV_ENV.MODEL],
+    `Model: ${runtimeConfig.llm.model ?? "未指定"}。`,
   ));
 
-  // Production check
+  // Runtime mode check
   items.push(makeItem(
     "llm.non_production",
-    "非生产环境",
+    "Web AI 运行模式",
     "llm",
-    config.nonProduction ? "enabled" : "blocked",
+    guard.allowed ? "enabled" : "blocked",
     [],
     [],
     [],
-    config.nonProduction ? "当前为非生产环境，满足 dev-only 前置条件。" : "生产环境禁止 LLM dev 调用。",
-    config.productionBlocked,
+    guard.allowed
+      ? (guard.productionReady ? "正式模型模式已通过双重授权。" : "开发模型模式已显式启用。")
+      : guard.notice,
+    !guard.nonProduction && !guard.allowed,
   ));
 
   // Health check status
@@ -333,12 +330,12 @@ function collectLlmStatus(): StatusItem[] {
     "llm.health_check",
     "LLM Health Check 可用",
     "llm",
-    config.ready ? "enabled" : "blocked",
+    guard.allowed ? "enabled" : "blocked",
     [],
     [],
     [],
-    config.ready ? "LLM health check 可用（guard 已通过）。" : `LLM health check 不可用（guard blocked）。`,
-    config.productionBlocked,
+    guard.allowed ? "LLM 健康检查可用。" : "LLM 健康检查不可用。",
+    !guard.nonProduction && !guard.allowed,
   ));
 
   return items;
@@ -903,9 +900,6 @@ function collectAgentMcpStatus(): StatusItem[] {
 }
 
 function collectImportStatus(): StatusItem[] {
-  const pdfGuard = evaluatePdfImportGuard();
-  const docxGuard = evaluateDocxImportGuard();
-
   return [
     makeItem("import.book_preview", "Book Import Preview", "import", "preview-only", [], [], [], "书籍导入预览，需 Book API guard + dev import env 通过。"),
     makeItem("import.problem_preview", "Problem Import Preview", "import", "preview-only", [], [], [], "题目导入预览，需 Problem API guard + dev import env 通过。"),

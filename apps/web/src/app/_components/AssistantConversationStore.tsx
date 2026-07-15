@@ -87,7 +87,7 @@ export function AssistantConversationProvider({ children }: { children: ReactNod
       setError(null);
       setContextCompression(null);
       setTasks([]);
-      setConversationId(createConversationId());
+      setConversationId("");
     },
   }), [contextCompression, conversationId, draftQuestion, error, isSubmitting, messages, providerMode, status, tasks]);
 
@@ -108,7 +108,7 @@ export function useAssistantConversation(): AssistantConversationContextValue {
 
 function emptySnapshot(): AssistantConversationSnapshot {
   return {
-    conversationId: createConversationId(),
+    conversationId: "",
     messages: [],
     draftQuestion: "",
     isSubmitting: false,
@@ -118,12 +118,4 @@ function emptySnapshot(): AssistantConversationSnapshot {
     contextCompression: null,
     tasks: [],
   };
-}
-
-function createConversationId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return `assistant-conv-${crypto.randomUUID()}`;
-  }
-
-  return `assistant-conv-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 }

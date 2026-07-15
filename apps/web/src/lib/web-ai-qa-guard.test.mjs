@@ -71,6 +71,53 @@ var r8 = guard.evaluateWebAiQaGuard({ NODE_ENV: "production", LAP_WEB_LLM_QA_DEV
 assertEqual(r8.mode, "blocked", "production: blocked");
 assert(r8.blockedReasons.includes("production_only"), "includes production_only");
 
+// Test 8b: production requires both explicit production opt-ins
+var productionEnv = {
+  NODE_ENV: "production",
+  LAP_ASSISTANT_ENABLED: "true",
+  LAP_ASSISTANT_EXTERNAL_TOOLS_ENABLED: "true",
+  LAP_LLM_ENABLED: "true",
+  LAP_LLM_PROVIDER: "openai-compatible",
+  LAP_LLM_BASE_URL: "https://provider.example.com/v1",
+  LAP_LLM_API_KEY: "k",
+  LAP_LLM_MODEL: "m",
+};
+var r8b = guard.evaluateWebAiQaGuard({
+  ...productionEnv,
+  LAP_ALLOW_REAL_LLM: "true",
+});
+assertEqual(r8b.mode, "blocked", "production missing web opt-in: blocked");
+assert(r8b.blockedReasons.includes("production_only"), "production missing web opt-in: reason");
+
+var r8c = guard.evaluateWebAiQaGuard({
+  ...productionEnv,
+  LAP_ALLOW_PRODUCTION_WEB_AI: "true",
+});
+assertEqual(r8c.mode, "blocked", "production missing real-LLM opt-in: blocked");
+assert(r8c.blockedReasons.includes("production_only"), "production missing real-LLM opt-in: reason");
+
+var r8d = guard.evaluateWebAiQaGuard({
+  ...productionEnv,
+  LAP_ALLOW_PRODUCTION_WEB_AI: "true",
+  LAP_ALLOW_REAL_LLM: "true",
+});
+assertEqual(r8d.mode, "external_production", "production double opt-in: external_production");
+assertEqual(r8d.allowed, true, "production double opt-in: allowed");
+assertEqual(r8d.devOnly, false, "production double opt-in: devOnly=false");
+assertEqual(r8d.productionReady, true, "production double opt-in: productionReady=true");
+
+var r8e = guard.evaluateWebAiQaGuard({
+  ...productionEnv,
+  LAP_LLM_ENABLED: "false",
+  LAP_ALLOW_PRODUCTION_WEB_AI: "true",
+  LAP_ALLOW_REAL_LLM: "true",
+});
+assertEqual(r8e.mode, "blocked", "production global LLM switch off: blocked");
+assert(r8e.blockedReasons.includes("llm_disabled"), "production global LLM switch off: reason");
+
+assert(/[\u3400-\u9fff]/u.test(r8b.notice), "production blocked notice is Chinese");
+assert(!/NODE_ENV|dev guard|LAP_/iu.test(r8b.notice), "production blocked notice hides internals");
+
 // Test 9: APIPassword as auth
 var r9 = guard.evaluateWebAiQaGuard({ NODE_ENV: "development", LAP_WEB_LLM_QA_DEV_ENABLED: "true", LAP_ALLOW_EXTERNAL_LLM_PROVIDER: "true", LAP_LLM_DEV_ENDPOINT: "https://ep", LAP_LLM_DEV_API_KEY: "", LAP_LLM_DEV_APIPassword: "pw", LAP_LLM_DEV_MODEL: "m" });
 assertEqual(r9.mode, "external_dev", "APIPassword: external_dev");
