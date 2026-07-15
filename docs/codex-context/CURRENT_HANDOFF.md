@@ -2,6 +2,14 @@
 
 # CURRENT_HANDOFF
 
+## B19 Web Hotfix — 2026-07-15
+
+- Codeforces 刷新动作已使用正式数据库会话，刷新本身不会清除登录状态。
+- 错题复习计划动作错误读取旧开发 Cookie `lap-web-dev-session`，并使用脱敏的 `userIdPreview`，导致正式登录用户被判定为未登录。
+- 修复范围仅为错题复习计划 Server Action：统一改用 `getCurrentAuthSession()` 返回的可信 `session.userId`。
+- 新增 B19 回归测试，禁止该动作再次引用开发 Cookie、开发会话解析器或 `userIdPreview`。
+- 发布继续采用本地精确提交构建和服务器原子 release 切换，服务器不执行依赖安装或 Next.js 构建。
+
 ## A526 Update — 2026-06-30
 
 - A526 local Web final gate passed after user-confirmed manual Browser verification:

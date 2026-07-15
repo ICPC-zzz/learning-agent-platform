@@ -8,9 +8,8 @@
  * @serverOnly
  */
 
-import { cookies } from "next/headers";
-import { deserializeDevSession, getSafeSessionSummary } from "../../lib/web-auth-dev-session";
 import { getPrismaClient, PrismaCodeforcesAccountRepository } from "@learning-agent-platform/db";
+import { getCurrentAuthSession } from "../../lib/session/web-auth-session";
 import type { ReviewReportData } from "./CfWrongBookReviewReport";
 import { persistCfReviewPlanMemory } from "../../lib/assistant/learning-artifact-memory.ts";
 
@@ -30,8 +29,8 @@ export interface CfWrongBookReviewActionOutput {
 export async function generateCfWrongBookReview(): Promise<CfWrongBookReviewActionOutput> {
   if (!isFeatureEnabled()) return { success: false, errorCode: "FEATURE_DISABLED", errorMessage: "错题复习功能尚未启用" };
 
-  let userId: string | null = null;
-  try { const ck = await cookies(); userId = getSafeSessionSummary(deserializeDevSession(ck.get("lap-web-dev-session")?.value)).user?.userIdPreview ?? null; } catch {}
+  const session = await getCurrentAuthSession();
+  const userId = session.hasSession ? session.userId : null;
 
   if (!userId) return { success: false, errorCode: "NOT_LOGGED_IN", errorMessage: "请先登录" };
 
