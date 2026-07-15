@@ -2,6 +2,16 @@
 
 # CURRENT_HANDOFF
 
+## B20 Web Hotfix — 2026-07-15
+
+- 每日内容同步 cron 并未丢失；2026-07-15 三项任务均准时触发，但 `pnpm content:sync:*` 在跨 release 复用依赖时尝试非交互安装并以 `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY` 退出。
+- 生产调度已迁移为 `learning-agent-platform-content-sync.timer`：每天北京时间 06:00、`Persistent=true`、失败有限重试、完整同步进程树 `CPUQuota=25%`。
+- service 通过当前 release 的 `tsx` 直接运行现有同步 CLI，不允许执行依赖安装、Prisma generate、tsc 或 Next build。
+- 生成内容目录已持久化到 `/opt/learning-agent-platform/shared/content-data`，未来 release 切换前必须运行 `prepare-content-data.sh <release-path>`。
+- 2026-07-15 补跑成功：热点 84 条、GitHub 41 条、技术文章新增 181 篇；页面时间更新为 2026/07/15，健康接口 HTTP 200。
+- 旧内容 cron 已移除但备份保留，03:20 PostgreSQL 备份 cron 未改动；下一次 timer 为 2026-07-16 06:00 CST。
+- 详细证据、测试和回滚见 `docs/rounds/codex/B20_codex.md`。
+
 ## B19 Web Hotfix — 2026-07-15
 
 - Codeforces 刷新动作已使用正式数据库会话，刷新本身不会清除登录状态。
