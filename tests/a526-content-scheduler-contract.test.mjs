@@ -26,6 +26,7 @@ test("A526 systemd timer schedules one persistent 06:00 Asia/Shanghai batch", ()
 test("A526 scheduled sync uses protected env and direct no-build execution", () => {
   assert.match(serviceTemplate, /EnvironmentFile=\/etc\/learning-agent-platform\/web\.env/);
   assert.match(serviceTemplate, /run-content-sync\.sh/);
+  assert.match(serviceTemplate, /^CPUQuota=25%$/m);
   assert.match(runnerTemplate, /node_modules\/\.bin\/tsx/);
   assert.match(runnerTemplate, /scripts\/content-sync\.ts/);
   assert.doesNotMatch(serviceTemplate + runnerTemplate, /pnpm|install|prisma generate|next build|\btsc\b/i);

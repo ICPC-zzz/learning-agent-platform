@@ -17,5 +17,6 @@ Restart=on-failure
 RestartSec=10min
 TimeoutStartSec=30min
 Nice=10
+CPUQuota=25%
 NoNewPrivileges=true
 PrivateTmp=true

@@ -21,6 +21,7 @@ test("B20 service directly runs the no-build launcher with bounded retries", () 
   assert.match(service, /^Restart=on-failure$/m);
   assert.match(service, /^RestartSec=10min$/m);
   assert.match(service, /^StartLimitBurst=3$/m);
+  assert.match(service, /^CPUQuota=25%$/m);
   assert.doesNotMatch(service, /pnpm|install|prisma generate|next build|\btsc\b/i);
 });
 

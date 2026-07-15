@@ -162,7 +162,9 @@ The timer runs one batch every day at `06:00:00 Asia/Shanghai`. Its
 `Persistent=true` setting catches up after a boot that missed 06:00. The
 oneshot service executes the existing TypeScript CLI directly through the
 already-installed `tsx` runtime and must not install dependencies or build on
-the server. The existing commands remain available for authenticated manual
+the server. The service caps the complete sync process tree at 25% of one CPU
+to prevent article normalization from saturating a small production instance.
+The existing commands remain available for authenticated manual
 administration, but the production timer does not invoke them:
 
 ```text
