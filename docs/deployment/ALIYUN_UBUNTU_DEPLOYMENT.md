@@ -120,7 +120,50 @@ Then log out and log in again, or refresh the session, before testing `/admin` a
 
 ## Content Sync
 
-Use `deploy/cron/content-sync.example` or convert it to systemd timers. It reuses the existing idempotent sync commands:
+Production content sync uses a systemd timer. Do not install the legacy
+`deploy/cron/content-sync.example` entries: package-manager commands can try to
+reconcile dependencies inside a reused release and fail in a non-interactive
+scheduler.
+
+Before switching a new release, install the no-build runner and attach its data
+directory to persistent storage:
+
+```bash
+RELEASE=/opt/learning-agent-platform/releases/<release-directory>
+cd "$RELEASE"
+install -m 0755 deploy/scripts/run-content-sync.sh.example deploy/scripts/run-content-sync.sh
+install -m 0755 deploy/scripts/prepare-content-data.sh.example deploy/scripts/prepare-content-data.sh
+./deploy/scripts/prepare-content-data.sh "$RELEASE"
+```
+
+`prepare-content-data.sh` initializes
+`/opt/learning-agent-platform/shared/content-data` only when a generated file
+does not exist there, then links the release-level `apps/web/src/data`
+directory to that shared directory. Run it for every new release before the
+atomic `current` switch so article data cannot roll back during deployment.
+
+Install the service and timer templates after replacing `APP_USER` with the
+production application account. If the protected environment file is not
+`/etc/learning-agent-platform/web.env`, replace that path in the service before
+installation.
+
+```bash
+sed 's/APP_USER/admin/g; s#/etc/learning-agent-platform/web.env#/etc/learning-agent-platform.env#g' \
+  deploy/systemd/learning-agent-platform-content-sync.service.example \
+  | sudo tee /etc/systemd/system/learning-agent-platform-content-sync.service >/dev/null
+sudo install -m 0644 \
+  deploy/systemd/learning-agent-platform-content-sync.timer.example \
+  /etc/systemd/system/learning-agent-platform-content-sync.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now learning-agent-platform-content-sync.timer
+```
+
+The timer runs one batch every day at `06:00:00 Asia/Shanghai`. Its
+`Persistent=true` setting catches up after a boot that missed 06:00. The
+oneshot service executes the existing TypeScript CLI directly through the
+already-installed `tsx` runtime and must not install dependencies or build on
+the server. The existing commands remain available for authenticated manual
+administration, but the production timer does not invoke them:
 
 ```text
 content:sync:hot
@@ -129,7 +172,36 @@ content:sync:articles
 content:sync:all
 ```
 
-Keep secrets in the protected environment file, not in crontab. Configure log rotation for `/var/log/learning-agent-platform/*.log`. Sync failures should keep the previous successful generated snapshots.
+Remove only the three old content-sync lines from
+`/etc/cron.d/learning-agent-platform`; keep the PostgreSQL backup line. Keeping
+both cron and the timer enabled would create duplicate attempts.
+
+Inspect and manually catch up with:
+
+```bash
+systemctl list-timers learning-agent-platform-content-sync.timer --all
+sudo systemctl start learning-agent-platform-content-sync.service
+sudo systemctl status learning-agent-platform-content-sync.service --no-pager
+sudo journalctl -u learning-agent-platform-content-sync.service -n 100 --no-pager
+```
+
+Keep secrets in the protected environment file, never in unit files or
+crontab. The journal records safe summaries and exit status. Existing sync
+failures keep the previous successful generated snapshots. If legacy
+file-based sync logs are retained during migration, keep log rotation enabled
+for `/var/log/learning-agent-platform/*.log` until those files are retired.
+
+To roll back scheduling without deleting content, disable the timer and restore
+the backed-up cron file:
+
+```bash
+sudo systemctl disable --now learning-agent-platform-content-sync.timer
+sudo cp /etc/cron.d/learning-agent-platform.before-content-timer \
+  /etc/cron.d/learning-agent-platform
+```
+
+Do not remove `/opt/learning-agent-platform/shared/content-data` during a
+scheduler rollback.
 
 ## Database Backup
 

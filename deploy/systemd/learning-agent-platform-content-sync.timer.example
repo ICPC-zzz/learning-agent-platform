@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Learning Agent Platform content sync every day at 06:00 China time
+
+[Timer]
+OnCalendar=*-*-* 06:00:00 Asia/Shanghai
+Persistent=true
+AccuracySec=1min
+Unit=learning-agent-platform-content-sync.service
+
+[Install]
+WantedBy=timers.target

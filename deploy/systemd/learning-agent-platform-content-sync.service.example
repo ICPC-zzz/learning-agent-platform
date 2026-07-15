@@ -1,0 +1,21 @@
+[Unit]
+Description=Learning Agent Platform Daily Content Sync
+After=network-online.target postgresql.service
+Wants=network-online.target
+StartLimitIntervalSec=1h
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+User=APP_USER
+Group=APP_USER
+WorkingDirectory=/opt/learning-agent-platform/current
+EnvironmentFile=/etc/learning-agent-platform/web.env
+Environment=NODE_ENV=production
+ExecStart=/opt/learning-agent-platform/current/deploy/scripts/run-content-sync.sh
+Restart=on-failure
+RestartSec=10min
+TimeoutStartSec=30min
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true

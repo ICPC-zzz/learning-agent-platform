@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RELEASE_ROOT="${1:-/opt/learning-agent-platform/current}"
+SHARED_DATA_DIR="/opt/learning-agent-platform/shared/content-data"
+RELEASE_DATA_DIR="$RELEASE_ROOT/apps/web/src/data"
+RELEASE_DEFAULTS_DIR="$RELEASE_ROOT/apps/web/src/data.release-defaults"
+
+if [[ ! -d "$RELEASE_ROOT/apps/web/src" ]]; then
+  echo "invalid release root: $RELEASE_ROOT" >&2
+  exit 64
+fi
+
+mkdir -p -- "$SHARED_DATA_DIR"
+
+if [[ -L "$RELEASE_DATA_DIR" ]]; then
+  if [[ "$(readlink -f -- "$RELEASE_DATA_DIR")" != "$(readlink -f -- "$SHARED_DATA_DIR")" ]]; then
+    echo "content data symlink points to an unexpected directory" >&2
+    exit 65
+  fi
+  exit 0
+fi
+
+if [[ ! -d "$RELEASE_DATA_DIR" ]]; then
+  echo "release content data directory is missing" >&2
+  exit 66
+fi
+if [[ -e "$RELEASE_DEFAULTS_DIR" ]]; then
+  echo "release content defaults backup already exists" >&2
+  exit 67
+fi
+
+for source_file in "$RELEASE_DATA_DIR"/*.json; do
+  [[ -e "$source_file" ]] || continue
+  target_file="$SHARED_DATA_DIR/$(basename -- "$source_file")"
+  if [[ ! -e "$target_file" ]]; then
+    cp -- "$source_file" "$target_file"
+  fi
+done
+
+mv -- "$RELEASE_DATA_DIR" "$RELEASE_DEFAULTS_DIR"
+ln -s -- "$SHARED_DATA_DIR" "$RELEASE_DATA_DIR"

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_ROOT="/opt/learning-agent-platform/current"
+TSX_BIN="$APP_ROOT/node_modules/.bin/tsx"
+SYNC_SCRIPT="$APP_ROOT/scripts/content-sync.ts"
+DB_ENTRY="$APP_ROOT/packages/db/dist/index.js"
+
+if [[ ! -x "$TSX_BIN" ]]; then
+  echo "content sync runtime missing: tsx" >&2
+  exit 70
+fi
+if [[ ! -f "$SYNC_SCRIPT" ]]; then
+  echo "content sync runtime missing: sync script" >&2
+  exit 70
+fi
+if [[ ! -f "$DB_ENTRY" ]]; then
+  echo "content sync runtime missing: database build artifact" >&2
+  exit 70
+fi
+
+cd "$APP_ROOT"
+exec "$TSX_BIN" "$SYNC_SCRIPT"
